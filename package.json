@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node index.ts",
+    "interview": "ts-node index.ts",
     "format": "prettier --write ."
   },
   "keywords": [],
