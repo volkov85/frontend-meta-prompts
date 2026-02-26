@@ -69,16 +69,18 @@ All configurable via JSON.
 ### 🧠 Prompt Composition Engine
 
 Transforms structured config into production-ready interview prompts.
-
+```ts
 const prompt = composeInterviewPrompt(interviews, {
   templateId: "js-deep-dive-core",
   level: "senior",
   mode: { simulation: true, timeboxedMinutes: 30 },
 });
+```
 
 📊 Session Tracking
 
 Each session is persisted:
+```json
 {
   "id": "uuid",
   "date": "2026-03-01T12:00:00Z",
@@ -86,6 +88,7 @@ Each session is persisted:
   "level": "senior",
   "score": 7
 }
+```
 
 Enables:
 - progress tracking
