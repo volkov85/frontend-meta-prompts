@@ -44,7 +44,7 @@ Separation of concerns:
 
 ## Features
 
-- Structured interview templates (middle/senior)
+- Structured interview templates (junior/middle/senior)
 - Prompt generation with mode overrides
 - CLI to list templates and generate interviews
 - CLI mode to record external LLM evaluation

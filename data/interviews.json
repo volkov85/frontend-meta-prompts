@@ -387,6 +387,114 @@
       ],
       "questionStyles": ["behavioral", "review", "scenario"],
       "constraints": ["show impact metrics", "clear decision making", "risk mitigation"]
+    },
+    {
+      "id": "junior-javascript-fundamentals",
+      "title": "Junior: JavaScript Fundamentals",
+      "levels": ["junior"],
+      "focus": [
+        "variables and scope",
+        "types and coercion",
+        "functions and closures basics",
+        "arrays and objects",
+        "basic debugging"
+      ],
+      "questionStyles": ["explain-why", "predict-output", "code-reading"],
+      "constraints": [
+        "prefer clarity over advanced tricks",
+        "explain step by step",
+        "validate understanding with simple examples"
+      ]
+    },
+    {
+      "id": "junior-react-fundamentals",
+      "title": "Junior: React Fundamentals",
+      "levels": ["junior"],
+      "focus": [
+        "components and props",
+        "state and events",
+        "conditional rendering",
+        "lists and keys",
+        "basic hooks usage"
+      ],
+      "questionStyles": ["code-reading", "fix-bugs", "explain-why"],
+      "constraints": [
+        "focus on predictable component behavior",
+        "avoid premature optimization",
+        "highlight common beginner mistakes"
+      ]
+    },
+    {
+      "id": "junior-typescript-fundamentals",
+      "title": "Junior: TypeScript Fundamentals",
+      "levels": ["junior"],
+      "focus": [
+        "basic types",
+        "interfaces and type aliases",
+        "function typing",
+        "union and optional types",
+        "type errors interpretation"
+      ],
+      "questionStyles": ["code-writing", "type-debugging", "review"],
+      "constraints": [
+        "keep examples practical and small",
+        "explain error messages in plain language",
+        "prioritize maintainable typing"
+      ]
+    },
+    {
+      "id": "junior-async-http",
+      "title": "Junior: Async, Promises, and HTTP Basics",
+      "levels": ["junior"],
+      "focus": [
+        "async/await basics",
+        "promise states",
+        "try/catch for requests",
+        "loading/error UI states",
+        "simple retry awareness"
+      ],
+      "questionStyles": ["debugging", "predict-output", "scenario"],
+      "constraints": [
+        "ensure execution order is explained clearly",
+        "cover user-facing error handling",
+        "avoid advanced concurrency patterns"
+      ]
+    },
+    {
+      "id": "junior-testing-basics",
+      "title": "Junior: Testing Basics",
+      "levels": ["junior"],
+      "focus": [
+        "unit test purpose",
+        "arrange-act-assert",
+        "basic mocking",
+        "testing user behavior",
+        "flaky test awareness"
+      ],
+      "questionStyles": ["review", "fix-bugs", "code-writing"],
+      "constraints": [
+        "focus on confidence-building test cases",
+        "avoid over-mocking",
+        "connect tests to product behavior"
+      ]
+    },
+    {
+      "id": "junior-web-platform-basics",
+      "title": "Junior: Web Platform Basics",
+      "levels": ["junior"],
+      "focus": [
+        "DOM and events",
+        "event bubbling basics",
+        "rendering basics",
+        "HTTP request lifecycle",
+        "browser storage overview"
+      ],
+      "questionStyles": ["explain-why", "predict-output", "debugging"],
+      "constraints": [
+        "use concrete browser examples",
+        "avoid low-level internals unless needed",
+        "verify conceptual understanding first"
+      ]
     }
   ]
 }

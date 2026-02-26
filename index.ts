@@ -6,7 +6,7 @@ import {
   updateSessionScore,
 } from "./engine";
 
-type SessionLevel = "middle" | "senior";
+type SessionLevel = "junior" | "middle" | "senior";
 
 type CliOptions = {
   templateId: string;
@@ -43,8 +43,8 @@ function parseCsv(value: string): string[] {
 }
 
 function parseLevel(value: string): SessionLevel {
-  if (value === "middle" || value === "senior") return value;
-  throw new Error("--level must be either middle or senior");
+  if (value === "junior" || value === "middle" || value === "senior") return value;
+  throw new Error("--level must be one of: junior, middle, senior");
 }
 
 function parseScore(value: string): number {
@@ -177,7 +177,7 @@ Modes:
 
 Options:
   --template <id>         Interview template id (default: ${DEFAULT_TEMPLATE_ID})
-  --level <middle|senior> Candidate level (default: ${DEFAULT_LEVEL})
+  --level <junior|middle|senior> Candidate level (default: ${DEFAULT_LEVEL})
   --stack <a,b,c>         Override stack list
   --focus <a,b,c>         Add extra focus topics
   --extra <text>          Extra context for interview prompt

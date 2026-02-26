@@ -6,7 +6,7 @@ export type Session = {
   id: string;
   date: string;
   templateId: string;
-  level: "middle" | "senior";
+  level: "junior" | "middle" | "senior";
   score?: number;
   notes?: string;
 };
@@ -21,7 +21,7 @@ function isValidSession(value: unknown): value is Session {
     typeof candidate.id === "string" &&
     typeof candidate.date === "string" &&
     typeof candidate.templateId === "string" &&
-    (candidate.level === "middle" || candidate.level === "senior");
+    (candidate.level === "junior" || candidate.level === "middle" || candidate.level === "senior");
 
   const hasValidScore = candidate.score === undefined || Number.isFinite(candidate.score);
   const hasValidNotes = candidate.notes === undefined || typeof candidate.notes === "string";
@@ -63,7 +63,7 @@ function writeSessions(sessions: Session[]) {
   fs.renameSync(tempPath, sessionsPath);
 }
 
-export function createSession(templateId: string, level: "middle" | "senior"): Session {
+export function createSession(templateId: string, level: "junior" | "middle" | "senior"): Session {
   const newSession: Session = {
     id: crypto.randomUUID(),
     date: new Date().toISOString(),
