@@ -1,5 +1,16 @@
 type Level = "junior" | "middle" | "senior";
 
+type IncludeSection =
+  | "idealAnswer"
+  | "commonMistakes"
+  | "edgeCases"
+  | "tradeOffs"
+  | "seniorVsMiddle"
+  | "scoringRubric"
+  | "measurementPlan"
+  | "rolloutPlan"
+  | "securityConsiderations";
+
 type InterviewTemplate = {
   id: string;
   title: string;
@@ -7,6 +18,12 @@ type InterviewTemplate = {
   focus: string[];
   questionStyles: string[];
   constraints?: string[];
+  promptOverrides?: {
+    followUps?: number;
+    include?: IncludeSection[];
+    plainLanguage?: boolean;
+    goodAnswerCriteria?: string[];
+  };
 };
 
 export type InterviewConfig = {
@@ -16,17 +33,7 @@ export type InterviewConfig = {
     stack: string[];
     language: "ru" | "en";
     followUps: number;
-    include: Array<
-      | "idealAnswer"
-      | "commonMistakes"
-      | "edgeCases"
-      | "tradeOffs"
-      | "seniorVsMiddle"
-      | "scoringRubric"
-      | "measurementPlan"
-      | "rolloutPlan"
-      | "securityConsiderations"
-    >;
+    include: IncludeSection[];
     simulation: boolean;
     timeboxedMinutes: number;
   };
@@ -59,8 +66,9 @@ export function composeInterviewPrompt(config: InterviewConfig, opts: ComposeOpt
   const timeboxed = opts.mode?.timeboxedMinutes ?? config.defaults.timeboxedMinutes;
   const englishMode = opts.mode?.english ?? false;
 
-  const include = config.defaults.include;
-  const followUps = config.defaults.followUps;
+  const followUps = tpl.promptOverrides?.followUps ?? config.defaults.followUps;
+  const include = tpl.promptOverrides?.include ?? config.defaults.include;
+  const plainLanguage = tpl.promptOverrides?.plainLanguage ?? false;
 
   const focus = [...tpl.focus, ...(opts.focusBoost ?? [])];
   const uniqFocus = Array.from(new Set(focus));
@@ -113,6 +121,10 @@ export function composeInterviewPrompt(config: InterviewConfig, opts: ComposeOpt
   } else if (config.defaults.language === "ru") {
     lines.push(`- Speak Russian unless I answer in English.`);
   }
+  if (plainLanguage) {
+    lines.push(`- Use plain language, short sentences, and avoid heavy jargon.`);
+    lines.push(`- Briefly explain terms before using them in follow-up questions.`);
+  }
 
   // OUTPUT FORMAT
   lines.push(``, `OUTPUT FORMAT:`);
@@ -141,6 +153,12 @@ export function composeInterviewPrompt(config: InterviewConfig, opts: ComposeOpt
   if (include.includes("rolloutPlan")) lines.push(`- Rollout plan (flags, canary, rollback)`);
   if (include.includes("securityConsiderations"))
     lines.push(`- Security considerations (when relevant)`);
+
+  const goodAnswerCriteria = tpl.promptOverrides?.goodAnswerCriteria ?? [];
+  if (goodAnswerCriteria.length) {
+    lines.push(``, `GOOD ANSWER CRITERIA:`);
+    lines.push(...goodAnswerCriteria.map((criterion) => `- ${criterion}`));
+  }
 
   return lines.join("\n");
 }

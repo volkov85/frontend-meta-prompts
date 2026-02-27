@@ -404,7 +404,18 @@
         "prefer clarity over advanced tricks",
         "explain step by step",
         "validate understanding with simple examples"
-      ]
+      ],
+      "promptOverrides": {
+        "followUps": 2,
+        "plainLanguage": true,
+        "include": ["idealAnswer", "commonMistakes", "edgeCases", "scoringRubric"],
+        "goodAnswerCriteria": [
+          "Explains solution in simple, correct steps without skipping basics",
+          "Uses small examples and predicts output correctly for core cases",
+          "Can name at least one common mistake and how to avoid it",
+          "Writes readable code with clear variable names"
+        ]
+      }
     },
     {
       "id": "junior-react-fundamentals",
@@ -422,7 +433,18 @@
         "focus on predictable component behavior",
         "avoid premature optimization",
         "highlight common beginner mistakes"
-      ]
+      ],
+      "promptOverrides": {
+        "followUps": 2,
+        "plainLanguage": true,
+        "include": ["idealAnswer", "commonMistakes", "edgeCases", "scoringRubric"],
+        "goodAnswerCriteria": [
+          "Correctly explains props, state, and component re-render behavior",
+          "Identifies obvious bug causes and proposes a basic fix",
+          "Keeps component logic simple and easy to read",
+          "Mentions user-visible states like loading/error when relevant"
+        ]
+      }
     },
     {
       "id": "junior-typescript-fundamentals",
@@ -440,7 +462,18 @@
         "keep examples practical and small",
         "explain error messages in plain language",
         "prioritize maintainable typing"
-      ]
+      ],
+      "promptOverrides": {
+        "followUps": 2,
+        "plainLanguage": true,
+        "include": ["idealAnswer", "commonMistakes", "edgeCases", "scoringRubric"],
+        "goodAnswerCriteria": [
+          "Chooses correct basic types for variables, params, and return values",
+          "Can explain a type error in plain language and fix it",
+          "Uses simple unions/interfaces without overcomplicating typing",
+          "Keeps examples practical and close to real UI code"
+        ]
+      }
     },
     {
       "id": "junior-async-http",
@@ -458,7 +491,18 @@
         "ensure execution order is explained clearly",
         "cover user-facing error handling",
         "avoid advanced concurrency patterns"
-      ]
+      ],
+      "promptOverrides": {
+        "followUps": 2,
+        "plainLanguage": true,
+        "include": ["idealAnswer", "commonMistakes", "edgeCases", "scoringRubric"],
+        "goodAnswerCriteria": [
+          "Explains async flow in the right order with clear steps",
+          "Handles loading, success, and error UI states explicitly",
+          "Uses try/catch correctly for request failures",
+          "Avoids advanced patterns and keeps control flow understandable"
+        ]
+      }
     },
     {
       "id": "junior-testing-basics",
@@ -476,7 +520,18 @@
         "focus on confidence-building test cases",
         "avoid over-mocking",
         "connect tests to product behavior"
-      ]
+      ],
+      "promptOverrides": {
+        "followUps": 2,
+        "plainLanguage": true,
+        "include": ["idealAnswer", "commonMistakes", "edgeCases", "scoringRubric"],
+        "goodAnswerCriteria": [
+          "Writes tests around user behavior, not implementation details",
+          "Uses clear arrange-act-assert structure",
+          "Covers at least one unhappy path or edge case",
+          "Explains what confidence the test gives to the team"
+        ]
+      }
     },
     {
       "id": "junior-web-platform-basics",
@@ -494,7 +549,18 @@
         "use concrete browser examples",
         "avoid low-level internals unless needed",
         "verify conceptual understanding first"
-      ]
+      ],
+      "promptOverrides": {
+        "followUps": 2,
+        "plainLanguage": true,
+        "include": ["idealAnswer", "commonMistakes", "edgeCases", "scoringRubric"],
+        "goodAnswerCriteria": [
+          "Correctly explains event flow and basic DOM interactions",
+          "Uses concrete browser examples instead of abstract theory",
+          "Can reason about simple rendering/performance implications",
+          "Identifies beginner mistakes and suggests safe fixes"
+        ]
+      }
     }
   ]
 }
