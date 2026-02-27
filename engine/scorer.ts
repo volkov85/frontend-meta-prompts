@@ -5,7 +5,7 @@ export type Evaluation = {
   recommendations: string[];
 };
 
-export function basicScoreEvaluation(answer: string): Evaluation {
+export const basicScoreEvaluation = (answer: string): Evaluation => {
   const lengthScore = Math.min(answer.length / 200, 3); // до 3 баллов
   const tradeOffBonus = answer.toLowerCase().includes("trade-off") ? 2 : 0;
   const complexityBonus = answer.toLowerCase().includes("o(") ? 2 : 0;
@@ -25,4 +25,4 @@ export function basicScoreEvaluation(answer: string): Evaluation {
         ? ["Add trade-offs", "Add edge cases", "Be more structured"]
         : ["Improve clarity and communication polish"],
   };
-}
+};

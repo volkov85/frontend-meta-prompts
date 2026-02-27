@@ -13,7 +13,7 @@ type ComposeOptions = {
   focusBoost?: string[];
 };
 
-export function composeInterviewPrompt(config: InterviewConfig, opts: ComposeOptions): string {
+export const composeInterviewPrompt = (config: InterviewConfig, opts: ComposeOptions): string => {
   const tpl = config.templates.find((t) => t.id === opts.templateId);
   if (!tpl) throw new Error(`Unknown templateId: ${opts.templateId}`);
 
@@ -114,4 +114,4 @@ export function composeInterviewPrompt(config: InterviewConfig, opts: ComposeOpt
   }
 
   return lines.join("\n");
-}
+};

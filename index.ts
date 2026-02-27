@@ -29,33 +29,33 @@ type CliOptions = {
 const DEFAULT_TEMPLATE_ID = "js-deep-dive-core";
 const DEFAULT_LEVEL: SessionLevel = "senior";
 
-function parseBoolean(value: string, flag: string): boolean {
+const parseBoolean = (value: string, flag: string): boolean => {
   if (value === "true") return true;
   if (value === "false") return false;
   throw new Error(`${flag} must be either true or false`);
-}
+};
 
-function parseCsv(value: string): string[] {
+const parseCsv = (value: string): string[] => {
   return value
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
-}
+};
 
-function parseLevel(value: string): SessionLevel {
+const parseLevel = (value: string): SessionLevel => {
   if (value === "junior" || value === "middle" || value === "senior") return value;
   throw new Error("--level must be one of: junior, middle, senior");
-}
+};
 
-function parseScore(value: string): number {
+const parseScore = (value: string): number => {
   const parsed = Number(value);
   if (!Number.isFinite(parsed) || parsed < 0 || parsed > 10) {
     throw new Error("--score must be a number between 0 and 10");
   }
   return parsed;
-}
+};
 
-function parseArgs(argv: string[]): CliOptions {
+const parseArgs = (argv: string[]): CliOptions => {
   const options: CliOptions = {
     templateId: DEFAULT_TEMPLATE_ID,
     level: DEFAULT_LEVEL,
@@ -163,9 +163,9 @@ function parseArgs(argv: string[]): CliOptions {
   }
 
   return options;
-}
+};
 
-function printHelp() {
+const printHelp = () => {
   console.log(`Frontend Meta Prompts CLI
 
 Usage:
@@ -196,16 +196,20 @@ Examples:
   npm run interview -- --template js-deep-dive-core --level senior
   npm run interview -- --record-eval --session-id <id> --score 8.5 --notes "Strong trade-offs"
   npm run interview -- --list-templates`);
-}
+};
 
-function listTemplates(config: InterviewConfig) {
+const listTemplates = (config: InterviewConfig) => {
   console.log("Available templates:");
   for (const template of config.templates) {
     console.log(`- ${template.id} [${template.levels.join(", ")}]`);
   }
-}
+};
 
-function assertTemplateSupportsLevel(config: InterviewConfig, templateId: string, level: SessionLevel) {
+const assertTemplateSupportsLevel = (
+  config: InterviewConfig,
+  templateId: string,
+  level: SessionLevel,
+) => {
   const template = config.templates.find((item) => item.id === templateId);
   if (!template) {
     throw new Error(`Unknown templateId: ${templateId}`);
@@ -214,9 +218,9 @@ function assertTemplateSupportsLevel(config: InterviewConfig, templateId: string
   if (!template.levels.includes(level)) {
     throw new Error(`Template \"${templateId}\" does not support level \"${level}\"`);
   }
-}
+};
 
-function runRecordEvalMode(options: CliOptions) {
+const runRecordEvalMode = (options: CliOptions) => {
   if (!options.sessionId) {
     throw new Error("--record-eval requires --session-id");
   }
@@ -226,9 +230,9 @@ function runRecordEvalMode(options: CliOptions) {
 
   updateSessionScore(options.sessionId, options.score, options.notes);
   console.log(`Evaluation saved for session: ${options.sessionId}`);
-}
+};
 
-function main() {
+const main = () => {
   const config = interviews as InterviewConfig;
   const options = parseArgs(process.argv.slice(2));
 
@@ -283,7 +287,7 @@ function main() {
 
   updateSessionScore(targetSessionId, options.score, options.notes);
   console.log(`\nEvaluation saved for session: ${targetSessionId}`);
-}
+};
 
 try {
   main();

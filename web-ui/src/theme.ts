@@ -5,7 +5,7 @@ export const appTheme = createTheme({
     mode: "dark",
     primary: { main: "#7dd3fc" },
     secondary: { main: "#fb7185" },
-    background: { default: "transparent", paper: "rgba(17, 24, 39, 0.86)" },
+    background: { default: "transparent", paper: "#111827" },
   },
   typography: {
     fontFamily: "'Space Grotesk', sans-serif",
@@ -13,4 +13,29 @@ export const appTheme = createTheme({
     button: { textTransform: "none", fontWeight: 700 },
   },
   shape: { borderRadius: 14 },
+  components: {
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: "none",
+        },
+      },
+    },
+    MuiPopover: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: "#111827",
+          opacity: 1,
+        },
+      },
+    },
+    MuiMenu: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: "#111827",
+          opacity: 1,
+        },
+      },
+    },
+  },
 });

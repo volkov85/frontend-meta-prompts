@@ -13,7 +13,7 @@ export type Session = {
 
 const sessionsPath = path.resolve(process.cwd(), "data/sessions.json");
 
-function isValidSession(value: unknown): value is Session {
+const isValidSession = (value: unknown): value is Session => {
   if (!value || typeof value !== "object") return false;
 
   const candidate = value as Partial<Session>;
@@ -27,15 +27,15 @@ function isValidSession(value: unknown): value is Session {
   const hasValidNotes = candidate.notes === undefined || typeof candidate.notes === "string";
 
   return hasValidCore && hasValidScore && hasValidNotes;
-}
+};
 
-function validateScore(score: number) {
+const validateScore = (score: number) => {
   if (!Number.isFinite(score) || score < 0 || score > 10) {
     throw new Error("Score must be a finite number between 0 and 10");
   }
-}
+};
 
-function readSessions(): Session[] {
+const readSessions = (): Session[] => {
   if (!fs.existsSync(sessionsPath)) return [];
 
   const raw = fs.readFileSync(sessionsPath, "utf-8").trim();
@@ -50,9 +50,9 @@ function readSessions(): Session[] {
     // Defensive fallback: corrupted JSON should not crash the engine.
     return [];
   }
-}
+};
 
-function writeSessions(sessions: Session[]) {
+const writeSessions = (sessions: Session[]) => {
   const dir = path.dirname(sessionsPath);
   fs.mkdirSync(dir, { recursive: true });
 
@@ -61,9 +61,12 @@ function writeSessions(sessions: Session[]) {
 
   fs.writeFileSync(tempPath, payload, "utf-8");
   fs.renameSync(tempPath, sessionsPath);
-}
+};
 
-export function createSession(templateId: string, level: "junior" | "middle" | "senior"): Session {
+export const createSession = (
+  templateId: string,
+  level: "junior" | "middle" | "senior",
+): Session => {
   const newSession: Session = {
     id: crypto.randomUUID(),
     date: new Date().toISOString(),
@@ -76,9 +79,9 @@ export function createSession(templateId: string, level: "junior" | "middle" | "
   writeSessions(sessions);
 
   return newSession;
-}
+};
 
-export function updateSessionScore(sessionId: string, score: number, notes?: string) {
+export const updateSessionScore = (sessionId: string, score: number, notes?: string) => {
   validateScore(score);
 
   const sessions = readSessions();
@@ -92,8 +95,8 @@ export function updateSessionScore(sessionId: string, score: number, notes?: str
   }
 
   writeSessions(sessions);
-}
+};
 
-export function listSessions(): Session[] {
+export const listSessions = (): Session[] => {
   return readSessions().sort((a, b) => b.date.localeCompare(a.date));
-}
+};

@@ -22,7 +22,7 @@ import {
 } from "@mui/material";
 import interviewsData from "./data/interviews.json";
 import { composeInterviewPrompt } from "./lib/composePrompt";
-import { createSession, listSessions, updateSessionScore } from "./lib/localSessions";
+import { clearSessions, createSession, listSessions, updateSessionScore } from "./lib/localSessions";
 import { InterviewConfig, InterviewTemplate, Level, Session } from "./lib/types";
 
 type InterviewLanguage = "en" | "ru";
@@ -30,14 +30,14 @@ type InterviewLanguage = "en" | "ru";
 const ALL_LEVELS: Level[] = ["junior", "middle", "senior"];
 const config = interviewsData as InterviewConfig;
 
-function parseCsv(value: string): string[] {
+const parseCsv = (value: string): string[] => {
   return value
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
-}
+};
 
-export default function App() {
+const App = () => {
   const [templates, setTemplates] = useState<InterviewTemplate[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [busy, setBusy] = useState(false);
@@ -64,11 +64,11 @@ export default function App() {
     [templates, level],
   );
 
-  function refreshSessions() {
+  const refreshSessions = () => {
     setSessions(listSessions());
-  }
+  };
 
-  function loadInitial() {
+  const loadInitial = () => {
     try {
       setTemplates(config.templates);
       setSessions(listSessions());
@@ -83,7 +83,7 @@ export default function App() {
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : String(loadError));
     }
-  }
+  };
 
   useEffect(() => {
     loadInitial();
@@ -97,7 +97,7 @@ export default function App() {
     }
   }, [templatesForLevel, templateId]);
 
-  async function generatePrompt() {
+  const generatePrompt = async () => {
     try {
       setBusy(true);
       setError("");
@@ -129,9 +129,9 @@ export default function App() {
     } finally {
       setBusy(false);
     }
-  }
+  };
 
-  async function saveEvaluation() {
+  const saveEvaluation = async () => {
     try {
       setBusy(true);
       setError("");
@@ -146,7 +146,14 @@ export default function App() {
     } finally {
       setBusy(false);
     }
-  }
+  };
+
+  const handleClearSessions = () => {
+    clearSessions();
+    setSessions([]);
+    setActiveSessionId("");
+    setSnack("Sessions cleared");
+  };
 
   return (
     <>
@@ -341,9 +348,14 @@ export default function App() {
                   sx={{ mb: 1 }}
                 >
                   <Typography variant="h6">Recent Sessions</Typography>
-                  <Button size="small" onClick={refreshSessions}>
-                    Refresh
-                  </Button>
+                  <Stack direction="row" spacing={1}>
+                    <Button size="small" color="error" onClick={handleClearSessions}>
+                      Clear sessions
+                    </Button>
+                    <Button size="small" onClick={refreshSessions}>
+                      Refresh
+                    </Button>
+                  </Stack>
                 </Stack>
                 <Divider sx={{ mb: 1.5 }} />
                 <Stack spacing={1}>
@@ -382,4 +394,6 @@ export default function App() {
       </Snackbar>
     </>
   );
-}
+};
+
+export default App;
