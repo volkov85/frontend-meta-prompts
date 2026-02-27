@@ -8,6 +8,8 @@
 Structured interview engine for Senior Frontend Engineers
 (React, TypeScript, JavaScript, System Design)
 
+Live Demo: https://volkov85.github.io/frontend-meta-prompts/
+
 This project helps you run a repeatable interview practice loop:
 1. Generate a structured interview prompt
 2. Run interview in external LLM/chat
