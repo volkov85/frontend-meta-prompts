@@ -46,9 +46,40 @@ Separation of concerns:
 
 - Structured interview templates (junior/middle/senior)
 - Prompt generation with mode overrides
+- Template-level prompt overrides (`promptOverrides`) for per-template tuning
 - CLI to list templates and generate interviews
 - CLI mode to record external LLM evaluation
 - JSON persistence for session tracking
+
+## Template Prompt Overrides
+
+Templates in `data/interviews.json` can define `promptOverrides`:
+- `followUps` - overrides default follow-up count
+- `include` - overrides default output sections
+- `plainLanguage` - forces simpler wording and shorter phrasing
+- `goodAnswerCriteria` - adds explicit "GOOD ANSWER CRITERIA" block to output
+
+Example:
+
+```json
+{
+  "id": "junior-javascript-fundamentals",
+  "promptOverrides": {
+    "followUps": 2,
+    "plainLanguage": true,
+    "include": ["idealAnswer", "commonMistakes", "edgeCases", "scoringRubric"],
+    "goodAnswerCriteria": [
+      "Explains solution in simple, correct steps"
+    ]
+  }
+}
+```
+
+Junior templates (`junior-*`) now use softer defaults:
+- fewer follow-ups (`2`)
+- plain language enabled
+- explicit good answer criteria
+- reduced include sections (without senior-focused blocks)
 
 ## Getting Started
 
