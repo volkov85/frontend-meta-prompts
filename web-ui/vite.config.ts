@@ -4,14 +4,9 @@ import path from "path";
 
 export default defineConfig({
   root: path.resolve(__dirname),
+  base: process.env.VITE_BASE_PATH ?? "/",
   plugins: [react()],
   server: {
     port: 5173,
-    proxy: {
-      "/api": {
-        target: "http://localhost:4174",
-        changeOrigin: true,
-      },
-    },
   },
 });

@@ -1,0 +1,566 @@
+{
+  "version": "1.0",
+  "defaults": {
+    "companyBar": "top-tier product company",
+    "stack": ["React", "TypeScript", "JavaScript"],
+    "language": "en",
+    "followUps": 3,
+    "include": [
+      "idealAnswer",
+      "commonMistakes",
+      "edgeCases",
+      "tradeOffs",
+      "seniorVsMiddle",
+      "scoringRubric",
+      "measurementPlan",
+      "rolloutPlan",
+      "securityConsiderations"
+    ],
+    "simulation": true,
+    "timeboxedMinutes": 30
+  },
+  "templates": [
+    {
+      "id": "js-deep-dive-core",
+      "title": "JavaScript Deep Dive (Core Mechanics)",
+      "levels": ["middle", "senior"],
+      "focus": [
+        "event loop",
+        "microtasks vs macrotasks",
+        "closures",
+        "this binding",
+        "prototypes",
+        "memory model",
+        "garbage collection"
+      ],
+      "questionStyles": ["explain-why", "predict-output", "edge-case-analysis"],
+      "constraints": [
+        "Explain internal mechanics step by step",
+        "Avoid hand-wavy explanations",
+        "Use real execution model reasoning"
+      ]
+    },
+    {
+      "id": "js-async-concurrency",
+      "title": "JavaScript Async & Concurrency",
+      "levels": ["middle", "senior"],
+      "focus": [
+        "event loop phases",
+        "promise chaining",
+        "async/await internals",
+        "race conditions",
+        "cancellation patterns",
+        "abort controller",
+        "backpressure"
+      ],
+      "questionStyles": ["debugging", "architecture", "predict-output"],
+      "constraints": [
+        "Explain execution order precisely",
+        "Discuss memory and performance impact",
+        "Propose production-safe patterns"
+      ]
+    },
+    {
+      "id": "algorithms-frontend-practical",
+      "title": "Algorithms for Frontend Engineers",
+      "levels": ["middle", "senior"],
+      "focus": [
+        "debounce/throttle",
+        "memoization",
+        "LRU cache",
+        "flatten structures",
+        "tree traversal (DOM-like)",
+        "deep equality",
+        "diffing logic"
+      ],
+      "questionStyles": ["code-writing", "optimization", "complexity-analysis"],
+      "constraints": [
+        "Write production-quality code",
+        "Explain Big-O time and space complexity",
+        "Discuss trade-offs"
+      ]
+    },
+    {
+      "id": "algorithms-data-structures",
+      "title": "Data Structures & Complexity",
+      "levels": ["middle", "senior"],
+      "focus": ["hash maps", "sets", "trees", "graphs", "heap", "trie", "complexity analysis"],
+      "questionStyles": ["problem-solving", "optimization", "design"],
+      "constraints": [
+        "Explain why this structure was chosen",
+        "Analyze worst-case complexity",
+        "Discuss edge cases"
+      ]
+    },
+    {
+      "id": "algorithms-performance",
+      "title": "Performance & Optimization",
+      "levels": ["middle", "senior"],
+      "focus": [
+        "memoization strategy",
+        "caching policies",
+        "time vs space trade-offs",
+        "stream processing",
+        "batching",
+        "rate limiting"
+      ],
+      "questionStyles": ["system-design", "optimization-plan"],
+      "constraints": [
+        "Balance readability and performance",
+        "Discuss real-world trade-offs",
+        "Explain scalability limits"
+      ]
+    },
+    {
+      "id": "react-performance-profiling",
+      "title": "React Performance & Profiling",
+      "levels": ["middle", "senior"],
+      "focus": ["profiling", "rendering", "memoization", "virtualization", "concurrency"],
+      "questionStyles": ["case-study", "debugging"],
+      "constraints": ["no premature optimization", "measure first", "explain trade-offs"]
+    },
+    {
+      "id": "react-architecture-state",
+      "title": "React Architecture & State Management",
+      "levels": ["middle", "senior"],
+      "focus": ["state modeling", "server state vs client state", "caching", "sync", "validation"],
+      "questionStyles": ["system-design", "refactor-plan"],
+      "constraints": ["clear boundaries", "scalable patterns", "testability"]
+    },
+    {
+      "id": "typescript-advanced-generics",
+      "title": "TypeScript Advanced Types & Generics",
+      "levels": ["middle", "senior"],
+      "focus": ["generics", "conditional types", "infer", "type-level patterns", "API design"],
+      "questionStyles": ["code-writing", "type-debugging"],
+      "constraints": ["strict mode", "soundness vs ergonomics", "DX"]
+    },
+    {
+      "id": "react-hooks-internals",
+      "title": "React Hooks Deep Dive",
+      "levels": ["middle", "senior"],
+      "focus": ["hooks rules", "closures", "effects", "layout effects", "stale state", "refs"],
+      "questionStyles": ["gotchas", "explain-why"],
+      "constraints": ["explain exact bug cause", "propose fixes + reasoning"]
+    },
+    {
+      "id": "frontend-system-design-dashboard",
+      "title": "Frontend System Design: Data-heavy Dashboard",
+      "levels": ["senior"],
+      "focus": [
+        "data fetching",
+        "caching",
+        "pagination",
+        "realtime",
+        "error states",
+        "accessibility"
+      ],
+      "questionStyles": ["system-design"],
+      "constraints": ["handle offline/slow network", "observability", "progressive loading"]
+    },
+    {
+      "id": "component-api-design",
+      "title": "Component API Design (Design System)",
+      "levels": ["middle", "senior"],
+      "focus": [
+        "DX",
+        "accessibility",
+        "composition",
+        "theming",
+        "tokens",
+        "polymorphic components"
+      ],
+      "questionStyles": ["api-design", "review"],
+      "constraints": ["a11y first", "backward compatibility", "migration plan"]
+    },
+    {
+      "id": "debugging-production-incident",
+      "title": "Debugging a Production Incident",
+      "levels": ["senior"],
+      "focus": ["repro", "triage", "rollbacks", "feature flags", "monitoring", "postmortem"],
+      "questionStyles": ["incident-response"],
+      "constraints": ["time pressure", "stakeholders", "minimize blast radius"]
+    },
+    {
+      "id": "testing-strategy",
+      "title": "Testing Strategy (Unit/Integration/E2E)",
+      "levels": ["middle", "senior"],
+      "focus": [
+        "test pyramid",
+        "mocking strategy",
+        "contract tests",
+        "flakiness",
+        "CI performance"
+      ],
+      "questionStyles": ["strategy", "review"],
+      "constraints": ["fast feedback", "reliability", "maintainability"]
+    },
+    {
+      "id": "bundling-runtime-performance",
+      "title": "Bundling & Runtime Performance",
+      "levels": ["middle", "senior"],
+      "focus": ["bundlers", "code splitting", "tree-shaking", "perf budgets", "web vitals"],
+      "questionStyles": ["optimization-plan", "trade-offs"],
+      "constraints": ["avoid regressions", "measure with vitals", "rollout plan"]
+    },
+    {
+      "id": "behavioral-senior",
+      "title": "Behavioral (Senior Signals)",
+      "levels": ["middle", "senior"],
+      "focus": ["ownership", "conflict", "mentoring", "influence", "trade-offs communication"],
+      "questionStyles": ["behavioral"],
+      "constraints": ["use STAR", "show impact metrics", "reflect + learnings"]
+    },
+    {
+      "id": "web-platform-rendering",
+      "title": "Web Platform: Rendering Pipeline & Performance",
+      "levels": ["middle", "senior"],
+      "focus": [
+        "style/layout/paint/composite",
+        "reflow vs repaint",
+        "layers & GPU compositing",
+        "event loop + rendering",
+        "INP/LCP/CLS interpretation"
+      ],
+      "questionStyles": ["case-study", "debugging", "explain-why"],
+      "constraints": ["measure first", "propose safe rollout", "avoid guesswork"]
+    },
+    {
+      "id": "web-platform-events",
+      "title": "Web Platform: Events & Input",
+      "levels": ["middle", "senior"],
+      "focus": [
+        "capture/bubble",
+        "passive listeners",
+        "pointer events",
+        "preventDefault implications",
+        "delegation",
+        "scroll performance"
+      ],
+      "questionStyles": ["predict-output", "debugging", "edge-case-analysis"],
+      "constraints": ["explain exact propagation", "include mobile/touch edge cases"]
+    },
+    {
+      "id": "web-platform-storage-offline",
+      "title": "Web Platform: Storage, Caching & Offline",
+      "levels": ["middle", "senior"],
+      "focus": [
+        "HTTP cache semantics",
+        "Service Worker cache",
+        "IndexedDB",
+        "stale-while-revalidate",
+        "offline-first UX"
+      ],
+      "questionStyles": ["system-design", "trade-offs"],
+      "constraints": ["handle invalidation", "data consistency strategy"]
+    },
+    {
+      "id": "web-platform-workers",
+      "title": "Web Platform: Workers & Concurrency",
+      "levels": ["middle", "senior"],
+      "focus": [
+        "Web Workers",
+        "message passing",
+        "transferables",
+        "main-thread budget",
+        "cancellation"
+      ],
+      "questionStyles": ["architecture", "optimization-plan"],
+      "constraints": ["avoid blocking main thread", "clear ownership boundaries"]
+    },
+    {
+      "id": "networking-http-contracts",
+      "title": "Networking: HTTP, Retries, Timeouts, Contracts",
+      "levels": ["middle", "senior"],
+      "focus": [
+        "idempotency",
+        "retries with backoff",
+        "timeouts",
+        "pagination patterns",
+        "API versioning",
+        "contract testing"
+      ],
+      "questionStyles": ["system-design", "review", "debugging"],
+      "constraints": ["avoid retry storms", "define failure UX", "backward compatibility"]
+    },
+    {
+      "id": "security-web",
+      "title": "Security: XSS/CSRF/CSP & Secure Storage",
+      "levels": ["middle", "senior"],
+      "focus": [
+        "XSS types",
+        "CSRF conditions",
+        "CSP basics",
+        "cookie flags (SameSite/HttpOnly/Secure)",
+        "localStorage risks",
+        "clickjacking"
+      ],
+      "questionStyles": ["threat-model", "review", "incident-response"],
+      "constraints": ["practical mitigations", "no hand-wavy security"]
+    },
+    {
+      "id": "a11y-advanced",
+      "title": "Accessibility (a11y): Practical Senior Level",
+      "levels": ["middle", "senior"],
+      "focus": [
+        "semantic HTML",
+        "keyboard navigation",
+        "focus management",
+        "ARIA patterns",
+        "forms errors & announcements",
+        "screen reader basics"
+      ],
+      "questionStyles": ["review", "system-design", "fix-bugs"],
+      "constraints": ["don’t overuse ARIA", "include testing strategy"]
+    },
+    {
+      "id": "css-architecture-design-systems",
+      "title": "CSS Architecture & Design Systems",
+      "levels": ["middle", "senior"],
+      "focus": [
+        "cascade/specificity/layers",
+        "CSS variables & theming",
+        "tokens",
+        "component API composition",
+        "responsive strategy",
+        "migration/backward compatibility"
+      ],
+      "questionStyles": ["api-design", "review", "migration-plan"],
+      "constraints": ["a11y & theming", "DX and stability"]
+    },
+    {
+      "id": "tooling-build-delivery",
+      "title": "Tooling: Bundling, Code Splitting, Delivery Strategy",
+      "levels": ["middle", "senior"],
+      "focus": [
+        "tree-shaking",
+        "chunking strategy",
+        "dynamic import",
+        "source maps",
+        "perf budgets",
+        "rollout strategy"
+      ],
+      "questionStyles": ["optimization-plan", "trade-offs", "debugging"],
+      "constraints": ["avoid regressions", "measure with Web Vitals", "gradual rollout"]
+    },
+    {
+      "id": "observability-production",
+      "title": "Observability: Logs/Metrics/Tracing & Error Handling",
+      "levels": ["senior"],
+      "focus": [
+        "structured logging",
+        "frontend metrics",
+        "distributed tracing basics",
+        "error boundaries",
+        "retry UX",
+        "feature flags",
+        "kill switches"
+      ],
+      "questionStyles": ["incident-response", "system-design"],
+      "constraints": ["minimize blast radius", "actionable monitoring plan"]
+    },
+    {
+      "id": "ssr-hydration",
+      "title": "SSR/SSG/CSR: Hydration Pitfalls & Caching",
+      "levels": ["middle", "senior"],
+      "focus": [
+        "SSR vs CSR vs SSG",
+        "hydration mismatch",
+        "streaming concepts",
+        "caching & invalidation",
+        "auth implications"
+      ],
+      "questionStyles": ["explain-why", "debugging", "system-design"],
+      "constraints": ["identify mismatch root cause", "safe rollout/migration plan"]
+    },
+    {
+      "id": "leadership-design-review",
+      "title": "Senior Skills: Design Review, Mentoring, Influence",
+      "levels": ["senior"],
+      "focus": [
+        "technical RFC",
+        "trade-off communication",
+        "mentoring",
+        "alignment with product",
+        "risk management",
+        "delivery planning"
+      ],
+      "questionStyles": ["behavioral", "review", "scenario"],
+      "constraints": ["show impact metrics", "clear decision making", "risk mitigation"]
+    },
+    {
+      "id": "junior-javascript-fundamentals",
+      "title": "Junior: JavaScript Fundamentals",
+      "levels": ["junior"],
+      "focus": [
+        "variables and scope",
+        "types and coercion",
+        "functions and closures basics",
+        "arrays and objects",
+        "basic debugging"
+      ],
+      "questionStyles": ["explain-why", "predict-output", "code-reading"],
+      "constraints": [
+        "prefer clarity over advanced tricks",
+        "explain step by step",
+        "validate understanding with simple examples"
+      ],
+      "promptOverrides": {
+        "followUps": 2,
+        "plainLanguage": true,
+        "include": ["idealAnswer", "commonMistakes", "edgeCases", "scoringRubric"],
+        "goodAnswerCriteria": [
+          "Explains solution in simple, correct steps without skipping basics",
+          "Uses small examples and predicts output correctly for core cases",
+          "Can name at least one common mistake and how to avoid it",
+          "Writes readable code with clear variable names"
+        ]
+      }
+    },
+    {
+      "id": "junior-react-fundamentals",
+      "title": "Junior: React Fundamentals",
+      "levels": ["junior"],
+      "focus": [
+        "components and props",
+        "state and events",
+        "conditional rendering",
+        "lists and keys",
+        "basic hooks usage"
+      ],
+      "questionStyles": ["code-reading", "fix-bugs", "explain-why"],
+      "constraints": [
+        "focus on predictable component behavior",
+        "avoid premature optimization",
+        "highlight common beginner mistakes"
+      ],
+      "promptOverrides": {
+        "followUps": 2,
+        "plainLanguage": true,
+        "include": ["idealAnswer", "commonMistakes", "edgeCases", "scoringRubric"],
+        "goodAnswerCriteria": [
+          "Correctly explains props, state, and component re-render behavior",
+          "Identifies obvious bug causes and proposes a basic fix",
+          "Keeps component logic simple and easy to read",
+          "Mentions user-visible states like loading/error when relevant"
+        ]
+      }
+    },
+    {
+      "id": "junior-typescript-fundamentals",
+      "title": "Junior: TypeScript Fundamentals",
+      "levels": ["junior"],
+      "focus": [
+        "basic types",
+        "interfaces and type aliases",
+        "function typing",
+        "union and optional types",
+        "type errors interpretation"
+      ],
+      "questionStyles": ["code-writing", "type-debugging", "review"],
+      "constraints": [
+        "keep examples practical and small",
+        "explain error messages in plain language",
+        "prioritize maintainable typing"
+      ],
+      "promptOverrides": {
+        "followUps": 2,
+        "plainLanguage": true,
+        "include": ["idealAnswer", "commonMistakes", "edgeCases", "scoringRubric"],
+        "goodAnswerCriteria": [
+          "Chooses correct basic types for variables, params, and return values",
+          "Can explain a type error in plain language and fix it",
+          "Uses simple unions/interfaces without overcomplicating typing",
+          "Keeps examples practical and close to real UI code"
+        ]
+      }
+    },
+    {
+      "id": "junior-async-http",
+      "title": "Junior: Async, Promises, and HTTP Basics",
+      "levels": ["junior"],
+      "focus": [
+        "async/await basics",
+        "promise states",
+        "try/catch for requests",
+        "loading/error UI states",
+        "simple retry awareness"
+      ],
+      "questionStyles": ["debugging", "predict-output", "scenario"],
+      "constraints": [
+        "ensure execution order is explained clearly",
+        "cover user-facing error handling",
+        "avoid advanced concurrency patterns"
+      ],
+      "promptOverrides": {
+        "followUps": 2,
+        "plainLanguage": true,
+        "include": ["idealAnswer", "commonMistakes", "edgeCases", "scoringRubric"],
+        "goodAnswerCriteria": [
+          "Explains async flow in the right order with clear steps",
+          "Handles loading, success, and error UI states explicitly",
+          "Uses try/catch correctly for request failures",
+          "Avoids advanced patterns and keeps control flow understandable"
+        ]
+      }
+    },
+    {
+      "id": "junior-testing-basics",
+      "title": "Junior: Testing Basics",
+      "levels": ["junior"],
+      "focus": [
+        "unit test purpose",
+        "arrange-act-assert",
+        "basic mocking",
+        "testing user behavior",
+        "flaky test awareness"
+      ],
+      "questionStyles": ["review", "fix-bugs", "code-writing"],
+      "constraints": [
+        "focus on confidence-building test cases",
+        "avoid over-mocking",
+        "connect tests to product behavior"
+      ],
+      "promptOverrides": {
+        "followUps": 2,
+        "plainLanguage": true,
+        "include": ["idealAnswer", "commonMistakes", "edgeCases", "scoringRubric"],
+        "goodAnswerCriteria": [
+          "Writes tests around user behavior, not implementation details",
+          "Uses clear arrange-act-assert structure",
+          "Covers at least one unhappy path or edge case",
+          "Explains what confidence the test gives to the team"
+        ]
+      }
+    },
+    {
+      "id": "junior-web-platform-basics",
+      "title": "Junior: Web Platform Basics",
+      "levels": ["junior"],
+      "focus": [
+        "DOM and events",
+        "event bubbling basics",
+        "rendering basics",
+        "HTTP request lifecycle",
+        "browser storage overview"
+      ],
+      "questionStyles": ["explain-why", "predict-output", "debugging"],
+      "constraints": [
+        "use concrete browser examples",
+        "avoid low-level internals unless needed",
+        "verify conceptual understanding first"
+      ],
+      "promptOverrides": {
+        "followUps": 2,
+        "plainLanguage": true,
+        "include": ["idealAnswer", "commonMistakes", "edgeCases", "scoringRubric"],
+        "goodAnswerCriteria": [
+          "Correctly explains event flow and basic DOM interactions",
+          "Uses concrete browser examples instead of abstract theory",
+          "Can reason about simple rendering/performance implications",
+          "Identifies beginner mistakes and suggests safe fixes"
+        ]
+      }
+    }
+  ]
+}

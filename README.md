@@ -27,7 +27,7 @@ This project makes it structured:
 ```text
 data/
   interviews.json    # Interview templates and defaults
-  sessions.json      # Runtime session history
+  sessions.json      # Runtime session history for CLI mode
 
 engine/
   composeInterviewPrompt.ts  # Prompt builder
@@ -35,6 +35,12 @@ engine/
   scorer.ts                  # Optional local scorer (not required by CLI flow)
 
 index.ts              # CLI entry point
+
+web-ui/
+  src/data/interviews.json   # Frontend config copy for static build
+  src/lib/composePrompt.ts   # Prompt builder for browser mode
+  src/lib/localSessions.ts   # localStorage session persistence
+  src/App.tsx                # React UI
 ```
 
 Separation of concerns:
@@ -93,15 +99,9 @@ Run CLI help:
 npm run interview -- --help
 ```
 
-Run API server (for Web UI):
-```bash
-npm run web
-```
-This starts backend at `http://localhost:4174`.
-
 Run Web UI in dev mode:
 ```bash
-npm run web:dev
+npm run web
 ```
 Then open `http://localhost:5173`.
 
@@ -151,29 +151,36 @@ Rules:
 ## Web UI (React + MUI)
 
 The project includes a browser interface powered by React + TypeScript + MUI, built with Vite.
+This mode is fully static and GitHub Pages compatible.
 
 Capabilities:
 - Select template and level
 - Configure stack, focus, context, timebox, simulation mode
-- Generate interview prompt
-- Auto-create session and capture session id
-- Save score + notes
-- View latest sessions
+- Generate interview prompt in browser
+- Auto-create session id in browser
+- Save score + notes into localStorage
+- View latest local sessions
 
 Implementation:
-- `web/server.ts` - API server (`/api/*`) and static hosting for production build
-- `web-ui/vite.config.ts` - Vite config and API proxy for local dev
+- `web-ui/vite.config.ts` - Vite config
 - `web-ui/src/App.tsx` - main UI
 - `web-ui/src/main.tsx` - frontend entry
 - `web-ui/src/theme.ts` - MUI theme
 - `web-ui/src/styles.css` - visual theme and layout styles
+- `web-ui/src/lib/composePrompt.ts` - prompt composition logic
+- `web-ui/src/lib/localSessions.ts` - localStorage persistence
 
 Production build:
 ```bash
 npm run web:build
-npm run web
+npm run web:preview
 ```
-Then open `http://localhost:4174`.
+Then open the preview URL printed in terminal.
+
+GitHub Pages build (repo path base):
+```bash
+VITE_BASE_PATH=/YOUR_REPO_NAME/ npm run web:build
+```
 
 ## End-to-End Flow (recommended)
 

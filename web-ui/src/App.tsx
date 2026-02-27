@@ -20,42 +20,15 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-
-type Level = "junior" | "middle" | "senior";
-
-type Template = {
-  id: string;
-  title: string;
-  levels: Level[];
-  focus: string[];
-};
-
-type Session = {
-  id: string;
-  date: string;
-  templateId: string;
-  level: Level;
-  score?: number;
-  notes?: string;
-};
-
-type TemplatesResponse = {
-  defaults: {
-    stack: string[];
-    simulation: boolean;
-    timeboxedMinutes: number;
-  };
-  templates: Template[];
-};
-
-type SessionsResponse = {
-  sessions: Session[];
-};
+import interviewsData from "./data/interviews.json";
+import { composeInterviewPrompt } from "./lib/composePrompt";
+import { createSession, listSessions, updateSessionScore } from "./lib/localSessions";
+import { InterviewConfig, InterviewTemplate, Level, Session } from "./lib/types";
 
 type InterviewLanguage = "en" | "ru";
 
 const ALL_LEVELS: Level[] = ["junior", "middle", "senior"];
-const API_BASE = import.meta.env.VITE_API_BASE ?? "";
+const config = interviewsData as InterviewConfig;
 
 function parseCsv(value: string): string[] {
   return value
@@ -64,19 +37,9 @@ function parseCsv(value: string): string[] {
     .filter(Boolean);
 }
 
-async function requestJson<T>(url: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE}${url}`, init);
-  const payload = await response.json();
-  if (!response.ok) {
-    throw new Error(payload.error ?? "Request failed");
-  }
-  return payload as T;
-}
-
 export default function App() {
-  const [templates, setTemplates] = useState<Template[]>([]);
+  const [templates, setTemplates] = useState<InterviewTemplate[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -101,35 +64,24 @@ export default function App() {
     [templates, level],
   );
 
-  async function refreshSessions() {
-    const payload = await requestJson<SessionsResponse>("/api/sessions");
-    setSessions(payload.sessions);
+  function refreshSessions() {
+    setSessions(listSessions());
   }
 
-  async function loadInitial() {
+  function loadInitial() {
     try {
-      setLoading(true);
-      const [templatesPayload, sessionsPayload] = await Promise.all([
-        requestJson<TemplatesResponse>("/api/templates"),
-        requestJson<SessionsResponse>("/api/sessions"),
-      ]);
+      setTemplates(config.templates);
+      setSessions(listSessions());
 
-      setTemplates(templatesPayload.templates);
-      setSessions(sessionsPayload.sessions);
-
-      const juniorTemplate = templatesPayload.templates.find((template) =>
-        template.levels.includes("junior"),
-      );
+      const juniorTemplate = config.templates.find((template) => template.levels.includes("junior"));
       setLevel("junior");
-      setTemplateId(juniorTemplate?.id ?? templatesPayload.templates[0]?.id ?? "");
+      setTemplateId(juniorTemplate?.id ?? config.templates[0]?.id ?? "");
 
-      setStackInput((templatesPayload.defaults.stack ?? []).join(", "));
-      setSimulation(Boolean(templatesPayload.defaults.simulation));
-      setTimebox(Number(templatesPayload.defaults.timeboxedMinutes ?? 30));
+      setStackInput((config.defaults.stack ?? []).join(", "));
+      setSimulation(Boolean(config.defaults.simulation));
+      setTimebox(Number(config.defaults.timeboxedMinutes ?? 30));
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : String(loadError));
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -149,33 +101,29 @@ export default function App() {
     try {
       setBusy(true);
       setError("");
-      const payload = await requestJson<{ prompt: string; sessionId: string | null }>(
-        "/api/generate",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            templateId,
-            level,
-            stack: parseCsv(stackInput),
-            focusBoost: parseCsv(focusInput),
-            extraContext,
-            simulation,
-            english: language === "en",
-            timeboxedMinutes: Number(timebox),
-            persistSession,
-          }),
+      const nextPrompt = composeInterviewPrompt(config, {
+        templateId,
+        level,
+        stack: parseCsv(stackInput),
+        focusBoost: parseCsv(focusInput),
+        extraContext,
+        mode: {
+          simulation,
+          english: language === "en",
+          timeboxedMinutes: Number(timebox),
         },
-      );
+      });
 
-      setPrompt(payload.prompt);
-      if (payload.sessionId) {
-        setActiveSessionId(payload.sessionId);
-        setSnack(`Session created: ${payload.sessionId}`);
+      setPrompt(nextPrompt);
+      if (persistSession) {
+        const session = createSession(templateId, level);
+        setActiveSessionId(session.id);
+        setSnack(`Session created: ${session.id}`);
       } else {
         setActiveSessionId("");
       }
-      await refreshSessions();
+
+      refreshSessions();
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : String(requestError));
     } finally {
@@ -187,20 +135,12 @@ export default function App() {
     try {
       setBusy(true);
       setError("");
-      await requestJson("/api/evaluate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sessionId: activeSessionId,
-          score: Number(score),
-          notes,
-        }),
-      });
+      updateSessionScore(activeSessionId, Number(score), notes);
 
       setSnack("Evaluation saved");
       setScore("");
       setNotes("");
-      await refreshSessions();
+      refreshSessions();
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : String(requestError));
     } finally {
@@ -223,7 +163,6 @@ export default function App() {
       </AppBar>
 
       <Container maxWidth="xl" sx={{ py: 3 }}>
-        {loading && <LinearProgress />}
         {error && (
           <Alert sx={{ mb: 2 }} severity="error" onClose={() => setError("")}>
             {error}

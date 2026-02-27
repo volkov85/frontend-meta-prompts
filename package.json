@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "ts-node index.ts",
     "interview": "ts-node index.ts",
-    "web": "npm run web:api",
-    "web:api": "ts-node web/server.ts",
+    "web": "npm run web:dev",
     "web:dev": "vite --config web-ui/vite.config.ts",
     "web:build": "vite build --config web-ui/vite.config.ts",
     "web:preview": "vite preview --config web-ui/vite.config.ts",
