@@ -64,7 +64,7 @@ export function composeInterviewPrompt(config: InterviewConfig, opts: ComposeOpt
   const stack = opts.stack ?? config.defaults.stack;
   const simulation = opts.mode?.simulation ?? config.defaults.simulation;
   const timeboxed = opts.mode?.timeboxedMinutes ?? config.defaults.timeboxedMinutes;
-  const englishMode = opts.mode?.english ?? false;
+  const englishMode = opts.mode?.english ?? config.defaults.language === "en";
 
   const followUps = tpl.promptOverrides?.followUps ?? config.defaults.followUps;
   const include = tpl.promptOverrides?.include ?? config.defaults.include;

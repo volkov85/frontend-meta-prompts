@@ -93,6 +93,18 @@ Run CLI help:
 npm run interview -- --help
 ```
 
+Run API server (for Web UI):
+```bash
+npm run web
+```
+This starts backend at `http://localhost:4174`.
+
+Run Web UI in dev mode:
+```bash
+npm run web:dev
+```
+Then open `http://localhost:5173`.
+
 Format code:
 ```bash
 npm run format
@@ -133,8 +145,35 @@ Rules:
 ### 3) List templates
 
 ```bash
-npm run interview -- --list-templates
+  npm run interview -- --list-templates
 ```
+
+## Web UI (React + MUI)
+
+The project includes a browser interface powered by React + TypeScript + MUI, built with Vite.
+
+Capabilities:
+- Select template and level
+- Configure stack, focus, context, timebox, simulation mode
+- Generate interview prompt
+- Auto-create session and capture session id
+- Save score + notes
+- View latest sessions
+
+Implementation:
+- `web/server.ts` - API server (`/api/*`) and static hosting for production build
+- `web-ui/vite.config.ts` - Vite config and API proxy for local dev
+- `web-ui/src/App.tsx` - main UI
+- `web-ui/src/main.tsx` - frontend entry
+- `web-ui/src/theme.ts` - MUI theme
+- `web-ui/src/styles.css` - visual theme and layout styles
+
+Production build:
+```bash
+npm run web:build
+npm run web
+```
+Then open `http://localhost:4174`.
 
 ## End-to-End Flow (recommended)
 

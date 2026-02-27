@@ -6,16 +6,32 @@
   "scripts": {
     "dev": "ts-node index.ts",
     "interview": "ts-node index.ts",
+    "web": "npm run web:api",
+    "web:api": "ts-node web/server.ts",
+    "web:dev": "vite --config web-ui/vite.config.ts",
+    "web:build": "vite build --config web-ui/vite.config.ts",
+    "web:preview": "vite preview --config web-ui/vite.config.ts",
     "format": "prettier --write ."
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^5.15.21",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
   "devDependencies": {
+    "@types/react": "^18.3.24",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
     "@types/node": "^25.3.1",
     "prettier": "^3.8.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite": "^5.4.21"
   }
 }

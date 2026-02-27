@@ -3,7 +3,7 @@
   "defaults": {
     "companyBar": "top-tier product company",
     "stack": ["React", "TypeScript", "JavaScript"],
-    "language": "ru",
+    "language": "en",
     "followUps": 3,
     "include": [
       "idealAnswer",

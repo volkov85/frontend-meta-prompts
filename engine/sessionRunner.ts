@@ -93,3 +93,7 @@ export function updateSessionScore(sessionId: string, score: number, notes?: str
 
   writeSessions(sessions);
 }
+
+export function listSessions(): Session[] {
+  return readSessions().sort((a, b) => b.date.localeCompare(a.date));
+}
