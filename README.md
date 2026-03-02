@@ -39,7 +39,6 @@ engine/
 index.ts              # CLI entry point
 
 web-ui/
-  src/data/interviews.json   # Frontend config copy for static build
   src/lib/composePrompt.ts   # Prompt builder for browser mode
   src/lib/localSessions.ts   # localStorage session persistence
   src/App.tsx                # React UI

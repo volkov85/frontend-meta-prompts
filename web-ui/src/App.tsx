@@ -20,7 +20,7 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import interviewsData from "./data/interviews.json";
+import interviewsData from "../../data/interviews.json";
 import { composeInterviewPrompt } from "./lib/composePrompt";
 import { clearSessions, createSession, listSessions, updateSessionScore } from "./lib/localSessions";
 import { InterviewConfig, InterviewTemplate, Level, Session } from "./lib/types";
