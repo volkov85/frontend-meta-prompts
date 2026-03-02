@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useReducer } from "react";
 import interviewsData from "../../../data/interviews.json";
 import { composeInterviewPrompt } from "./composePrompt";
 import { clearSessions, createSession, listSessions, updateSessionScore } from "./localSessions";
@@ -17,137 +17,202 @@ const parseCsv = (value: string): string[] => {
     .filter(Boolean);
 };
 
+type InterviewAppState = {
+  templates: InterviewTemplate[];
+  sessions: Session[];
+  busy: boolean;
+  error: string;
+  templateId: string;
+  level: Level;
+  stackInput: string;
+  focusInput: string;
+  extraContext: string;
+  simulation: boolean;
+  language: InterviewLanguage;
+  timebox: number;
+  persistSession: boolean;
+  prompt: string;
+  activeSessionId: string;
+  score: string;
+  notes: string;
+  snack: string;
+};
+
+const initialState: InterviewAppState = {
+  templates: [],
+  sessions: [],
+  busy: false,
+  error: "",
+  templateId: "",
+  level: "junior",
+  stackInput: "",
+  focusInput: "",
+  extraContext: "",
+  simulation: true,
+  language: "en",
+  timebox: 30,
+  persistSession: true,
+  prompt: "",
+  activeSessionId: "",
+  score: "",
+  notes: "",
+  snack: "",
+};
+
+type Action = {
+  type: "patch";
+  payload: Partial<InterviewAppState>;
+};
+
+const reducer = (state: InterviewAppState, action: Action): InterviewAppState => {
+  if (action.type === "patch") {
+    return { ...state, ...action.payload };
+  }
+  return state;
+};
+
 export const useInterviewAppState = () => {
-  const [templates, setTemplates] = useState<InterviewTemplate[]>([]);
-  const [sessions, setSessions] = useState<Session[]>([]);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-
-  const [templateId, setTemplateId] = useState("");
-  const [level, setLevel] = useState<Level>("junior");
-  const [stackInput, setStackInput] = useState("");
-  const [focusInput, setFocusInput] = useState("");
-  const [extraContext, setExtraContext] = useState("");
-  const [simulation, setSimulation] = useState(true);
-  const [language, setLanguage] = useState<InterviewLanguage>("en");
-  const [timebox, setTimebox] = useState(30);
-  const [persistSession, setPersistSession] = useState(true);
-
-  const [prompt, setPrompt] = useState("");
-  const [activeSessionId, setActiveSessionId] = useState("");
-  const [score, setScore] = useState("");
-  const [notes, setNotes] = useState("");
-  const [snack, setSnack] = useState("");
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const templatesForLevel = useMemo(
-    () => templates.filter((item) => item.levels.includes(level)),
-    [templates, level],
+    () => state.templates.filter((item) => item.levels.includes(state.level)),
+    [state.level, state.templates],
   );
 
   const refreshSessions = () => {
-    setSessions(listSessions());
+    dispatch({ type: "patch", payload: { sessions: listSessions() } });
   };
 
   useEffect(() => {
     try {
-      setTemplates(config.templates);
-      setSessions(listSessions());
-
       const juniorTemplate = config.templates.find((template) => template.levels.includes("junior"));
-      setLevel("junior");
-      setTemplateId(juniorTemplate?.id ?? config.templates[0]?.id ?? "");
-
-      setStackInput((config.defaults.stack ?? []).join(", "));
-      setSimulation(Boolean(config.defaults.simulation));
-      setTimebox(Number(config.defaults.timeboxedMinutes ?? 30));
+      dispatch({
+        type: "patch",
+        payload: {
+          templates: config.templates,
+          sessions: listSessions(),
+          level: "junior",
+          templateId: juniorTemplate?.id ?? config.templates[0]?.id ?? "",
+          stackInput: (config.defaults.stack ?? []).join(", "),
+          simulation: Boolean(config.defaults.simulation),
+          timebox: Number(config.defaults.timeboxedMinutes ?? 30),
+        },
+      });
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : String(loadError));
+      dispatch({
+        type: "patch",
+        payload: { error: loadError instanceof Error ? loadError.message : String(loadError) },
+      });
     }
   }, []);
 
   useEffect(() => {
     if (!templatesForLevel.length) return;
-    const stillValid = templatesForLevel.some((template) => template.id === templateId);
+    const stillValid = templatesForLevel.some((template) => template.id === state.templateId);
     if (!stillValid) {
-      setTemplateId(templatesForLevel[0].id);
+      dispatch({ type: "patch", payload: { templateId: templatesForLevel[0].id } });
     }
-  }, [templatesForLevel, templateId]);
+  }, [state.templateId, templatesForLevel]);
 
   const generatePrompt = async () => {
     try {
-      setBusy(true);
-      setError("");
+      dispatch({ type: "patch", payload: { busy: true, error: "" } });
       const nextPrompt = composeInterviewPrompt(config, {
-        templateId,
-        level,
-        stack: parseCsv(stackInput),
-        focusBoost: parseCsv(focusInput),
-        extraContext,
+        templateId: state.templateId,
+        level: state.level,
+        stack: parseCsv(state.stackInput),
+        focusBoost: parseCsv(state.focusInput),
+        extraContext: state.extraContext,
         mode: {
-          simulation,
-          english: language === "en",
-          timeboxedMinutes: Number(timebox),
+          simulation: state.simulation,
+          english: state.language === "en",
+          timeboxedMinutes: Number(state.timebox),
         },
       });
 
-      setPrompt(nextPrompt);
-      if (persistSession) {
-        const session = createSession(templateId, level);
-        setActiveSessionId(session.id);
-        setSnack(`Session created: ${session.id}`);
+      if (state.persistSession) {
+        const session = createSession(state.templateId, state.level);
+        dispatch({
+          type: "patch",
+          payload: {
+            prompt: nextPrompt,
+            activeSessionId: session.id,
+            snack: `Session created: ${session.id}`,
+          },
+        });
       } else {
-        setActiveSessionId("");
+        dispatch({ type: "patch", payload: { prompt: nextPrompt, activeSessionId: "" } });
       }
 
       refreshSessions();
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : String(requestError));
+      dispatch({
+        type: "patch",
+        payload: { error: requestError instanceof Error ? requestError.message : String(requestError) },
+      });
     } finally {
-      setBusy(false);
+      dispatch({ type: "patch", payload: { busy: false } });
     }
   };
 
   const saveEvaluation = async () => {
     try {
-      setBusy(true);
-      setError("");
-      updateSessionScore(activeSessionId, Number(score), notes);
+      dispatch({ type: "patch", payload: { busy: true, error: "" } });
+      updateSessionScore(state.activeSessionId, Number(state.score), state.notes);
 
-      setSnack("Evaluation saved");
-      setScore("");
-      setNotes("");
+      dispatch({ type: "patch", payload: { snack: "Evaluation saved", score: "", notes: "" } });
       refreshSessions();
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : String(requestError));
+      dispatch({
+        type: "patch",
+        payload: { error: requestError instanceof Error ? requestError.message : String(requestError) },
+      });
     } finally {
-      setBusy(false);
+      dispatch({ type: "patch", payload: { busy: false } });
     }
   };
 
   const handleClearSessions = () => {
     clearSessions();
-    setSessions([]);
-    setActiveSessionId("");
-    setSnack("Sessions cleared");
+    dispatch({ type: "patch", payload: { sessions: [], activeSessionId: "", snack: "Sessions cleared" } });
   };
 
+  const setActiveSessionId = (value: string) =>
+    dispatch({ type: "patch", payload: { activeSessionId: value } });
+  const setError = (value: string) => dispatch({ type: "patch", payload: { error: value } });
+  const setExtraContext = (value: string) =>
+    dispatch({ type: "patch", payload: { extraContext: value } });
+  const setFocusInput = (value: string) => dispatch({ type: "patch", payload: { focusInput: value } });
+  const setLanguage = (value: InterviewLanguage) =>
+    dispatch({ type: "patch", payload: { language: value } });
+  const setLevel = (value: Level) => dispatch({ type: "patch", payload: { level: value } });
+  const setNotes = (value: string) => dispatch({ type: "patch", payload: { notes: value } });
+  const setPersistSession = (value: boolean) =>
+    dispatch({ type: "patch", payload: { persistSession: value } });
+  const setScore = (value: string) => dispatch({ type: "patch", payload: { score: value } });
+  const setSimulation = (value: boolean) => dispatch({ type: "patch", payload: { simulation: value } });
+  const setSnack = (value: string) => dispatch({ type: "patch", payload: { snack: value } });
+  const setStackInput = (value: string) => dispatch({ type: "patch", payload: { stackInput: value } });
+  const setTemplateId = (value: string) => dispatch({ type: "patch", payload: { templateId: value } });
+  const setTimebox = (value: number) => dispatch({ type: "patch", payload: { timebox: value } });
+
   return {
-    activeSessionId,
-    busy,
-    error,
-    extraContext,
-    focusInput,
+    activeSessionId: state.activeSessionId,
+    busy: state.busy,
+    error: state.error,
+    extraContext: state.extraContext,
+    focusInput: state.focusInput,
     generatePrompt,
     handleClearSessions,
-    language,
-    level,
-    notes,
-    persistSession,
-    prompt,
+    language: state.language,
+    level: state.level,
+    notes: state.notes,
+    persistSession: state.persistSession,
+    prompt: state.prompt,
     refreshSessions,
     saveEvaluation,
-    score,
-    sessions,
+    score: state.score,
+    sessions: state.sessions,
     setActiveSessionId,
     setError,
     setExtraContext,
@@ -162,11 +227,11 @@ export const useInterviewAppState = () => {
     setStackInput,
     setTemplateId,
     setTimebox,
-    simulation,
-    snack,
-    stackInput,
-    templateId,
+    simulation: state.simulation,
+    snack: state.snack,
+    stackInput: state.stackInput,
+    templateId: state.templateId,
     templatesForLevel,
-    timebox,
+    timebox: state.timebox,
   };
 };
