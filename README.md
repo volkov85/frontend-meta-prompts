@@ -119,6 +119,12 @@ Format code:
 npm run format
 ```
 
+Run full local quality gate:
+
+```bash
+npm run check
+```
+
 ## CLI Usage
 
 ### 1) Generate interview prompt
@@ -223,6 +229,34 @@ npx playwright install chromium
 npm run e2e
 npm run e2e:ui
 ```
+
+## Code Quality Gate
+
+Local checks:
+
+- `npm run typecheck`
+- `npm run lint`
+- `npm run format:check`
+- `npm run test`
+- `npm run check` (runs all of the above in sequence)
+
+Git hooks:
+
+- `pre-commit` -> `lint-staged` (ESLint + Prettier on staged files)
+- `commit-msg` -> `commitlint` with Conventional Commits rules
+
+## CI/CD (GitHub Actions)
+
+Workflows:
+
+- `CI Quality Gate` (`.github/workflows/ci.yml`)
+- `Deploy to GitHub Pages` (`.github/workflows/deploy-pages.yml`)
+
+Pipeline logic:
+
+- Quality gate runs on push and pull request for `main`
+- Deploy runs automatically only after successful `CI Quality Gate` on `main`
+- Deploy can also be started manually with `workflow_dispatch`
 
 Test files:
 
