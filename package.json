@@ -10,7 +10,13 @@
     "web:dev": "vite --config web-ui/vite.config.ts",
     "web:build": "vite build --config web-ui/vite.config.ts",
     "web:preview": "vite preview --config web-ui/vite.config.ts",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test": "vitest run --config web-ui/vite.config.ts",
+    "test:watch": "vitest --config web-ui/vite.config.ts",
+    "test:ui": "vitest --ui --config web-ui/vite.config.ts",
+    "test:coverage": "vitest run --coverage --config web-ui/vite.config.ts",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui"
   },
   "keywords": [],
   "author": "",
@@ -24,13 +30,21 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/node": "^25.3.1",
     "@types/react": "^18.3.24",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^4.7.0",
-    "@types/node": "^25.3.1",
+    "@vitest/coverage-v8": "^2.1.9",
+    "@vitest/ui": "^2.1.9",
+    "jsdom": "^25.0.1",
     "prettier": "^3.8.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
-    "vite": "^5.4.21"
+    "vite": "^5.4.21",
+    "vitest": "^2.1.8"
   }
 }
