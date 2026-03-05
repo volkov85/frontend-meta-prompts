@@ -183,6 +183,35 @@ GitHub Pages build (repo path base):
 VITE_BASE_PATH=/YOUR_REPO_NAME/ npm run web:build
 ```
 
+## Testing
+
+The project now includes:
+- Unit tests for prompt composition logic
+- Unit tests for browser session persistence (`localStorage`)
+- Integration tests for core React UI flows
+- End-to-end tests in a real browser with Playwright
+
+Run test suites:
+```bash
+npm run test
+npm run test:watch
+npm run test:ui
+npm run test:coverage
+```
+
+Run e2e:
+```bash
+npx playwright install chromium
+npm run e2e
+npm run e2e:ui
+```
+
+Test files:
+- `web-ui/src/lib/composePrompt.test.ts`
+- `web-ui/src/lib/localSessions.test.ts`
+- `web-ui/src/App.test.tsx`
+- `e2e/app.spec.ts`
+
 ## End-to-End Flow (recommended)
 
 1. Generate prompt and create session:
@@ -214,5 +243,9 @@ npm run interview -- --record-eval --session-id <id> --score 8 --notes "Good dep
 - TypeScript
 - Node.js
 - ts-node
+- Vite
+- Vitest
+- React Testing Library
+- Playwright
 - Prettier
 - JSON-driven configuration
