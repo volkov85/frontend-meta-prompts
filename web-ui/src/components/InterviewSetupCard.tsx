@@ -136,7 +136,10 @@ export const InterviewSetupCard = ({
             </TextField>
             <FormControlLabel
               control={
-                <Switch checked={simulation} onChange={(event) => setSimulation(event.target.checked)} />
+                <Switch
+                  checked={simulation}
+                  onChange={(event) => setSimulation(event.target.checked)}
+                />
               }
               label="Simulation"
             />
@@ -151,7 +154,12 @@ export const InterviewSetupCard = ({
             />
           </Stack>
 
-          <Button variant="contained" size="large" onClick={generatePrompt} disabled={busy || !templateId}>
+          <Button
+            variant="contained"
+            size="large"
+            onClick={generatePrompt}
+            disabled={busy || !templateId}
+          >
             Generate Prompt
           </Button>
         </Stack>

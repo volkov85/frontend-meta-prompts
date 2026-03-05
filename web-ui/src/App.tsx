@@ -8,7 +8,6 @@ import {
   Container,
   Divider,
   Grid,
-  LinearProgress,
   Snackbar,
   Toolbar,
   Typography,

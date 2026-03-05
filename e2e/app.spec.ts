@@ -31,4 +31,3 @@ test.describe("Frontend Meta Prompts", () => {
     await expect(page.getByText("No saved sessions yet.")).toBeVisible();
   });
 });
-

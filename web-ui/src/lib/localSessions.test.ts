@@ -65,7 +65,9 @@ describe("localSessions", () => {
       ]),
     );
 
-    expect(() => updateSessionScore("abc", 11)).toThrowError("Score must be a number between 0 and 10");
+    expect(() => updateSessionScore("abc", 11)).toThrowError(
+      "Score must be a number between 0 and 10",
+    );
   });
 
   it("returns empty list for malformed storage and supports clear", () => {

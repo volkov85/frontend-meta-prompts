@@ -216,7 +216,7 @@ const assertTemplateSupportsLevel = (
   }
 
   if (!template.levels.includes(level)) {
-    throw new Error(`Template \"${templateId}\" does not support level \"${level}\"`);
+    throw new Error(`Template "${templateId}" does not support level "${level}"`);
   }
 };
 

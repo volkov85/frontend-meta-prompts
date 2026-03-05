@@ -7,7 +7,11 @@ type SessionsCardProps = {
   sessions: Session[];
 };
 
-export const SessionsCard = ({ handleClearSessions, refreshSessions, sessions }: SessionsCardProps) => {
+export const SessionsCard = ({
+  handleClearSessions,
+  refreshSessions,
+  sessions,
+}: SessionsCardProps) => {
   return (
     <Card className="fade-up">
       <CardContent>
@@ -24,7 +28,9 @@ export const SessionsCard = ({ handleClearSessions, refreshSessions, sessions }:
         </Stack>
         <Divider sx={{ mb: 1.5 }} />
         <Stack spacing={1}>
-          {sessions.length === 0 && <Typography color="text.secondary">No saved sessions yet.</Typography>}
+          {sessions.length === 0 && (
+            <Typography color="text.secondary">No saved sessions yet.</Typography>
+          )}
           {sessions.slice(0, 10).map((session) => (
             <Card
               key={session.id}

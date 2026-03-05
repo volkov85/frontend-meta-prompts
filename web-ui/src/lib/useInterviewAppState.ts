@@ -85,7 +85,9 @@ export const useInterviewAppState = () => {
 
   useEffect(() => {
     try {
-      const juniorTemplate = config.templates.find((template) => template.levels.includes("junior"));
+      const juniorTemplate = config.templates.find((template) =>
+        template.levels.includes("junior"),
+      );
       dispatch({
         type: "patch",
         payload: {
@@ -148,7 +150,9 @@ export const useInterviewAppState = () => {
     } catch (requestError) {
       dispatch({
         type: "patch",
-        payload: { error: requestError instanceof Error ? requestError.message : String(requestError) },
+        payload: {
+          error: requestError instanceof Error ? requestError.message : String(requestError),
+        },
       });
     } finally {
       dispatch({ type: "patch", payload: { busy: false } });
@@ -165,7 +169,9 @@ export const useInterviewAppState = () => {
     } catch (requestError) {
       dispatch({
         type: "patch",
-        payload: { error: requestError instanceof Error ? requestError.message : String(requestError) },
+        payload: {
+          error: requestError instanceof Error ? requestError.message : String(requestError),
+        },
       });
     } finally {
       dispatch({ type: "patch", payload: { busy: false } });
@@ -174,7 +180,10 @@ export const useInterviewAppState = () => {
 
   const handleClearSessions = () => {
     clearSessions();
-    dispatch({ type: "patch", payload: { sessions: [], activeSessionId: "", snack: "Sessions cleared" } });
+    dispatch({
+      type: "patch",
+      payload: { sessions: [], activeSessionId: "", snack: "Sessions cleared" },
+    });
   };
 
   const setActiveSessionId = (value: string) =>
@@ -182,7 +191,8 @@ export const useInterviewAppState = () => {
   const setError = (value: string) => dispatch({ type: "patch", payload: { error: value } });
   const setExtraContext = (value: string) =>
     dispatch({ type: "patch", payload: { extraContext: value } });
-  const setFocusInput = (value: string) => dispatch({ type: "patch", payload: { focusInput: value } });
+  const setFocusInput = (value: string) =>
+    dispatch({ type: "patch", payload: { focusInput: value } });
   const setLanguage = (value: InterviewLanguage) =>
     dispatch({ type: "patch", payload: { language: value } });
   const setLevel = (value: Level) => dispatch({ type: "patch", payload: { level: value } });
@@ -190,10 +200,13 @@ export const useInterviewAppState = () => {
   const setPersistSession = (value: boolean) =>
     dispatch({ type: "patch", payload: { persistSession: value } });
   const setScore = (value: string) => dispatch({ type: "patch", payload: { score: value } });
-  const setSimulation = (value: boolean) => dispatch({ type: "patch", payload: { simulation: value } });
+  const setSimulation = (value: boolean) =>
+    dispatch({ type: "patch", payload: { simulation: value } });
   const setSnack = (value: string) => dispatch({ type: "patch", payload: { snack: value } });
-  const setStackInput = (value: string) => dispatch({ type: "patch", payload: { stackInput: value } });
-  const setTemplateId = (value: string) => dispatch({ type: "patch", payload: { templateId: value } });
+  const setStackInput = (value: string) =>
+    dispatch({ type: "patch", payload: { stackInput: value } });
+  const setTemplateId = (value: string) =>
+    dispatch({ type: "patch", payload: { templateId: value } });
   const setTimebox = (value: number) => dispatch({ type: "patch", payload: { timebox: value } });
 
   return {

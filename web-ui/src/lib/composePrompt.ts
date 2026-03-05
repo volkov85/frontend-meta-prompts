@@ -97,15 +97,18 @@ export const composeInterviewPrompt = (config: InterviewConfig, opts: ComposeOpt
   if (include.includes("commonMistakes")) lines.push("- Common mistakes");
   if (include.includes("edgeCases")) lines.push("- Edge cases");
   if (include.includes("tradeOffs")) lines.push("- Trade-offs");
-  if (include.includes("seniorVsMiddle")) lines.push("- What differentiates Senior vs Middle answer");
+  if (include.includes("seniorVsMiddle"))
+    lines.push("- What differentiates Senior vs Middle answer");
   if (include.includes("scoringRubric")) {
     lines.push(
       "- Scoring rubric (0-10) with criteria: correctness, depth, clarity, trade-offs, practicality",
     );
   }
-  if (include.includes("measurementPlan")) lines.push("- Measurement plan (what, how, success criteria)");
+  if (include.includes("measurementPlan"))
+    lines.push("- Measurement plan (what, how, success criteria)");
   if (include.includes("rolloutPlan")) lines.push("- Rollout plan (flags, canary, rollback)");
-  if (include.includes("securityConsiderations")) lines.push("- Security considerations (when relevant)");
+  if (include.includes("securityConsiderations"))
+    lines.push("- Security considerations (when relevant)");
 
   const goodAnswerCriteria = tpl.promptOverrides?.goodAnswerCriteria ?? [];
   if (goodAnswerCriteria.length) {
