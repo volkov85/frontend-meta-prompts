@@ -561,6 +561,130 @@
           "Identifies beginner mistakes and suggests safe fixes"
         ]
       }
+    },
+    {
+      "id": "frontend-i18n-l10n",
+      "title": "Frontend Internationalization (i18n) & Localization (l10n)",
+      "levels": ["middle", "senior"],
+      "focus": [
+        "message formatting (ICU/plurals)",
+        "locale routing and negotiation",
+        "RTL support",
+        "date/number/currency formatting",
+        "translation workflow",
+        "pseudolocalization testing"
+      ],
+      "questionStyles": ["system-design", "review", "fix-bugs"],
+      "constraints": [
+        "avoid hardcoded strings",
+        "include fallback strategy for missing translations",
+        "cover testing and release process for localization"
+      ]
+    },
+    {
+      "id": "frontend-product-metrics-experimentation",
+      "title": "Frontend Product Metrics & Experimentation",
+      "levels": ["middle", "senior"],
+      "focus": [
+        "event taxonomy",
+        "instrumentation quality",
+        "A/B testing basics",
+        "guardrail metrics",
+        "experiment rollout and ramp",
+        "sample ratio mismatch awareness"
+      ],
+      "questionStyles": ["case-study", "strategy", "trade-offs"],
+      "constraints": [
+        "separate product signal from noise",
+        "include data-quality validation",
+        "define rollback criteria before launch"
+      ]
+    },
+    {
+      "id": "frontend-legacy-migration-strangler",
+      "title": "Frontend Legacy Migration (Strangler Pattern)",
+      "levels": ["middle", "senior"],
+      "focus": [
+        "incremental migration plan",
+        "module boundaries",
+        "compatibility layer",
+        "routing coexistence",
+        "shared state migration",
+        "risk slicing by user segments"
+      ],
+      "questionStyles": ["migration-plan", "system-design", "risk-analysis"],
+      "constraints": [
+        "no big-bang rewrite",
+        "preserve delivery speed during migration",
+        "define objective stop/go checkpoints"
+      ]
+    },
+    {
+      "id": "pwa-mobile-resilience",
+      "title": "PWA & Mobile Resilience",
+      "levels": ["middle", "senior"],
+      "focus": [
+        "service worker update lifecycle",
+        "cache invalidation",
+        "offline and flaky network UX",
+        "background sync patterns",
+        "installability constraints",
+        "push notifications trade-offs"
+      ],
+      "questionStyles": ["architecture", "incident-response", "optimization-plan"],
+      "constraints": [
+        "avoid stale critical data",
+        "account for low-end devices",
+        "explicitly handle reconnect and conflict resolution"
+      ]
+    },
+    {
+      "id": "frontend-reliability-slo",
+      "title": "Frontend Reliability: SLI/SLO, Error Budgets, On-call",
+      "levels": ["senior"],
+      "focus": [
+        "frontend SLI/SLO definition",
+        "error budget policy",
+        "alert fatigue reduction",
+        "incident severity model",
+        "runbooks and ownership",
+        "post-incident learning loop"
+      ],
+      "questionStyles": ["system-design", "incident-response", "scenario"],
+      "constraints": [
+        "tie reliability goals to user impact",
+        "avoid noisy non-actionable alerts",
+        "define clear escalation and rollback paths"
+      ]
+    },
+    {
+      "id": "junior-html-css-a11y-basics",
+      "title": "Junior: HTML/CSS & Accessibility Basics",
+      "levels": ["junior"],
+      "focus": [
+        "semantic HTML",
+        "forms and labels",
+        "keyboard navigation basics",
+        "focus visibility",
+        "responsive layout fundamentals"
+      ],
+      "questionStyles": ["review", "fix-bugs", "explain-why"],
+      "constraints": [
+        "prefer native HTML semantics over custom controls",
+        "focus on user-visible behavior",
+        "keep CSS solutions simple and maintainable"
+      ],
+      "promptOverrides": {
+        "followUps": 2,
+        "plainLanguage": true,
+        "include": ["idealAnswer", "commonMistakes", "edgeCases", "scoringRubric"],
+        "goodAnswerCriteria": [
+          "Chooses semantic elements and explains why they help users",
+          "Finds basic accessibility issues and suggests safe fixes",
+          "Uses straightforward responsive CSS without overengineering",
+          "Connects technical fixes to user experience improvements"
+        ]
+      }
     }
   ]
 }
