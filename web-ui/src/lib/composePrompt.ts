@@ -25,8 +25,7 @@ export const composeInterviewPrompt = (config: InterviewConfig, opts: ComposeOpt
   const stack = opts.stack ?? config.defaults.stack;
   const simulation = opts.mode?.simulation ?? config.defaults.simulation;
   const timeboxed = opts.mode?.timeboxedMinutes ?? config.defaults.timeboxedMinutes;
-  const promptLanguage =
-    opts.mode?.language ?? (opts.mode?.english === false ? "ru" : "en");
+  const promptLanguage = opts.mode?.language ?? (opts.mode?.english === false ? "ru" : "en");
   const isEnglish = promptLanguage === "en";
 
   const followUps = tpl.promptOverrides?.followUps ?? config.defaults.followUps;
@@ -35,14 +34,13 @@ export const composeInterviewPrompt = (config: InterviewConfig, opts: ComposeOpt
 
   const focus = [...tpl.focus, ...(opts.focusBoost ?? [])];
   const uniqFocus = Array.from(new Set(focus));
-  const levelText =
-    isEnglish
-      ? opts.level
-      : opts.level === "junior"
-        ? "джун"
-        : opts.level === "middle"
-          ? "мидл"
-          : "сеньор";
+  const levelText = isEnglish
+    ? opts.level
+    : opts.level === "junior"
+      ? "джун"
+      : opts.level === "middle"
+        ? "мидл"
+        : "сеньор";
 
   const lines: string[] = [];
 
@@ -142,8 +140,10 @@ export const composeInterviewPrompt = (config: InterviewConfig, opts: ComposeOpt
     lines.push(isEnglish ? "3) Ideal answer (structured)" : "3) Идеальный ответ (структурно)");
   }
 
-  if (include.includes("commonMistakes")) lines.push(isEnglish ? "- Common mistakes" : "- Частые ошибки");
-  if (include.includes("edgeCases")) lines.push(isEnglish ? "- Edge cases" : "- Пограничные случаи");
+  if (include.includes("commonMistakes"))
+    lines.push(isEnglish ? "- Common mistakes" : "- Частые ошибки");
+  if (include.includes("edgeCases"))
+    lines.push(isEnglish ? "- Edge cases" : "- Пограничные случаи");
   if (include.includes("tradeOffs")) lines.push(isEnglish ? "- Trade-offs" : "- Компромиссы");
   if (include.includes("seniorVsMiddle"))
     lines.push(
@@ -166,7 +166,9 @@ export const composeInterviewPrompt = (config: InterviewConfig, opts: ComposeOpt
     );
   if (include.includes("rolloutPlan"))
     lines.push(
-      isEnglish ? "- Rollout plan (flags, canary, rollback)" : "- План выката (флаги, канарейка, откат)",
+      isEnglish
+        ? "- Rollout plan (flags, canary, rollback)"
+        : "- План выката (флаги, канарейка, откат)",
     );
   if (include.includes("securityConsiderations"))
     lines.push(

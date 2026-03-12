@@ -209,7 +209,11 @@ export const useInterviewAppState = () => {
     clearSessions();
     dispatch({
       type: "patch",
-      payload: { sessions: [], activeSessionId: "", snack: UI_COPY[state.language].sessionsCleared },
+      payload: {
+        sessions: [],
+        activeSessionId: "",
+        snack: UI_COPY[state.language].sessionsCleared,
+      },
     });
   };
 
