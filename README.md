@@ -56,6 +56,7 @@ Separation of concerns:
 
 - Structured interview templates (junior/middle/senior)
 - Prompt generation with mode overrides
+- Bilingual prompt generation (`en` / `ru`) in Web UI
 - Template-level prompt overrides (`promptOverrides`) for per-template tuning
 - CLI to list templates and generate interviews
 - CLI mode to record external LLM evaluation
@@ -174,10 +175,12 @@ Capabilities:
 
 - Select template and level
 - Configure stack, focus, context, timebox, simulation mode
-- Generate interview prompt in browser
+- Switch interface language (`EN` / `RU`) in the top bar
+- Generate interview prompt in browser in selected language
 - Auto-create session id in browser
 - Save score + notes into localStorage
 - View latest local sessions
+- Persist selected UI language in localStorage between reloads
 
 Implementation:
 
