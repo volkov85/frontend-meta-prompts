@@ -9,11 +9,16 @@ import {
   Divider,
   Grid,
   Snackbar,
+  ToggleButton,
+  ToggleButtonGroup,
   Toolbar,
   Typography,
 } from "@mui/material";
+import { MouseEvent } from "react";
 import { EvaluationCard, InterviewSetupCard, SessionsCard } from "./components";
 import { useInterviewAppState } from "./lib/useInterviewAppState";
+import { UI_COPY } from "./lib/uiCopy";
+import { InterviewLanguage } from "./lib/types";
 
 const App = () => {
   const {
@@ -54,6 +59,16 @@ const App = () => {
     templatesForLevel,
     timebox,
   } = useInterviewAppState();
+  const copy = UI_COPY[language];
+
+  const handleLanguageChange = (
+    _: MouseEvent<HTMLElement>,
+    nextLanguage: InterviewLanguage | null,
+  ) => {
+    if (nextLanguage) {
+      setLanguage(nextLanguage);
+    }
+  };
 
   return (
     <>
@@ -63,9 +78,24 @@ const App = () => {
         sx={{ backdropFilter: "blur(10px)", background: "rgba(2, 6, 23, 0.9)" }}
       >
         <Toolbar>
-          <Typography variant="h6">Frontend Meta Prompts</Typography>
+          <Typography variant="h6">{copy.appTitle}</Typography>
           <Box sx={{ flexGrow: 1 }} />
-          <Chip label="React + MUI" color="secondary" />
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <Typography variant="body2" color="text.secondary">
+              {copy.interfaceLanguage}
+            </Typography>
+            <ToggleButtonGroup
+              size="small"
+              exclusive
+              value={language}
+              onChange={handleLanguageChange}
+              color="secondary"
+            >
+              <ToggleButton value="en">EN</ToggleButton>
+              <ToggleButton value="ru">RU</ToggleButton>
+            </ToggleButtonGroup>
+            <Chip label={copy.techChip} color="secondary" />
+          </Box>
         </Toolbar>
       </AppBar>
 
@@ -88,7 +118,6 @@ const App = () => {
               persistSession={persistSession}
               setExtraContext={setExtraContext}
               setFocusInput={setFocusInput}
-              setLanguage={setLanguage}
               setLevel={setLevel}
               setPersistSession={setPersistSession}
               setSimulation={setSimulation}
@@ -105,6 +134,7 @@ const App = () => {
             <EvaluationCard
               activeSessionId={activeSessionId}
               busy={busy}
+              language={language}
               notes={notes}
               saveEvaluation={saveEvaluation}
               score={score}
@@ -118,19 +148,20 @@ const App = () => {
             <Card className="fade-up" sx={{ mb: 2 }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  Prompt Output
+                  {copy.promptOutputTitle}
                 </Typography>
                 <Divider sx={{ mb: 1.5 }} />
                 {prompt ? (
                   <Typography className="prompt-output">{prompt}</Typography>
                 ) : (
-                  <Typography color="text.secondary">Generated prompt will appear here.</Typography>
+                  <Typography color="text.secondary">{copy.promptOutputEmpty}</Typography>
                 )}
               </CardContent>
             </Card>
 
             <SessionsCard
               handleClearSessions={handleClearSessions}
+              language={language}
               refreshSessions={refreshSessions}
               sessions={sessions}
             />

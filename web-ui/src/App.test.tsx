@@ -42,6 +42,22 @@ describe("App", () => {
     expect(screen.getByText(/Session:/)).toBeInTheDocument();
   });
 
+  it("generates prompt in russian after switching language", async () => {
+    const user = userEvent.setup();
+    renderApp();
+
+    await user.click(screen.getByRole("button", { name: "RU" }));
+    const generateButton = screen.getByRole("button", { name: "Сгенерировать промпт" });
+    await waitFor(() => expect(generateButton).toBeEnabled());
+
+    await user.click(generateButton);
+
+    await waitFor(() => {
+      expect(screen.getByText(/РОЛЬ:/)).toBeInTheDocument();
+    });
+    expect(screen.getByText(/Сессия создана:/)).toBeInTheDocument();
+  });
+
   it("saves evaluation and updates session score", async () => {
     const user = userEvent.setup();
     renderApp();

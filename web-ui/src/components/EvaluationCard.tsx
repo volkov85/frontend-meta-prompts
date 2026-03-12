@@ -1,8 +1,11 @@
 import { Button, Card, CardContent, Stack, TextField, Typography } from "@mui/material";
+import { UI_COPY } from "../lib/uiCopy";
+import { InterviewLanguage } from "../lib/types";
 
 type EvaluationCardProps = {
   activeSessionId: string;
   busy: boolean;
+  language: InterviewLanguage;
   notes: string;
   saveEvaluation: () => Promise<void>;
   score: string;
@@ -14,6 +17,7 @@ type EvaluationCardProps = {
 export const EvaluationCard = ({
   activeSessionId,
   busy,
+  language,
   notes,
   saveEvaluation,
   score,
@@ -21,21 +25,23 @@ export const EvaluationCard = ({
   setNotes,
   setScore,
 }: EvaluationCardProps) => {
+  const copy = UI_COPY[language];
+
   return (
     <Card className="fade-up">
       <CardContent>
         <Typography variant="h6" gutterBottom>
-          Save Evaluation
+          {copy.evaluationTitle}
         </Typography>
         <Stack spacing={1.5}>
           <TextField
-            label="Session ID"
+            label={copy.sessionId}
             value={activeSessionId}
             onChange={(event) => setActiveSessionId(event.target.value)}
             fullWidth
           />
           <TextField
-            label="Score (0..10)"
+            label={copy.score}
             type="number"
             inputProps={{ min: 0, max: 10, step: 0.1 }}
             value={score}
@@ -43,7 +49,7 @@ export const EvaluationCard = ({
             fullWidth
           />
           <TextField
-            label="Notes"
+            label={copy.notes}
             value={notes}
             onChange={(event) => setNotes(event.target.value)}
             multiline
@@ -55,7 +61,7 @@ export const EvaluationCard = ({
             onClick={saveEvaluation}
             disabled={busy || !activeSessionId || score === ""}
           >
-            Save score
+            {copy.saveScore}
           </Button>
         </Stack>
       </CardContent>

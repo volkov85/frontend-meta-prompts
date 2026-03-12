@@ -15,7 +15,7 @@ describe("composeInterviewPrompt", () => {
       extraContext: "Candidate built two pet projects",
       mode: {
         simulation: true,
-        english: false,
+        language: "en",
         timeboxedMinutes: 25,
       },
     });
@@ -28,6 +28,24 @@ describe("composeInterviewPrompt", () => {
     expect(prompt).toContain("Use plain language, short sentences, and avoid heavy jargon.");
     expect(prompt).toContain("- Scoring rubric (0-10)");
     expect(prompt).toContain("render lifecycle");
+  });
+
+  it("builds a russian prompt when language is ru", () => {
+    const prompt = composeInterviewPrompt(config, {
+      templateId: "junior-javascript-fundamentals",
+      level: "junior",
+      mode: {
+        language: "ru",
+        simulation: true,
+      },
+    });
+
+    expect(prompt).toContain("РОЛЬ:");
+    expect(prompt).toContain("КОНТЕКСТ:");
+    expect(prompt).toContain("ЗАДАЧА:");
+    expect(prompt).toContain("РЕЖИМ:");
+    expect(prompt).toContain("Веди интервью на русском");
+    expect(prompt).toContain("Уровень кандидата: джун");
   });
 
   it("supports non-simulation mode", () => {

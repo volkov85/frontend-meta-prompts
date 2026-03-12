@@ -1,4 +1,5 @@
 export type Level = "junior" | "middle" | "senior";
+export type InterviewLanguage = "en" | "ru";
 
 export type IncludeSection =
   | "idealAnswer"

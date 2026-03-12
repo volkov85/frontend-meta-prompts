@@ -2,19 +2,37 @@ import { useEffect, useMemo, useReducer } from "react";
 import interviewsData from "../../../data/interviews.json";
 import { composeInterviewPrompt } from "./composePrompt";
 import { clearSessions, createSession, listSessions, updateSessionScore } from "./localSessions";
-import { InterviewConfig, InterviewTemplate, Level, Session } from "./types";
-
-export type InterviewLanguage = "en" | "ru";
+import { UI_COPY } from "./uiCopy";
+import { InterviewConfig, InterviewLanguage, InterviewTemplate, Level, Session } from "./types";
 
 export const ALL_LEVELS: Level[] = ["junior", "middle", "senior"];
 
 const config = interviewsData as InterviewConfig;
+const LANGUAGE_STORAGE_KEY = "frontend_meta_prompts_ui_language_v1";
 
 const parseCsv = (value: string): string[] => {
   return value
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
+};
+
+const readStoredLanguage = (): InterviewLanguage | null => {
+  try {
+    const value = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    if (value === "en" || value === "ru") return value;
+    return null;
+  } catch {
+    return null;
+  }
+};
+
+const writeStoredLanguage = (language: InterviewLanguage): void => {
+  try {
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+  } catch {
+    // Ignore storage failures (private mode/quota/etc.) and keep app usable.
+  }
 };
 
 type InterviewAppState = {
@@ -88,6 +106,7 @@ export const useInterviewAppState = () => {
       const juniorTemplate = config.templates.find((template) =>
         template.levels.includes("junior"),
       );
+      const storedLanguage = readStoredLanguage();
       dispatch({
         type: "patch",
         payload: {
@@ -96,6 +115,7 @@ export const useInterviewAppState = () => {
           level: "junior",
           templateId: juniorTemplate?.id ?? config.templates[0]?.id ?? "",
           stackInput: (config.defaults.stack ?? []).join(", "),
+          language: storedLanguage ?? config.defaults.language ?? "en",
           simulation: Boolean(config.defaults.simulation),
           timebox: Number(config.defaults.timeboxedMinutes ?? 30),
         },
@@ -116,6 +136,10 @@ export const useInterviewAppState = () => {
     }
   }, [state.templateId, templatesForLevel]);
 
+  useEffect(() => {
+    writeStoredLanguage(state.language);
+  }, [state.language]);
+
   const generatePrompt = async () => {
     try {
       dispatch({ type: "patch", payload: { busy: true, error: "" } });
@@ -127,7 +151,7 @@ export const useInterviewAppState = () => {
         extraContext: state.extraContext,
         mode: {
           simulation: state.simulation,
-          english: state.language === "en",
+          language: state.language,
           timeboxedMinutes: Number(state.timebox),
         },
       });
@@ -139,7 +163,7 @@ export const useInterviewAppState = () => {
           payload: {
             prompt: nextPrompt,
             activeSessionId: session.id,
-            snack: `Session created: ${session.id}`,
+            snack: UI_COPY[state.language].sessionCreated(session.id),
           },
         });
       } else {
@@ -164,7 +188,10 @@ export const useInterviewAppState = () => {
       dispatch({ type: "patch", payload: { busy: true, error: "" } });
       updateSessionScore(state.activeSessionId, Number(state.score), state.notes);
 
-      dispatch({ type: "patch", payload: { snack: "Evaluation saved", score: "", notes: "" } });
+      dispatch({
+        type: "patch",
+        payload: { snack: UI_COPY[state.language].evaluationSaved, score: "", notes: "" },
+      });
       refreshSessions();
     } catch (requestError) {
       dispatch({
@@ -182,7 +209,7 @@ export const useInterviewAppState = () => {
     clearSessions();
     dispatch({
       type: "patch",
-      payload: { sessions: [], activeSessionId: "", snack: "Sessions cleared" },
+      payload: { sessions: [], activeSessionId: "", snack: UI_COPY[state.language].sessionsCleared },
     });
   };
 

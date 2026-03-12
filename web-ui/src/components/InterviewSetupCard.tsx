@@ -9,8 +9,9 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { ALL_LEVELS, InterviewLanguage } from "../lib/useInterviewAppState";
-import { InterviewTemplate, Level } from "../lib/types";
+import { ALL_LEVELS } from "../lib/useInterviewAppState";
+import { LEVEL_LABELS, UI_COPY } from "../lib/uiCopy";
+import { InterviewLanguage, InterviewTemplate, Level } from "../lib/types";
 
 type InterviewSetupCardProps = {
   busy: boolean;
@@ -22,7 +23,6 @@ type InterviewSetupCardProps = {
   persistSession: boolean;
   setExtraContext: (value: string) => void;
   setFocusInput: (value: string) => void;
-  setLanguage: (value: InterviewLanguage) => void;
   setLevel: (value: Level) => void;
   setPersistSession: (value: boolean) => void;
   setSimulation: (value: boolean) => void;
@@ -46,7 +46,6 @@ export const InterviewSetupCard = ({
   persistSession,
   setExtraContext,
   setFocusInput,
-  setLanguage,
   setLevel,
   setPersistSession,
   setSimulation,
@@ -59,16 +58,19 @@ export const InterviewSetupCard = ({
   templatesForLevel,
   timebox,
 }: InterviewSetupCardProps) => {
+  const copy = UI_COPY[language];
+  const levelLabels = LEVEL_LABELS[language];
+
   return (
     <Card className="fade-up" sx={{ mb: 2 }}>
       <CardContent>
         <Typography variant="h6" gutterBottom>
-          Interview Setup
+          {copy.setupTitle}
         </Typography>
         <Stack spacing={1.5}>
           <TextField
             select
-            label="Template"
+            label={copy.template}
             value={templateId}
             onChange={(event) => setTemplateId(event.target.value)}
             fullWidth
@@ -82,32 +84,32 @@ export const InterviewSetupCard = ({
 
           <TextField
             select
-            label="Level"
+            label={copy.level}
             value={level}
             onChange={(event) => setLevel(event.target.value as Level)}
             fullWidth
           >
             {ALL_LEVELS.map((option) => (
               <MenuItem key={option} value={option}>
-                {option}
+                {levelLabels[option]}
               </MenuItem>
             ))}
           </TextField>
 
           <TextField
-            label="Stack (comma separated)"
+            label={copy.stack}
             value={stackInput}
             onChange={(event) => setStackInput(event.target.value)}
             fullWidth
           />
           <TextField
-            label="Focus boost (comma separated)"
+            label={copy.focusBoost}
             value={focusInput}
             onChange={(event) => setFocusInput(event.target.value)}
             fullWidth
           />
           <TextField
-            label="Extra context"
+            label={copy.extraContext}
             value={extraContext}
             onChange={(event) => setExtraContext(event.target.value)}
             multiline
@@ -116,24 +118,13 @@ export const InterviewSetupCard = ({
           />
           <TextField
             type="number"
-            label="Timebox (minutes)"
+            label={copy.timebox}
             value={timebox}
             onChange={(event) => setTimebox(Number(event.target.value))}
             fullWidth
           />
 
           <Stack direction="row" spacing={1}>
-            <TextField
-              select
-              size="small"
-              label="Language"
-              value={language}
-              onChange={(event) => setLanguage(event.target.value as InterviewLanguage)}
-              sx={{ minWidth: 150 }}
-            >
-              <MenuItem value="en">English</MenuItem>
-              <MenuItem value="ru">Russian</MenuItem>
-            </TextField>
             <FormControlLabel
               control={
                 <Switch
@@ -141,7 +132,7 @@ export const InterviewSetupCard = ({
                   onChange={(event) => setSimulation(event.target.checked)}
                 />
               }
-              label="Simulation"
+              label={copy.simulation}
             />
             <FormControlLabel
               control={
@@ -150,7 +141,7 @@ export const InterviewSetupCard = ({
                   onChange={(event) => setPersistSession(event.target.checked)}
                 />
               }
-              label="Create session"
+              label={copy.createSession}
             />
           </Stack>
 
@@ -160,7 +151,7 @@ export const InterviewSetupCard = ({
             onClick={generatePrompt}
             disabled={busy || !templateId}
           >
-            Generate Prompt
+            {copy.generatePrompt}
           </Button>
         </Stack>
       </CardContent>
