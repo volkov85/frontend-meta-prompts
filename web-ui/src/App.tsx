@@ -2,6 +2,7 @@ import {
   Alert,
   AppBar,
   Box,
+  Button,
   Card,
   CardContent,
   Chip,
@@ -67,6 +68,17 @@ const App = () => {
   ) => {
     if (nextLanguage) {
       setLanguage(nextLanguage);
+    }
+  };
+
+  const handleCopyPrompt = async () => {
+    if (!prompt) return;
+
+    try {
+      await navigator.clipboard.writeText(prompt);
+      setSnack(copy.promptCopied);
+    } catch {
+      setError(copy.promptCopyFailed);
     }
   };
 
@@ -147,9 +159,25 @@ const App = () => {
           <Grid item xs={12} md={7}>
             <Card className="fade-up" sx={{ mb: 2 }}>
               <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  {copy.promptOutputTitle}
-                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: 2,
+                    mb: 1,
+                  }}
+                >
+                  <Typography variant="h6">{copy.promptOutputTitle}</Typography>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={handleCopyPrompt}
+                    disabled={!prompt}
+                  >
+                    {copy.copyPrompt}
+                  </Button>
+                </Box>
                 <Divider sx={{ mb: 1.5 }} />
                 {prompt ? (
                   <Typography className="prompt-output">{prompt}</Typography>

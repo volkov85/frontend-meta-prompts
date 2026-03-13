@@ -1,7 +1,7 @@
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 import { appTheme } from "./theme";
 
@@ -16,6 +16,12 @@ const renderApp = () =>
 describe("App", () => {
   beforeEach(() => {
     localStorage.clear();
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: vi.fn().mockResolvedValue(undefined),
+      },
+    });
   });
 
   it("renders initial layout", () => {
@@ -110,5 +116,25 @@ describe("App", () => {
 
     await user.click(screen.getByRole("button", { name: "Clear sessions" }));
     expect(screen.getByText("No saved sessions yet.")).toBeInTheDocument();
+  });
+
+  it("copies generated prompt to clipboard", async () => {
+    const user = userEvent.setup();
+    renderApp();
+
+    const generateButton = screen.getByRole("button", { name: "Generate Prompt" });
+    await waitFor(() => expect(generateButton).toBeEnabled());
+    await user.click(generateButton);
+
+    await waitFor(() => expect(screen.getByText(/ROLE:/)).toBeInTheDocument());
+
+    const copyButton = screen.getByRole("button", { name: "Copy" });
+    expect(copyButton).toBeEnabled();
+
+    await user.click(copyButton);
+
+    await waitFor(() => {
+      expect(screen.getByText("Prompt copied")).toBeInTheDocument();
+    });
   });
 });

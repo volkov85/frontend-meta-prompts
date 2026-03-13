@@ -21,6 +21,7 @@ type UiCopy = {
   saveScore: string;
   promptOutputTitle: string;
   promptOutputEmpty: string;
+  copyPrompt: string;
   recentSessions: string;
   clearSessions: string;
   refresh: string;
@@ -31,6 +32,8 @@ type UiCopy = {
   sessionCreated: (sessionId: string) => string;
   evaluationSaved: string;
   sessionsCleared: string;
+  promptCopied: string;
+  promptCopyFailed: string;
 };
 
 export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
@@ -55,6 +58,7 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     saveScore: "Save score",
     promptOutputTitle: "Prompt Output",
     promptOutputEmpty: "Generated prompt will appear here.",
+    copyPrompt: "Copy",
     recentSessions: "Recent Sessions",
     clearSessions: "Clear sessions",
     refresh: "Refresh",
@@ -65,6 +69,8 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     sessionCreated: (sessionId: string) => `Session created: ${sessionId}`,
     evaluationSaved: "Evaluation saved",
     sessionsCleared: "Sessions cleared",
+    promptCopied: "Prompt copied",
+    promptCopyFailed: "Unable to copy prompt",
   },
   ru: {
     appTitle: "Frontend Meta Prompts",
@@ -87,6 +93,7 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     saveScore: "Сохранить оценку",
     promptOutputTitle: "Сгенерированный промпт",
     promptOutputEmpty: "Здесь появится сгенерированный промпт.",
+    copyPrompt: "Копировать",
     recentSessions: "Последние сессии",
     clearSessions: "Очистить сессии",
     refresh: "Обновить",
@@ -97,6 +104,8 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     sessionCreated: (sessionId: string) => `Сессия создана: ${sessionId}`,
     evaluationSaved: "Оценка сохранена",
     sessionsCleared: "Сессии очищены",
+    promptCopied: "Промпт скопирован",
+    promptCopyFailed: "Не удалось скопировать промпт",
   },
 };
 
