@@ -1,15 +1,7 @@
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";
-
-export type Session = {
-  id: string;
-  date: string;
-  templateId: string;
-  level: "junior" | "middle" | "senior";
-  score?: number;
-  notes?: string;
-};
+import { Level, Session } from "../core";
 
 const sessionsPath = path.resolve(process.cwd(), "data/sessions.json");
 
@@ -63,10 +55,7 @@ const writeSessions = (sessions: Session[]) => {
   fs.renameSync(tempPath, sessionsPath);
 };
 
-export const createSession = (
-  templateId: string,
-  level: "junior" | "middle" | "senior",
-): Session => {
+export const createSession = (templateId: string, level: Level): Session => {
   const newSession: Session = {
     id: crypto.randomUUID(),
     date: new Date().toISOString(),

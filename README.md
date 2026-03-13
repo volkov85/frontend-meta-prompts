@@ -22,7 +22,7 @@ Interview prep is usually random and hard to track.
 This project makes it structured:
 
 - Template-driven interview topics
-- Prompt composition engine
+- Shared prompt composition core for CLI and Web UI
 - Session history persistence
 - External evaluation recording (LLM/interviewer score + notes)
 
@@ -33,15 +33,20 @@ data/
   interviews.json    # Interview templates and defaults
   sessions.json      # Runtime session history for CLI mode
 
+core/
+  composeInterviewPrompt.ts  # Shared prompt builder (single source of truth)
+  types.ts                   # Shared interview domain types
+
 engine/
-  composeInterviewPrompt.ts  # Prompt builder
+  composeInterviewPrompt.ts  # Re-export of shared prompt builder for CLI imports
   sessionRunner.ts           # Session create/update and persistence
   scorer.ts                  # Optional local scorer (not required by CLI flow)
 
 index.ts              # CLI entry point
 
 web-ui/
-  src/lib/composePrompt.ts   # Prompt builder for browser mode
+  src/lib/composePrompt.ts   # Re-export of shared prompt builder for browser mode
+  src/lib/types.ts           # Re-export of shared core types for the UI layer
   src/lib/localSessions.ts   # localStorage session persistence
   src/App.tsx                # React UI
 ```
@@ -49,18 +54,36 @@ web-ui/
 Separation of concerns:
 
 - Data layer: declarative interview templates
-- Engine layer: business logic
+- Core layer: shared prompt generation and domain types
+- Engine layer: CLI runtime and filesystem persistence
+- Web layer: browser UI and localStorage persistence
 - Runtime layer: generated sessions and evaluation results
 
 ## Features
 
 - Structured interview templates (junior/middle/senior)
-- Prompt generation with mode overrides
+- Prompt generation with mode overrides from a shared core module
 - Bilingual prompt generation (`en` / `ru`) in Web UI
 - Template-level prompt overrides (`promptOverrides`) for per-template tuning
 - CLI to list templates and generate interviews
 - CLI mode to record external LLM evaluation
-- JSON persistence for session tracking
+- Session persistence in JSON (CLI) and `localStorage` (Web UI)
+
+## Shared Core
+
+The project uses a shared `core/` module so CLI and Web UI do not duplicate
+prompt-building logic or domain types.
+
+What lives in `core/`:
+
+- `core/composeInterviewPrompt.ts` - canonical prompt builder
+- `core/types.ts` - canonical interview config and session types
+
+Benefits:
+
+- One source of truth for prompt generation behavior
+- Consistent output across CLI and browser flows
+- Lower maintenance cost when adding new template options or modes
 
 ## Template Prompt Overrides
 
@@ -189,7 +212,8 @@ Implementation:
 - `web-ui/src/main.tsx` - frontend entry
 - `web-ui/src/theme.ts` - MUI theme
 - `web-ui/src/styles.css` - visual theme and layout styles
-- `web-ui/src/lib/composePrompt.ts` - prompt composition logic
+- `web-ui/src/lib/composePrompt.ts` - Web-facing re-export of shared prompt composition logic
+- `web-ui/src/lib/types.ts` - Web-facing re-export of shared interview types
 - `web-ui/src/lib/localSessions.ts` - localStorage persistence
 
 Production build:
@@ -211,7 +235,7 @@ VITE_BASE_PATH=/YOUR_REPO_NAME/ npm run web:build
 
 The project now includes:
 
-- Unit tests for prompt composition logic
+- Unit tests for shared prompt composition logic
 - Unit tests for browser session persistence (`localStorage`)
 - Integration tests for core React UI flows
 - End-to-end tests in a real browser with Playwright
