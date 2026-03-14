@@ -82,6 +82,26 @@ const App = () => {
     }
   };
 
+  const handleSharePrompt = async () => {
+    if (!prompt) return;
+
+    try {
+      if (typeof navigator.share === "function") {
+        await navigator.share({
+          title: copy.promptOutputTitle,
+          text: prompt,
+        });
+        setSnack(copy.promptShared);
+        return;
+      }
+
+      await navigator.clipboard.writeText(prompt);
+      setSnack(copy.promptSharedFallback);
+    } catch {
+      setError(copy.promptShareFailed);
+    }
+  };
+
   return (
     <>
       <AppBar
@@ -169,14 +189,24 @@ const App = () => {
                   }}
                 >
                   <Typography variant="h6">{copy.promptOutputTitle}</Typography>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={handleCopyPrompt}
-                    disabled={!prompt}
-                  >
-                    {copy.copyPrompt}
-                  </Button>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, ml: "auto" }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={handleCopyPrompt}
+                      disabled={!prompt}
+                    >
+                      {copy.copyPrompt}
+                    </Button>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={handleSharePrompt}
+                      disabled={!prompt}
+                    >
+                      {copy.sharePrompt}
+                    </Button>
+                  </Box>
                 </Box>
                 <Divider sx={{ mb: 1.5 }} />
                 {prompt ? (

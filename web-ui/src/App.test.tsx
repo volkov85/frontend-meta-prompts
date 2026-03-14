@@ -22,6 +22,10 @@ describe("App", () => {
         writeText: vi.fn().mockResolvedValue(undefined),
       },
     });
+    Object.defineProperty(navigator, "share", {
+      configurable: true,
+      value: vi.fn().mockResolvedValue(undefined),
+    });
   });
 
   it("renders initial layout", () => {
@@ -135,6 +139,26 @@ describe("App", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Prompt copied")).toBeInTheDocument();
+    });
+  });
+
+  it("shares generated prompt", async () => {
+    const user = userEvent.setup();
+    renderApp();
+
+    const generateButton = screen.getByRole("button", { name: "Generate Prompt" });
+    await waitFor(() => expect(generateButton).toBeEnabled());
+    await user.click(generateButton);
+
+    await waitFor(() => expect(screen.getByText(/ROLE:/)).toBeInTheDocument());
+
+    const shareButton = screen.getByRole("button", { name: "Share" });
+    expect(shareButton).toBeEnabled();
+
+    await user.click(shareButton);
+
+    await waitFor(() => {
+      expect(screen.getByText("Prompt shared")).toBeInTheDocument();
     });
   });
 });
