@@ -23,6 +23,7 @@ type UiCopy = {
   promptOutputEmpty: string;
   copyPrompt: string;
   sharePrompt: string;
+  startNewSession: string;
   recentSessions: string;
   clearSessions: string;
   refresh: string;
@@ -38,6 +39,7 @@ type UiCopy = {
   promptShared: string;
   promptShareFailed: string;
   promptSharedFallback: string;
+  newSessionStarted: string;
 };
 
 export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
@@ -64,6 +66,7 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     promptOutputEmpty: "Generated prompt will appear here.",
     copyPrompt: "Copy",
     sharePrompt: "Share",
+    startNewSession: "Start new session",
     recentSessions: "Recent Sessions",
     clearSessions: "Clear sessions",
     refresh: "Refresh",
@@ -79,6 +82,7 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     promptShared: "Prompt shared",
     promptShareFailed: "Unable to share prompt",
     promptSharedFallback: "Share not available, prompt copied instead",
+    newSessionStarted: "Ready for a new session",
   },
   ru: {
     appTitle: "Frontend Meta Prompts",
@@ -103,6 +107,7 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     promptOutputEmpty: "Здесь появится сгенерированный промпт.",
     copyPrompt: "Копировать",
     sharePrompt: "Поделиться",
+    startNewSession: "Новая сессия",
     recentSessions: "Последние сессии",
     clearSessions: "Очистить сессии",
     refresh: "Обновить",
@@ -118,6 +123,7 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     promptShared: "Промпт отправлен",
     promptShareFailed: "Не удалось поделиться промптом",
     promptSharedFallback: "Шаринг недоступен, промпт скопирован",
+    newSessionStarted: "Готово к новой сессии",
   },
 };
 

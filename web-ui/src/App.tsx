@@ -39,6 +39,7 @@ const App = () => {
     saveEvaluation,
     score,
     sessions,
+    startNewSession,
     setActiveSessionId,
     setError,
     setExtraContext,
@@ -205,6 +206,14 @@ const App = () => {
                       disabled={!prompt}
                     >
                       {copy.sharePrompt}
+                    </Button>
+                    <Button
+                      variant="text"
+                      size="small"
+                      onClick={startNewSession}
+                      disabled={!prompt}
+                    >
+                      {copy.startNewSession}
                     </Button>
                   </Box>
                 </Box>

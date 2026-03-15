@@ -161,4 +161,25 @@ describe("App", () => {
       expect(screen.getByText("Prompt shared")).toBeInTheDocument();
     });
   });
+
+  it("starts a new session by clearing the current prompt", async () => {
+    const user = userEvent.setup();
+    renderApp();
+
+    const generateButton = screen.getByRole("button", { name: "Generate Prompt" });
+    await waitFor(() => expect(generateButton).toBeEnabled());
+    await user.click(generateButton);
+
+    await waitFor(() => expect(screen.getByText(/ROLE:/)).toBeInTheDocument());
+
+    const startNewSessionButton = screen.getByRole("button", { name: "Start new session" });
+    expect(startNewSessionButton).toBeEnabled();
+
+    await user.click(startNewSessionButton);
+
+    await waitFor(() => {
+      expect(screen.getByText("Generated prompt will appear here.")).toBeInTheDocument();
+    });
+    expect(screen.queryByText(/ROLE:/)).not.toBeInTheDocument();
+  });
 });

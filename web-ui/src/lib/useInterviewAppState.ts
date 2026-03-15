@@ -217,6 +217,20 @@ export const useInterviewAppState = () => {
     });
   };
 
+  const startNewSession = () => {
+    dispatch({
+      type: "patch",
+      payload: {
+        activeSessionId: "",
+        error: "",
+        notes: "",
+        prompt: "",
+        score: "",
+        snack: UI_COPY[state.language].newSessionStarted,
+      },
+    });
+  };
+
   const setActiveSessionId = (value: string) =>
     dispatch({ type: "patch", payload: { activeSessionId: value } });
   const setError = (value: string) => dispatch({ type: "patch", payload: { error: value } });
@@ -256,6 +270,7 @@ export const useInterviewAppState = () => {
     refreshSessions,
     saveEvaluation,
     score: state.score,
+    startNewSession,
     sessions: state.sessions,
     setActiveSessionId,
     setError,
