@@ -139,8 +139,8 @@ const App = () => {
           </Alert>
         )}
 
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, md: 5 }}>
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, md: 5 }}>
             <InterviewSetupCard
               busy={busy}
               extraContext={extraContext}
@@ -177,7 +177,7 @@ const App = () => {
             />
           </Grid>
 
-            <Grid size={{ xs: 12, md: 7 }}>
+          <Grid size={{ xs: 12, md: 7 }}>
             <Card className="fade-up" sx={{ mb: 2 }}>
               <CardContent>
                 <Box
