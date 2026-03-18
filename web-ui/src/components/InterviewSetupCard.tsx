@@ -70,20 +70,6 @@ export const InterviewSetupCard = ({
         <Stack spacing={1.5}>
           <TextField
             select
-            label={copy.template}
-            value={templateId}
-            onChange={(event) => setTemplateId(event.target.value)}
-            fullWidth
-          >
-            {templatesForLevel.map((template) => (
-              <MenuItem key={template.id} value={template.id}>
-                {template.title}
-              </MenuItem>
-            ))}
-          </TextField>
-
-          <TextField
-            select
             label={copy.level}
             value={level}
             onChange={(event) => setLevel(event.target.value as Level)}
@@ -92,6 +78,20 @@ export const InterviewSetupCard = ({
             {ALL_LEVELS.map((option) => (
               <MenuItem key={option} value={option}>
                 {levelLabels[option]}
+              </MenuItem>
+            ))}
+          </TextField>
+
+          <TextField
+            select
+            label={copy.template}
+            value={templateId}
+            onChange={(event) => setTemplateId(event.target.value)}
+            fullWidth
+          >
+            {templatesForLevel.map((template) => (
+              <MenuItem key={template.id} value={template.id}>
+                {template.title}
               </MenuItem>
             ))}
           </TextField>

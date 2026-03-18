@@ -28,6 +28,10 @@ describe("App", () => {
     });
   });
 
+  const seedSessions = (sessions: object[]) => {
+    localStorage.setItem("frontend_meta_prompts_sessions_v1", JSON.stringify(sessions));
+  };
+
   it("renders initial layout", () => {
     renderApp();
 
@@ -120,6 +124,62 @@ describe("App", () => {
 
     await user.click(screen.getByRole("button", { name: "Clear sessions" }));
     expect(screen.getByText("No saved sessions yet.")).toBeInTheDocument();
+  });
+
+  it("filters sessions by level and score status", async () => {
+    const user = userEvent.setup();
+    seedSessions([
+      {
+        id: "session-middle-rated",
+        date: "2026-03-18T10:00:00.000Z",
+        templateId: "react-hooks-internals",
+        level: "middle",
+        score: 8.5,
+      },
+      {
+        id: "session-junior-unrated",
+        date: "2026-03-18T09:00:00.000Z",
+        templateId: "junior-react-fundamentals",
+        level: "junior",
+      },
+    ]);
+    renderApp();
+
+    await user.click(screen.getByLabelText("Level filter"));
+    await user.click(screen.getByRole("option", { name: "Junior" }));
+
+    expect(screen.getByText("junior-react-fundamentals")).toBeInTheDocument();
+    expect(screen.queryByText("react-hooks-internals")).not.toBeInTheDocument();
+
+    await user.click(screen.getByLabelText("Score filter"));
+    await user.click(screen.getByRole("option", { name: "Rated" }));
+
+    expect(screen.getByText("No sessions match the current filters.")).toBeInTheDocument();
+  });
+
+  it("filters sessions by search query", async () => {
+    const user = userEvent.setup();
+    seedSessions([
+      {
+        id: "session-search-match",
+        date: "2026-03-18T10:00:00.000Z",
+        templateId: "react-hooks-internals",
+        level: "middle",
+        notes: "stale closure issue",
+      },
+      {
+        id: "session-search-other",
+        date: "2026-03-18T09:00:00.000Z",
+        templateId: "junior-react-fundamentals",
+        level: "junior",
+      },
+    ]);
+    renderApp();
+
+    await user.type(screen.getByLabelText("Search"), "closure");
+
+    expect(screen.getByText("react-hooks-internals")).toBeInTheDocument();
+    expect(screen.queryByText("junior-react-fundamentals")).not.toBeInTheDocument();
   });
 
   it("copies generated prompt to clipboard", async () => {

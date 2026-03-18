@@ -27,7 +27,16 @@ type UiCopy = {
   recentSessions: string;
   clearSessions: string;
   refresh: string;
+  sessionSearch: string;
+  sessionSearchPlaceholder: string;
+  levelFilterLabel: string;
+  scoreFilterLabel: string;
+  filterAllLevels: string;
+  filterAllScores: string;
+  filterRated: string;
+  filterUnrated: string;
   noSessions: string;
+  noFilteredSessions: string;
   sessionPrefix: string;
   scorePrefix: string;
   notRated: string;
@@ -70,7 +79,16 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     recentSessions: "Recent Sessions",
     clearSessions: "Clear sessions",
     refresh: "Refresh",
+    sessionSearch: "Search",
+    sessionSearchPlaceholder: "Session ID, template, note",
+    levelFilterLabel: "Level filter",
+    scoreFilterLabel: "Score filter",
+    filterAllLevels: "All levels",
+    filterAllScores: "All scores",
+    filterRated: "Rated",
+    filterUnrated: "Not rated",
     noSessions: "No saved sessions yet.",
+    noFilteredSessions: "No sessions match the current filters.",
     sessionPrefix: "Session",
     scorePrefix: "Score",
     notRated: "not rated",
@@ -111,7 +129,16 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     recentSessions: "Последние сессии",
     clearSessions: "Очистить сессии",
     refresh: "Обновить",
+    sessionSearch: "Поиск",
+    sessionSearchPlaceholder: "ID сессии, шаблон, заметка",
+    levelFilterLabel: "Фильтр уровня",
+    scoreFilterLabel: "Фильтр оценки",
+    filterAllLevels: "Все уровни",
+    filterAllScores: "Все оценки",
+    filterRated: "С оценкой",
+    filterUnrated: "Без оценки",
     noSessions: "Сохранённых сессий пока нет.",
+    noFilteredSessions: "По текущим фильтрам сессий не найдено.",
     sessionPrefix: "Сессия",
     scorePrefix: "Оценка",
     notRated: "без оценки",
@@ -128,6 +155,6 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
 };
 
 export const LEVEL_LABELS: Record<InterviewLanguage, Record<Level, string>> = {
-  en: { junior: "junior", middle: "middle", senior: "senior" },
-  ru: { junior: "джун", middle: "мидл", senior: "сеньор" },
+  en: { junior: "Junior", middle: "Middle", senior: "Senior" },
+  ru: { junior: "Джун", middle: "Мидл", senior: "Сеньор" },
 };
