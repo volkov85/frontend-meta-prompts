@@ -16,7 +16,7 @@ import {
   Typography,
 } from "@mui/material";
 import { MouseEvent } from "react";
-import { EvaluationCard, InterviewSetupCard, SessionsCard } from "./components";
+import { EvaluationCard, InterviewSetupCard, ProgressChartCard, SessionsCard } from "./components";
 import { useInterviewAppState } from "./lib/useInterviewAppState";
 import { UI_COPY } from "./lib/uiCopy";
 import { InterviewLanguage } from "./lib/types";
@@ -225,7 +225,7 @@ const App = () => {
                 )}
               </CardContent>
             </Card>
-
+            <ProgressChartCard language={language} sessions={sessions} />
             <SessionsCard
               handleClearSessions={handleClearSessions}
               language={language}

@@ -10,6 +10,10 @@ Structured interview engine for Senior Frontend Engineers
 
 Live Demo: https://volkov85.github.io/frontend-meta-prompts/
 
+<p align="center">
+  <img src="./docs/assets/app-preview.png" alt="Frontend Meta Prompts web UI screenshot" width="100%" />
+</p>
+
 This project helps you run a repeatable interview practice loop:
 
 1. Generate a structured interview prompt
@@ -68,6 +72,7 @@ Separation of concerns:
 - CLI to list templates and generate interviews
 - CLI mode to record external LLM evaluation
 - Session persistence in JSON (CLI) and `localStorage` (Web UI)
+- Interview progress chart in Web UI with recent scores, averages, and coverage
 
 ## Shared Core
 
@@ -202,6 +207,7 @@ Capabilities:
 - Generate interview prompt in browser in selected language
 - Auto-create session id in browser
 - Save score + notes into localStorage
+- Track recent interview momentum with a score trend chart and summary stats
 - View latest local sessions
 - Persist selected UI language in localStorage between reloads
 
@@ -209,6 +215,7 @@ Implementation:
 
 - `web-ui/vite.config.ts` - Vite config
 - `web-ui/src/App.tsx` - main UI
+- `web-ui/src/components/ProgressChartCard.tsx` - scored session trend chart and KPI cards
 - `web-ui/src/main.tsx` - frontend entry
 - `web-ui/src/theme.ts` - MUI theme
 - `web-ui/src/styles.css` - visual theme and layout styles

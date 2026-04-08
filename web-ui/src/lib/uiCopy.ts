@@ -21,6 +21,12 @@ type UiCopy = {
   saveScore: string;
   promptOutputTitle: string;
   promptOutputEmpty: string;
+  progressChartTitle: string;
+  progressChartSubtitle: string;
+  progressChartEmpty: string;
+  progressAverage: string;
+  progressLatest: string;
+  progressCoverage: string;
   copyPrompt: string;
   sharePrompt: string;
   startNewSession: string;
@@ -73,6 +79,12 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     saveScore: "Save score",
     promptOutputTitle: "Prompt Output",
     promptOutputEmpty: "Generated prompt will appear here.",
+    progressChartTitle: "Interview Momentum",
+    progressChartSubtitle: "Recent scored sessions against level targets",
+    progressChartEmpty: "Save a few scored sessions to unlock the chart.",
+    progressAverage: "Average",
+    progressLatest: "Latest",
+    progressCoverage: "Coverage",
     copyPrompt: "Copy",
     sharePrompt: "Share",
     startNewSession: "Start new session",
@@ -123,6 +135,12 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     saveScore: "Сохранить оценку",
     promptOutputTitle: "Сгенерированный промпт",
     promptOutputEmpty: "Здесь появится сгенерированный промпт.",
+    progressChartTitle: "Динамика интервью",
+    progressChartSubtitle: "Последние оценённые сессии относительно целевых зон",
+    progressChartEmpty: "Сохраните несколько оценённых сессий, чтобы увидеть график.",
+    progressAverage: "Среднее",
+    progressLatest: "Последняя",
+    progressCoverage: "Покрытие",
     copyPrompt: "Копировать",
     sharePrompt: "Поделиться",
     startNewSession: "Новая сессия",

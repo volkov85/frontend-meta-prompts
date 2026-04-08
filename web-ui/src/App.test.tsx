@@ -36,6 +36,7 @@ describe("App", () => {
     renderApp();
 
     expect(screen.getByText("Frontend Meta Prompts")).toBeInTheDocument();
+    expect(screen.getByText("Interview Momentum")).toBeInTheDocument();
     expect(screen.getByText("Generated prompt will appear here.")).toBeInTheDocument();
     expect(screen.getByText("No saved sessions yet.")).toBeInTheDocument();
   });
@@ -180,6 +181,39 @@ describe("App", () => {
 
     expect(screen.getByText("react-hooks-internals")).toBeInTheDocument();
     expect(screen.queryByText("junior-react-fundamentals")).not.toBeInTheDocument();
+  });
+
+  it("renders progress chart stats from rated sessions", () => {
+    seedSessions([
+      {
+        id: "session-1",
+        date: "2026-03-18T10:00:00.000Z",
+        templateId: "react-hooks-internals",
+        level: "middle",
+        score: 8.4,
+      },
+      {
+        id: "session-2",
+        date: "2026-03-17T10:00:00.000Z",
+        templateId: "state-management",
+        level: "middle",
+        score: 7.2,
+      },
+      {
+        id: "session-3",
+        date: "2026-03-16T10:00:00.000Z",
+        templateId: "frontend-system-design",
+        level: "senior",
+      },
+    ]);
+
+    renderApp();
+
+    expect(screen.getByText("Average")).toBeInTheDocument();
+    expect(screen.getByText("7.8")).toBeInTheDocument();
+    expect(screen.getByText("Latest")).toBeInTheDocument();
+    expect(screen.getByText("8.4")).toBeInTheDocument();
+    expect(screen.getByText("67%")).toBeInTheDocument();
   });
 
   it("copies generated prompt to clipboard", async () => {
