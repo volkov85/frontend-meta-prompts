@@ -16,6 +16,7 @@ const renderApp = () =>
 describe("App", () => {
   beforeEach(() => {
     localStorage.clear();
+    window.history.replaceState({}, "", "/");
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
       value: {
@@ -496,5 +497,74 @@ describe("App", () => {
     expect((stored as { id: string }[]).map((session) => session.id).sort()).toEqual(
       ["session-existing", "session-imported"].sort(),
     );
+  });
+
+  it("hydrates setup form from URL query parameters", async () => {
+    window.history.replaceState(
+      {},
+      "",
+      "/?template=react-hooks-internals&level=senior&stack=Solid%2C%20Qwik&focus=signals%2C%20ssr&extra=fintech%20checkout&simulation=1&timebox=42&lang=en",
+    );
+
+    renderApp();
+
+    await waitFor(() => {
+      expect(screen.getByText("Setup loaded from shared link")).toBeInTheDocument();
+    });
+    expect(screen.getByLabelText("Stack (comma separated)")).toHaveValue("Solid, Qwik");
+    expect(screen.getByLabelText("Focus boost (comma separated)")).toHaveValue("signals, ssr");
+    expect(screen.getByLabelText("Extra context")).toHaveValue("fintech checkout");
+    expect(screen.getByLabelText("Timebox (minutes)")).toHaveValue(42);
+    await waitFor(() => expect(window.location.search).toBe(""));
+  });
+
+  it("copies share link to clipboard when the user requests it", async () => {
+    const user = userEvent.setup();
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText },
+    });
+
+    renderApp();
+
+    const shareButton = screen.getByRole("button", { name: "Copy share link" });
+    await waitFor(() => expect(shareButton).toBeEnabled());
+    await user.click(shareButton);
+
+    await waitFor(() => {
+      expect(screen.getByText("Share link copied to clipboard")).toBeInTheDocument();
+    });
+    expect(writeText).toHaveBeenCalledTimes(1);
+    const copied = writeText.mock.calls[0][0] as string;
+    expect(copied).toContain("template=");
+    expect(copied).toContain("level=");
+    expect(copied).toContain("simulation=");
+    expect(copied).toContain("lang=");
+  });
+
+  it("URL params win over saved setup", async () => {
+    seedSetup({
+      templateId: "react-hooks-internals",
+      level: "junior",
+      stackInput: "from-storage",
+      focusInput: "from-storage-focus",
+      extraContext: "from-storage-extra",
+      simulation: false,
+      timebox: 30,
+      persistSession: true,
+    });
+    window.history.replaceState({}, "", "/?stack=from-url&timebox=55&simulation=1");
+
+    renderApp();
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Stack (comma separated)")).toHaveValue("from-url");
+    });
+    expect(screen.getByLabelText("Timebox (minutes)")).toHaveValue(55);
+    expect(screen.getByLabelText("Focus boost (comma separated)")).toHaveValue(
+      "from-storage-focus",
+    );
+    expect(screen.getByLabelText("Extra context")).toHaveValue("from-storage-extra");
   });
 });

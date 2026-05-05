@@ -16,6 +16,12 @@ import {
   parseSessionsImport,
   serializeSessionsExport,
 } from "./exportSessions";
+import {
+  encodeConfigToUrl,
+  hasShareableParams,
+  parseConfigFromUrl,
+  stripShareableParams,
+} from "./configLink";
 import { readStoredSetup, writeStoredSetup } from "./setupStorage";
 import { UI_COPY } from "./uiCopy";
 import { InterviewConfig, InterviewLanguage, InterviewTemplate, Level, Session } from "./types";
@@ -126,35 +132,73 @@ export const useInterviewAppState = () => {
       const storedLanguage = readStoredLanguage();
       const storedSetup = readStoredSetup();
 
+      let urlSetup: ReturnType<typeof parseConfigFromUrl> = {};
+      let urlSnack = "";
+      let urlHadParams = false;
+      if (typeof window !== "undefined") {
+        const searchParams = new URLSearchParams(window.location.search);
+        if (hasShareableParams(searchParams)) {
+          urlHadParams = true;
+          urlSetup = parseConfigFromUrl(searchParams);
+          const linkLanguage =
+            urlSetup.language ?? storedLanguage ?? config.defaults.language ?? "en";
+          urlSnack = UI_COPY[linkLanguage].shareLinkApplied;
+        }
+      }
+
       const defaultLevel: Level = "junior";
       const defaultTemplateId = juniorTemplate?.id ?? config.templates[0]?.id ?? "";
       const defaultStackInput = (config.defaults.stack ?? []).join(", ");
       const defaultSimulation = Boolean(config.defaults.simulation);
       const defaultTimebox = Number(config.defaults.timeboxedMinutes ?? 30);
 
-      const restoredTemplateId =
-        storedSetup?.templateId &&
+      const candidateTemplateId =
+        urlSetup.templateId ??
+        (storedSetup?.templateId &&
         config.templates.some((template) => template.id === storedSetup.templateId)
           ? storedSetup.templateId
-          : defaultTemplateId;
+          : defaultTemplateId);
+      const restoredTemplateId = config.templates.some(
+        (template) => template.id === candidateTemplateId,
+      )
+        ? candidateTemplateId
+        : defaultTemplateId;
 
       dispatch({
         type: "patch",
         payload: {
           templates: config.templates,
           sessions: listSessions(),
-          level: storedSetup?.level ?? defaultLevel,
+          level: urlSetup.level ?? storedSetup?.level ?? defaultLevel,
           templateId: restoredTemplateId,
-          stackInput: storedSetup?.stackInput ?? defaultStackInput,
-          focusInput: storedSetup?.focusInput ?? "",
-          extraContext: storedSetup?.extraContext ?? "",
-          language: storedLanguage ?? config.defaults.language ?? "en",
-          simulation: storedSetup?.simulation ?? defaultSimulation,
-          timebox: storedSetup?.timebox ?? defaultTimebox,
+          stackInput: urlSetup.stackInput ?? storedSetup?.stackInput ?? defaultStackInput,
+          focusInput: urlSetup.focusInput ?? storedSetup?.focusInput ?? "",
+          extraContext: urlSetup.extraContext ?? storedSetup?.extraContext ?? "",
+          language: urlSetup.language ?? storedLanguage ?? config.defaults.language ?? "en",
+          simulation: urlSetup.simulation ?? storedSetup?.simulation ?? defaultSimulation,
+          timebox: urlSetup.timebox ?? storedSetup?.timebox ?? defaultTimebox,
           persistSession: storedSetup?.persistSession ?? true,
           setupInitialized: true,
+          snack: urlSnack,
         },
       });
+
+      if (urlHadParams && typeof window !== "undefined") {
+        // Defer the URL cleanup: first ensure the dispatched setup is committed
+        // (and React StrictMode's dev-only second mount has had a chance to
+        // re-read the same URL params identically) before stripping them.
+        window.setTimeout(() => {
+          if (typeof window === "undefined") return;
+          if (!window.history?.replaceState) return;
+          const current = new URLSearchParams(window.location.search);
+          if (!hasShareableParams(current)) return;
+          window.history.replaceState(
+            window.history.state,
+            "",
+            stripShareableParams(window.location.href),
+          );
+        }, 0);
+      }
     } catch (loadError) {
       dispatch({
         type: "patch",
@@ -281,6 +325,38 @@ export const useInterviewAppState = () => {
       });
     } finally {
       dispatch({ type: "patch", payload: { busy: false } });
+    }
+  };
+
+  const handleCopyShareLink = async () => {
+    try {
+      if (typeof window === "undefined") {
+        throw new Error("window is not available");
+      }
+      const url = encodeConfigToUrl(window.location.href, {
+        templateId: state.templateId,
+        level: state.level,
+        stackInput: state.stackInput,
+        focusInput: state.focusInput,
+        extraContext: state.extraContext,
+        simulation: state.simulation,
+        timebox: state.timebox,
+        language: state.language,
+      });
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        throw new Error("clipboard unavailable");
+      }
+      dispatch({
+        type: "patch",
+        payload: { snack: UI_COPY[state.language].shareLinkCopied },
+      });
+    } catch {
+      dispatch({
+        type: "patch",
+        payload: { error: UI_COPY[state.language].shareLinkCopyFailed },
+      });
     }
   };
 
@@ -425,6 +501,7 @@ export const useInterviewAppState = () => {
     focusInput: state.focusInput,
     generatePrompt,
     handleClearSessions,
+    handleCopyShareLink,
     handleExportJson,
     handleExportMarkdown,
     handleImportJson,

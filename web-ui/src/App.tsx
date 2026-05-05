@@ -30,6 +30,7 @@ const App = () => {
     focusInput,
     generatePrompt,
     handleClearSessions,
+    handleCopyShareLink,
     handleExportJson,
     handleExportMarkdown,
     handleImportJson,
@@ -152,6 +153,7 @@ const App = () => {
               extraContext={extraContext}
               focusInput={focusInput}
               generatePrompt={generatePrompt}
+              handleCopyShareLink={handleCopyShareLink}
               language={language}
               level={level}
               persistSession={persistSession}

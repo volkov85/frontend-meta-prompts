@@ -113,4 +113,16 @@ test.describe("Frontend Meta Prompts", () => {
     );
     await expect(page.getByLabel("Timebox (minutes)")).toHaveValue("17");
   });
+
+  test("hydrates setup from a shared URL", async ({ page }) => {
+    await page.goto(
+      "/?template=react-hooks-internals&level=middle&stack=Solid%2C%20Qwik&focus=signals%2C%20ssr&extra=fintech%20checkout&simulation=1&timebox=42&lang=en",
+    );
+
+    await expect(page.getByLabel("Stack (comma separated)")).toHaveValue("Solid, Qwik");
+    await expect(page.getByLabel("Focus boost (comma separated)")).toHaveValue("signals, ssr");
+    await expect(page.getByLabel("Extra context")).toHaveValue("fintech checkout");
+    await expect(page.getByLabel("Timebox (minutes)")).toHaveValue("42");
+    await expect.poll(() => new URL(page.url()).search).toBe("");
+  });
 });
