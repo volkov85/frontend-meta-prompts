@@ -4,6 +4,9 @@
 [![Node](https://img.shields.io/badge/Node.js-%3E%3D18-green)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#)
 [![Prettier](https://img.shields.io/badge/code_style-Prettier-ff69b4.svg)](#)
+[![CI Quality Gate](https://github.com/volkov85/frontend-meta-prompts/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/volkov85/frontend-meta-prompts/actions/workflows/ci.yml)
+[![Lighthouse CI](https://github.com/volkov85/frontend-meta-prompts/actions/workflows/lighthouse.yml/badge.svg?branch=main)](https://github.com/volkov85/frontend-meta-prompts/actions/workflows/lighthouse.yml)
+[![Deploy to GitHub Pages](https://github.com/volkov85/frontend-meta-prompts/actions/workflows/deploy-pages.yml/badge.svg?branch=main)](https://github.com/volkov85/frontend-meta-prompts/actions/workflows/deploy-pages.yml)
 
 Structured interview engine for Senior Frontend Engineers
 (React, TypeScript, JavaScript, System Design)
@@ -282,14 +285,36 @@ Git hooks:
 
 Workflows:
 
-- `CI Quality Gate` (`.github/workflows/ci.yml`)
+- `CI Quality Gate` (`.github/workflows/ci.yml`) — runs three jobs in parallel:
+  - `quality-gate`: typecheck + lint + Prettier + Vitest
+  - `e2e`: Playwright Chromium against the dev server (uploads `playwright-report/` on failure)
+  - `size-limit`: only on pull requests; comments bundle-size deltas on the PR
+- `Lighthouse CI` (`.github/workflows/lighthouse.yml`) — runs Lighthouse against the production build and uploads the HTML report to temporary public storage. Asserts category scores (perf ≥ 0.85, a11y ≥ 0.9, best-practices ≥ 0.9, SEO ≥ 0.7) at warn level.
 - `Deploy to GitHub Pages` (`.github/workflows/deploy-pages.yml`)
 
 Pipeline logic:
 
 - Quality gate runs on push and pull request for `main`
+- Lighthouse CI runs on push and pull request for `main`
 - Deploy runs automatically only after successful `CI Quality Gate` on `main`
 - Deploy can also be started manually with `workflow_dispatch`
+
+Bundle size budgets (`size-limit` config in `package.json`, gzip):
+
+| Target            | Budget |
+| ----------------- | ------ |
+| App entry chunk   | 30 KB  |
+| `react-vendor`    | 65 KB  |
+| `mui-vendor`      | 110 KB |
+| Total JS (assets) | 200 KB |
+
+Run locally:
+
+```bash
+npm run size       # build + size-limit checks
+npm run size:why   # interactive bundle composition explorer
+npm run lhci       # build + Lighthouse CI assertions
+```
 
 Test files:
 

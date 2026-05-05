@@ -22,7 +22,10 @@
     "test:ui": "vitest --ui --config web-ui/vite.config.ts",
     "test:coverage": "vitest run --coverage --config web-ui/vite.config.ts",
     "e2e": "playwright test",
-    "e2e:ui": "playwright test --ui"
+    "e2e:ui": "playwright test --ui",
+    "size": "npm run web:build && size-limit",
+    "size:why": "npm run web:build && size-limit --why",
+    "lhci": "npm run web:build && lhci autorun"
   },
   "keywords": [],
   "author": "",
@@ -39,7 +42,9 @@
     "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "^20.5.0",
     "@eslint/js": "^9.39.4",
+    "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.58.2",
+    "@size-limit/preset-app": "^12.1.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
@@ -59,6 +64,7 @@
     "jsdom": "^29.0.0",
     "lint-staged": "^16.4.0",
     "prettier": "^3.8.1",
+    "size-limit": "^12.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "vite": "^8.0.0",
@@ -70,5 +76,31 @@
       "prettier --write"
     ],
     "*.{json,md,css,yml,yaml}": "prettier --write"
-  }
+  },
+  "size-limit": [
+    {
+      "name": "app entry (gzip)",
+      "path": "web-ui/dist/assets/index-*.js",
+      "limit": "30 KB",
+      "gzip": true
+    },
+    {
+      "name": "react vendor (gzip)",
+      "path": "web-ui/dist/assets/react-vendor-*.js",
+      "limit": "65 KB",
+      "gzip": true
+    },
+    {
+      "name": "mui vendor (gzip)",
+      "path": "web-ui/dist/assets/mui-vendor-*.js",
+      "limit": "110 KB",
+      "gzip": true
+    },
+    {
+      "name": "total JS (gzip)",
+      "path": "web-ui/dist/assets/*.js",
+      "limit": "200 KB",
+      "gzip": true
+    }
+  ]
 }
