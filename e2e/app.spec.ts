@@ -51,6 +51,51 @@ test.describe("Frontend Meta Prompts", () => {
     await expect(page.getByText("No saved sessions yet.")).toBeVisible();
   });
 
+  test("exposes social meta tags and PWA manifest", async ({ page }) => {
+    const response = await page.goto("/");
+    expect(response?.ok()).toBeTruthy();
+
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+      "content",
+      /Structured interview prep prompt engine/i,
+    );
+    await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute("content", "#7c3aed");
+    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
+      "content",
+      /Frontend Meta Prompts/i,
+    );
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+      "content",
+      /og-image\.png$/,
+    );
+    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
+      "content",
+      "summary_large_image",
+    );
+    await expect(page.locator('link[rel="manifest"]')).toHaveAttribute(
+      "href",
+      /manifest\.webmanifest$/,
+    );
+    await expect(page.locator('link[rel="icon"][type="image/svg+xml"]')).toHaveAttribute(
+      "href",
+      /favicon\.svg$/,
+    );
+
+    const manifestHref = await page.locator('link[rel="manifest"]').getAttribute("href");
+    expect(manifestHref).toBeTruthy();
+    const manifestResponse = await page.request.get(new URL(manifestHref!, page.url()).toString());
+    expect(manifestResponse.ok()).toBeTruthy();
+    const manifest = await manifestResponse.json();
+    expect(manifest.name).toBe("Frontend Meta Prompts");
+    expect(manifest.start_url).toBeTruthy();
+    expect(manifest.display).toBe("standalone");
+    const maskable = (
+      manifest.icons as Array<{ sizes: string; purpose: string; src: string }>
+    ).find((icon) => icon.sizes === "512x512" && icon.purpose === "maskable");
+    expect(maskable).toBeDefined();
+    expect(maskable?.src).toMatch(/\.png$/);
+  });
+
   test("persists setup state across reloads", async ({ page }) => {
     await page.goto("/");
 
