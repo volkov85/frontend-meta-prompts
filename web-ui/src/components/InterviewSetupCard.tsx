@@ -18,6 +18,7 @@ type InterviewSetupCardProps = {
   extraContext: string;
   focusInput: string;
   generatePrompt: () => Promise<void>;
+  handleCopyShareLink: () => Promise<void>;
   language: InterviewLanguage;
   level: Level;
   persistSession: boolean;
@@ -41,6 +42,7 @@ export const InterviewSetupCard = ({
   extraContext,
   focusInput,
   generatePrompt,
+  handleCopyShareLink,
   language,
   level,
   persistSession,
@@ -145,14 +147,25 @@ export const InterviewSetupCard = ({
             />
           </Stack>
 
-          <Button
-            variant="contained"
-            size="large"
-            onClick={generatePrompt}
-            disabled={busy || !templateId}
-          >
-            {copy.generatePrompt}
-          </Button>
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
+            <Button
+              variant="contained"
+              size="large"
+              onClick={generatePrompt}
+              disabled={busy || !templateId}
+              sx={{ flex: 1 }}
+            >
+              {copy.generatePrompt}
+            </Button>
+            <Button
+              variant="outlined"
+              size="large"
+              onClick={handleCopyShareLink}
+              disabled={busy || !templateId}
+            >
+              {copy.copyShareLink}
+            </Button>
+          </Stack>
         </Stack>
       </CardContent>
     </Card>

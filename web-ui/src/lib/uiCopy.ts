@@ -14,6 +14,10 @@ type UiCopy = {
   simulation: string;
   createSession: string;
   generatePrompt: string;
+  copyShareLink: string;
+  shareLinkCopied: string;
+  shareLinkCopyFailed: string;
+  shareLinkApplied: string;
   evaluationTitle: string;
   sessionId: string;
   score: string;
@@ -101,6 +105,10 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     simulation: "Simulation",
     createSession: "Create session",
     generatePrompt: "Generate Prompt",
+    copyShareLink: "Copy share link",
+    shareLinkCopied: "Share link copied to clipboard",
+    shareLinkCopyFailed: "Unable to copy share link",
+    shareLinkApplied: "Setup loaded from shared link",
     evaluationTitle: "Save Evaluation",
     sessionId: "Session ID",
     score: "Score (0..10)",
@@ -197,6 +205,10 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     simulation: "Симуляция",
     createSession: "Создавать сессию",
     generatePrompt: "Сгенерировать промпт",
+    copyShareLink: "Копировать ссылку шеринга",
+    shareLinkCopied: "Ссылка скопирована в буфер обмена",
+    shareLinkCopyFailed: "Не удалось скопировать ссылку",
+    shareLinkApplied: "Настройка загружена из ссылки",
     evaluationTitle: "Сохранить оценку",
     sessionId: "ID сессии",
     score: "Оценка (0..10)",
