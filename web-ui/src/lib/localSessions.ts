@@ -1,4 +1,4 @@
-import { Level, Session } from "./types";
+import { Level, Session, SessionContext } from "./types";
 
 const SESSIONS_KEY = "frontend_meta_prompts_sessions_v1";
 
@@ -23,12 +23,21 @@ export const listSessions = (): Session[] => {
   return readSessions().sort((a, b) => b.date.localeCompare(a.date));
 };
 
-export const createSession = (templateId: string, level: Level): Session => {
+export type CreateSessionInput = {
+  templateId: string;
+  level: Level;
+  prompt?: string;
+  context?: SessionContext;
+};
+
+export const createSession = (input: CreateSessionInput): Session => {
   const session: Session = {
     id: crypto.randomUUID(),
     date: new Date().toISOString(),
-    templateId,
-    level,
+    templateId: input.templateId,
+    level: input.level,
+    ...(input.prompt !== undefined ? { prompt: input.prompt } : {}),
+    ...(input.context !== undefined ? { context: input.context } : {}),
   };
 
   const sessions = readSessions();

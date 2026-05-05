@@ -21,13 +21,55 @@ describe("localSessions", () => {
       ]),
     );
 
-    const created = createSession("junior-typescript-fundamentals", "junior");
+    const created = createSession({
+      templateId: "junior-typescript-fundamentals",
+      level: "junior",
+    });
     expect(created.id).toBeTruthy();
 
     const sessions = listSessions();
     expect(sessions).toHaveLength(2);
     expect(sessions[0].id).toBe(created.id);
     expect(sessions[1].id).toBe("old");
+  });
+
+  it("persists prompt and context fields when provided", () => {
+    const created = createSession({
+      templateId: "junior-typescript-fundamentals",
+      level: "junior",
+      prompt: "ROLE:\nYou are a senior frontend interviewer.",
+      context: {
+        stack: ["React", "TypeScript"],
+        focusBoost: ["closures"],
+        extraContext: "Pet project context",
+        simulation: true,
+        language: "en",
+        timeboxedMinutes: 30,
+        companyBar: "top-tier product company",
+      },
+    });
+
+    const persisted = listSessions().find((session) => session.id === created.id);
+    expect(persisted?.prompt).toContain("ROLE:");
+    expect(persisted?.context?.stack).toEqual(["React", "TypeScript"]);
+    expect(persisted?.context?.focusBoost).toEqual(["closures"]);
+    expect(persisted?.context?.extraContext).toBe("Pet project context");
+    expect(persisted?.context?.simulation).toBe(true);
+    expect(persisted?.context?.language).toBe("en");
+    expect(persisted?.context?.timeboxedMinutes).toBe(30);
+    expect(persisted?.context?.companyBar).toBe("top-tier product company");
+  });
+
+  it("omits prompt and context when not provided (backward compatible)", () => {
+    const created = createSession({
+      templateId: "junior-react-fundamentals",
+      level: "junior",
+    });
+
+    const persisted = listSessions().find((session) => session.id === created.id);
+    expect(persisted).toBeDefined();
+    expect(persisted).not.toHaveProperty("prompt");
+    expect(persisted).not.toHaveProperty("context");
   });
 
   it("updates session score and notes", () => {

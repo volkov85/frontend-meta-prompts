@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";
-import { Level, Session } from "../core";
+import { Level, Session, SessionContext } from "../core";
 
 const sessionsPath = path.resolve(process.cwd(), "data/sessions.json");
 
@@ -17,8 +17,12 @@ const isValidSession = (value: unknown): value is Session => {
 
   const hasValidScore = candidate.score === undefined || Number.isFinite(candidate.score);
   const hasValidNotes = candidate.notes === undefined || typeof candidate.notes === "string";
+  const hasValidPrompt = candidate.prompt === undefined || typeof candidate.prompt === "string";
+  const hasValidContext =
+    candidate.context === undefined ||
+    (typeof candidate.context === "object" && candidate.context !== null);
 
-  return hasValidCore && hasValidScore && hasValidNotes;
+  return hasValidCore && hasValidScore && hasValidNotes && hasValidPrompt && hasValidContext;
 };
 
 const validateScore = (score: number) => {
@@ -55,12 +59,21 @@ const writeSessions = (sessions: Session[]) => {
   fs.renameSync(tempPath, sessionsPath);
 };
 
-export const createSession = (templateId: string, level: Level): Session => {
+export type CreateSessionInput = {
+  templateId: string;
+  level: Level;
+  prompt?: string;
+  context?: SessionContext;
+};
+
+export const createSession = (input: CreateSessionInput): Session => {
   const newSession: Session = {
     id: crypto.randomUUID(),
     date: new Date().toISOString(),
-    templateId,
-    level,
+    templateId: input.templateId,
+    level: input.level,
+    ...(input.prompt !== undefined ? { prompt: input.prompt } : {}),
+    ...(input.context !== undefined ? { context: input.context } : {}),
   };
 
   const sessions = readSessions();

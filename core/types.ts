@@ -55,6 +55,16 @@ export type ComposeInterviewPromptOptions = {
   focusBoost?: string[];
 };
 
+export type SessionContext = {
+  stack?: string[];
+  focusBoost?: string[];
+  extraContext?: string;
+  simulation?: boolean;
+  language?: InterviewLanguage;
+  timeboxedMinutes?: number;
+  companyBar?: string;
+};
+
 export type Session = {
   id: string;
   date: string;
@@ -62,4 +72,6 @@ export type Session = {
   level: Level;
   score?: number;
   notes?: string;
+  prompt?: string;
+  context?: SessionContext;
 };

@@ -143,21 +143,38 @@ export const useInterviewAppState = () => {
   const generatePrompt = async () => {
     try {
       dispatch({ type: "patch", payload: { busy: true, error: "" } });
+      const stack = parseCsv(state.stackInput);
+      const focusBoost = parseCsv(state.focusInput);
+      const extraContext = state.extraContext;
+      const timeboxedMinutes = Number(state.timebox);
       const nextPrompt = composeInterviewPrompt(config, {
         templateId: state.templateId,
         level: state.level,
-        stack: parseCsv(state.stackInput),
-        focusBoost: parseCsv(state.focusInput),
-        extraContext: state.extraContext,
+        stack,
+        focusBoost,
+        extraContext,
         mode: {
           simulation: state.simulation,
           language: state.language,
-          timeboxedMinutes: Number(state.timebox),
+          timeboxedMinutes,
         },
       });
 
       if (state.persistSession) {
-        const session = createSession(state.templateId, state.level);
+        const session = createSession({
+          templateId: state.templateId,
+          level: state.level,
+          prompt: nextPrompt,
+          context: {
+            stack,
+            focusBoost,
+            extraContext,
+            simulation: state.simulation,
+            language: state.language,
+            timeboxedMinutes,
+            companyBar: config.defaults.companyBar,
+          },
+        });
         dispatch({
           type: "patch",
           payload: {

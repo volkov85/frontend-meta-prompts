@@ -268,7 +268,20 @@ const main = () => {
 
   let sessionId: string | null = null;
   if (options.persistSession) {
-    const session = createSession(options.templateId, options.level);
+    const session = createSession({
+      templateId: options.templateId,
+      level: options.level,
+      prompt,
+      context: {
+        stack: options.stack,
+        focusBoost: options.focusBoost,
+        extraContext: options.extraContext,
+        simulation: options.simulation,
+        language: options.english ? "en" : undefined,
+        timeboxedMinutes: options.timeboxedMinutes,
+        companyBar: config.defaults.companyBar,
+      },
+    });
     sessionId = session.id;
     console.log(`Session created: ${session.id}`);
   }
