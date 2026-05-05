@@ -288,7 +288,7 @@ Workflows:
 - `CI Quality Gate` (`.github/workflows/ci.yml`) — runs three jobs in parallel:
   - `quality-gate`: typecheck + lint + Prettier + Vitest
   - `e2e`: Playwright Chromium against the dev server (uploads `playwright-report/` on failure)
-  - `size-limit`: only on pull requests; comments bundle-size deltas on the PR
+  - `size-limit`: builds the production bundle and enforces gzip size budgets; fails the job if any chunk exceeds its limit
 - `Lighthouse CI` (`.github/workflows/lighthouse.yml`) — runs Lighthouse against the production build and uploads the HTML report to temporary public storage. Asserts category scores (perf ≥ 0.85, a11y ≥ 0.9, best-practices ≥ 0.9, SEO ≥ 0.7) at warn level.
 - `Deploy to GitHub Pages` (`.github/workflows/deploy-pages.yml`)
 

@@ -69,12 +69,8 @@ jobs:
           retention-days: 7
 
   size-limit:
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    permissions:
-      contents: read
-      pull-requests: write
 
     steps:
       - name: Checkout
@@ -86,9 +82,11 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: size-limit
-        uses: andresz1/size-limit-action@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          build_script: web:build
-          package_manager: npm
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web app
+        run: npm run web:build
+
+      - name: Enforce bundle size budgets
+        run: npx size-limit
