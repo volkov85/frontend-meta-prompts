@@ -66,3 +66,9 @@ export const updateSessionScore = (sessionId: string, score: number, notes?: str
 export const clearSessions = (): void => {
   localStorage.removeItem(SESSIONS_KEY);
 };
+
+export const replaceSessions = (sessions: Session[]): void => {
+  writeSessions(sessions);
+};
+
+export const readRawSessions = (): Session[] => readSessions();

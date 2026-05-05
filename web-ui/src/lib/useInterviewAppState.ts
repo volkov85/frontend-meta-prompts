@@ -1,7 +1,22 @@
 import { useEffect, useMemo, useReducer } from "react";
 import interviewsData from "../../../data/interviews.json";
 import { composeInterviewPrompt } from "./composePrompt";
-import { clearSessions, createSession, listSessions, updateSessionScore } from "./localSessions";
+import {
+  clearSessions,
+  createSession,
+  listSessions,
+  readRawSessions,
+  replaceSessions,
+  updateSessionScore,
+} from "./localSessions";
+import {
+  buildExportFilename,
+  buildSessionsMarkdown,
+  mergeSessions,
+  parseSessionsImport,
+  serializeSessionsExport,
+} from "./exportSessions";
+import { readStoredSetup, writeStoredSetup } from "./setupStorage";
 import { UI_COPY } from "./uiCopy";
 import { InterviewConfig, InterviewLanguage, InterviewTemplate, Level, Session } from "./types";
 
@@ -54,6 +69,7 @@ type InterviewAppState = {
   score: string;
   notes: string;
   snack: string;
+  setupInitialized: boolean;
 };
 
 const initialState: InterviewAppState = {
@@ -75,6 +91,7 @@ const initialState: InterviewAppState = {
   score: "",
   notes: "",
   snack: "",
+  setupInitialized: false,
 };
 
 type Action = {
@@ -107,23 +124,44 @@ export const useInterviewAppState = () => {
         template.levels.includes("junior"),
       );
       const storedLanguage = readStoredLanguage();
+      const storedSetup = readStoredSetup();
+
+      const defaultLevel: Level = "junior";
+      const defaultTemplateId = juniorTemplate?.id ?? config.templates[0]?.id ?? "";
+      const defaultStackInput = (config.defaults.stack ?? []).join(", ");
+      const defaultSimulation = Boolean(config.defaults.simulation);
+      const defaultTimebox = Number(config.defaults.timeboxedMinutes ?? 30);
+
+      const restoredTemplateId =
+        storedSetup?.templateId &&
+        config.templates.some((template) => template.id === storedSetup.templateId)
+          ? storedSetup.templateId
+          : defaultTemplateId;
+
       dispatch({
         type: "patch",
         payload: {
           templates: config.templates,
           sessions: listSessions(),
-          level: "junior",
-          templateId: juniorTemplate?.id ?? config.templates[0]?.id ?? "",
-          stackInput: (config.defaults.stack ?? []).join(", "),
+          level: storedSetup?.level ?? defaultLevel,
+          templateId: restoredTemplateId,
+          stackInput: storedSetup?.stackInput ?? defaultStackInput,
+          focusInput: storedSetup?.focusInput ?? "",
+          extraContext: storedSetup?.extraContext ?? "",
           language: storedLanguage ?? config.defaults.language ?? "en",
-          simulation: Boolean(config.defaults.simulation),
-          timebox: Number(config.defaults.timeboxedMinutes ?? 30),
+          simulation: storedSetup?.simulation ?? defaultSimulation,
+          timebox: storedSetup?.timebox ?? defaultTimebox,
+          persistSession: storedSetup?.persistSession ?? true,
+          setupInitialized: true,
         },
       });
     } catch (loadError) {
       dispatch({
         type: "patch",
-        payload: { error: loadError instanceof Error ? loadError.message : String(loadError) },
+        payload: {
+          error: loadError instanceof Error ? loadError.message : String(loadError),
+          setupInitialized: true,
+        },
       });
     }
   }, []);
@@ -139,6 +177,30 @@ export const useInterviewAppState = () => {
   useEffect(() => {
     writeStoredLanguage(state.language);
   }, [state.language]);
+
+  useEffect(() => {
+    if (!state.setupInitialized) return;
+    writeStoredSetup({
+      templateId: state.templateId,
+      level: state.level,
+      stackInput: state.stackInput,
+      focusInput: state.focusInput,
+      extraContext: state.extraContext,
+      simulation: state.simulation,
+      timebox: state.timebox,
+      persistSession: state.persistSession,
+    });
+  }, [
+    state.setupInitialized,
+    state.templateId,
+    state.level,
+    state.stackInput,
+    state.focusInput,
+    state.extraContext,
+    state.simulation,
+    state.timebox,
+    state.persistSession,
+  ]);
 
   const generatePrompt = async () => {
     try {
@@ -234,6 +296,90 @@ export const useInterviewAppState = () => {
     });
   };
 
+  const triggerDownload = (filename: string, content: string, mimeType: string) => {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportJson = () => {
+    try {
+      const sessions = readRawSessions();
+      const json = serializeSessionsExport(sessions);
+      triggerDownload(buildExportFilename("json"), json, "application/json");
+      dispatch({
+        type: "patch",
+        payload: { snack: UI_COPY[state.language].sessionsExportedJson(sessions.length) },
+      });
+    } catch (exportError) {
+      dispatch({
+        type: "patch",
+        payload: {
+          error:
+            exportError instanceof Error
+              ? UI_COPY[state.language].sessionsExportFailed(exportError.message)
+              : UI_COPY[state.language].sessionsExportFailed(String(exportError)),
+        },
+      });
+    }
+  };
+
+  const handleExportMarkdown = () => {
+    try {
+      const sessions = readRawSessions();
+      const markdown = buildSessionsMarkdown(sessions);
+      triggerDownload(buildExportFilename("md"), markdown, "text/markdown");
+      dispatch({
+        type: "patch",
+        payload: { snack: UI_COPY[state.language].sessionsExportedMarkdown(sessions.length) },
+      });
+    } catch (exportError) {
+      dispatch({
+        type: "patch",
+        payload: {
+          error:
+            exportError instanceof Error
+              ? UI_COPY[state.language].sessionsExportFailed(exportError.message)
+              : UI_COPY[state.language].sessionsExportFailed(String(exportError)),
+        },
+      });
+    }
+  };
+
+  const handleImportJson = async (file: File) => {
+    try {
+      const text = await file.text();
+      const { sessions: incoming, invalidCount } = parseSessionsImport(text);
+      const existing = readRawSessions();
+      const { added, skipped } = mergeSessions(existing, incoming);
+      replaceSessions(existing);
+      const refreshed = listSessions();
+      dispatch({
+        type: "patch",
+        payload: {
+          sessions: refreshed,
+          snack: UI_COPY[state.language].sessionsImported(added, skipped, invalidCount),
+        },
+      });
+    } catch (importError) {
+      dispatch({
+        type: "patch",
+        payload: {
+          error:
+            importError instanceof Error
+              ? UI_COPY[state.language].sessionsImportFailed(importError.message)
+              : UI_COPY[state.language].sessionsImportFailed(String(importError)),
+        },
+      });
+    }
+  };
+
   const startNewSession = () => {
     dispatch({
       type: "patch",
@@ -279,6 +425,9 @@ export const useInterviewAppState = () => {
     focusInput: state.focusInput,
     generatePrompt,
     handleClearSessions,
+    handleExportJson,
+    handleExportMarkdown,
+    handleImportJson,
     language: state.language,
     level: state.level,
     notes: state.notes,

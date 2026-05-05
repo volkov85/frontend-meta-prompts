@@ -30,6 +30,9 @@ const App = () => {
     focusInput,
     generatePrompt,
     handleClearSessions,
+    handleExportJson,
+    handleExportMarkdown,
+    handleImportJson,
     language,
     level,
     notes,
@@ -235,6 +238,9 @@ const App = () => {
               refreshSessions={refreshSessions}
               sessions={sessions}
               onCopyPrompt={copyPromptText}
+              onExportJson={handleExportJson}
+              onExportMarkdown={handleExportMarkdown}
+              onImportJson={handleImportJson}
             />
           </Grid>
         </Grid>
