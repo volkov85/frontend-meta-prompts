@@ -32,6 +32,18 @@ type UiCopy = {
   startNewSession: string;
   recentSessions: string;
   clearSessions: string;
+  clearSessionsConfirmTitle: string;
+  clearSessionsConfirmBody: (count: number) => string;
+  clearSessionsConfirmCancel: string;
+  clearSessionsConfirmConfirm: string;
+  exportJson: string;
+  exportMarkdown: string;
+  importJson: string;
+  sessionsExportedJson: (count: number) => string;
+  sessionsExportedMarkdown: (count: number) => string;
+  sessionsExportFailed: (reason: string) => string;
+  sessionsImported: (added: number, skipped: number, invalid: number) => string;
+  sessionsImportFailed: (reason: string) => string;
   refresh: string;
   sessionSearch: string;
   sessionSearchPlaceholder: string;
@@ -107,6 +119,28 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     startNewSession: "Start new session",
     recentSessions: "Recent Sessions",
     clearSessions: "Clear sessions",
+    clearSessionsConfirmTitle: "Clear all sessions?",
+    clearSessionsConfirmBody: (count: number) =>
+      count === 1
+        ? "This will permanently delete 1 saved session. This action cannot be undone."
+        : `This will permanently delete ${count} saved sessions. This action cannot be undone.`,
+    clearSessionsConfirmCancel: "Cancel",
+    clearSessionsConfirmConfirm: "Yes, clear all",
+    exportJson: "Export JSON",
+    exportMarkdown: "Export Markdown",
+    importJson: "Import JSON",
+    sessionsExportedJson: (count: number) =>
+      count === 1 ? "Exported 1 session as JSON" : `Exported ${count} sessions as JSON`,
+    sessionsExportedMarkdown: (count: number) =>
+      count === 1 ? "Exported 1 session as Markdown" : `Exported ${count} sessions as Markdown`,
+    sessionsExportFailed: (reason: string) => `Export failed: ${reason}`,
+    sessionsImported: (added: number, skipped: number, invalid: number) => {
+      const parts = [`Imported ${added} new`];
+      if (skipped > 0) parts.push(`skipped ${skipped} duplicate${skipped === 1 ? "" : "s"}`);
+      if (invalid > 0) parts.push(`ignored ${invalid} invalid`);
+      return parts.join(", ");
+    },
+    sessionsImportFailed: (reason: string) => `Import failed: ${reason}`,
     refresh: "Refresh",
     sessionSearch: "Search",
     sessionSearchPlaceholder: "Session ID, template, note",
@@ -181,6 +215,30 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     startNewSession: "Новая сессия",
     recentSessions: "Последние сессии",
     clearSessions: "Очистить сессии",
+    clearSessionsConfirmTitle: "Очистить все сессии?",
+    clearSessionsConfirmBody: (count: number) =>
+      count === 1
+        ? "Это безвозвратно удалит 1 сохранённую сессию. Действие нельзя отменить."
+        : `Это безвозвратно удалит сохранённых сессий: ${count}. Действие нельзя отменить.`,
+    clearSessionsConfirmCancel: "Отмена",
+    clearSessionsConfirmConfirm: "Да, очистить всё",
+    exportJson: "Экспорт JSON",
+    exportMarkdown: "Экспорт Markdown",
+    importJson: "Импорт JSON",
+    sessionsExportedJson: (count: number) =>
+      count === 1 ? "Экспортирована 1 сессия в JSON" : `Экспортировано сессий в JSON: ${count}`,
+    sessionsExportedMarkdown: (count: number) =>
+      count === 1
+        ? "Экспортирована 1 сессия в Markdown"
+        : `Экспортировано сессий в Markdown: ${count}`,
+    sessionsExportFailed: (reason: string) => `Не удалось экспортировать: ${reason}`,
+    sessionsImported: (added: number, skipped: number, invalid: number) => {
+      const parts = [`Импортировано новых: ${added}`];
+      if (skipped > 0) parts.push(`пропущено дубликатов: ${skipped}`);
+      if (invalid > 0) parts.push(`проигнорировано некорректных: ${invalid}`);
+      return parts.join(", ");
+    },
+    sessionsImportFailed: (reason: string) => `Не удалось импортировать: ${reason}`,
     refresh: "Обновить",
     sessionSearch: "Поиск",
     sessionSearchPlaceholder: "ID сессии, шаблон, заметка",

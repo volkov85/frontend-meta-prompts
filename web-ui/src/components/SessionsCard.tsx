@@ -2,13 +2,18 @@ import {
   Button,
   Card,
   CardContent,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Divider,
   MenuItem,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { SessionPromptDialog } from "./SessionPromptDialog";
 import { LEVEL_LABELS, UI_COPY } from "../lib/uiCopy";
 import { InterviewLanguage, Session } from "../lib/types";
@@ -19,6 +24,9 @@ type SessionsCardProps = {
   refreshSessions: () => void;
   sessions: Session[];
   onCopyPrompt?: (prompt: string) => void;
+  onExportJson?: () => void;
+  onExportMarkdown?: () => void;
+  onImportJson?: (file: File) => void;
 };
 
 export const SessionsCard = ({
@@ -27,11 +35,16 @@ export const SessionsCard = ({
   refreshSessions,
   sessions,
   onCopyPrompt,
+  onExportJson,
+  onExportMarkdown,
+  onImportJson,
 }: SessionsCardProps) => {
   const [searchValue, setSearchValue] = useState("");
   const [levelFilter, setLevelFilter] = useState<"all" | Session["level"]>("all");
   const [scoreFilter, setScoreFilter] = useState<"all" | "rated" | "unrated">("all");
   const [activePromptSessionId, setActivePromptSessionId] = useState<string | null>(null);
+  const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
+  const importInputRef = useRef<HTMLInputElement | null>(null);
   const copy = UI_COPY[language];
   const levelLabels = LEVEL_LABELS[language];
   const activePromptSession = useMemo(
@@ -64,10 +77,65 @@ export const SessionsCard = ({
   return (
     <Card className="fade-up">
       <CardContent>
-        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          justifyContent="space-between"
+          alignItems={{ xs: "flex-start", sm: "center" }}
+          spacing={1}
+          sx={{ mb: 1 }}
+        >
           <Typography variant="h6">{copy.recentSessions}</Typography>
-          <Stack direction="row" spacing={1}>
-            <Button size="small" color="error" onClick={handleClearSessions}>
+          <Stack direction="row" spacing={1} flexWrap="wrap" rowGap={1}>
+            {onExportJson && (
+              <Button
+                size="small"
+                onClick={onExportJson}
+                disabled={sessions.length === 0}
+                aria-label={copy.exportJson}
+              >
+                {copy.exportJson}
+              </Button>
+            )}
+            {onExportMarkdown && (
+              <Button
+                size="small"
+                onClick={onExportMarkdown}
+                disabled={sessions.length === 0}
+                aria-label={copy.exportMarkdown}
+              >
+                {copy.exportMarkdown}
+              </Button>
+            )}
+            {onImportJson && (
+              <>
+                <Button
+                  size="small"
+                  onClick={() => importInputRef.current?.click()}
+                  aria-label={copy.importJson}
+                >
+                  {copy.importJson}
+                </Button>
+                <input
+                  ref={importInputRef}
+                  type="file"
+                  accept="application/json,.json"
+                  hidden
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    if (file) {
+                      onImportJson(file);
+                    }
+                    event.target.value = "";
+                  }}
+                />
+              </>
+            )}
+            <Button
+              size="small"
+              color="error"
+              onClick={() => setClearConfirmOpen(true)}
+              disabled={sessions.length === 0}
+            >
               {copy.clearSessions}
             </Button>
             <Button size="small" onClick={refreshSessions}>
@@ -165,6 +233,36 @@ export const SessionsCard = ({
         session={activePromptSession}
         onCopyPrompt={(prompt) => onCopyPrompt?.(prompt)}
       />
+      <Dialog
+        open={clearConfirmOpen}
+        onClose={() => setClearConfirmOpen(false)}
+        aria-labelledby="clear-sessions-confirm-title"
+        aria-describedby="clear-sessions-confirm-description"
+      >
+        <DialogTitle id="clear-sessions-confirm-title">
+          {copy.clearSessionsConfirmTitle}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="clear-sessions-confirm-description">
+            {copy.clearSessionsConfirmBody(sessions.length)}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setClearConfirmOpen(false)} autoFocus>
+            {copy.clearSessionsConfirmCancel}
+          </Button>
+          <Button
+            color="error"
+            variant="contained"
+            onClick={() => {
+              setClearConfirmOpen(false);
+              handleClearSessions();
+            }}
+          >
+            {copy.clearSessionsConfirmConfirm}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Card>
   );
 };

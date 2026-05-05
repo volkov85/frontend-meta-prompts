@@ -44,7 +44,6 @@ core/
 engine/
   composeInterviewPrompt.ts  # Re-export of shared prompt builder for CLI imports
   sessionRunner.ts           # Session create/update and persistence
-  scorer.ts                  # Optional local scorer (not required by CLI flow)
 
 index.ts              # CLI entry point
 

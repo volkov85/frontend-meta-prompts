@@ -32,6 +32,10 @@ describe("App", () => {
     localStorage.setItem("frontend_meta_prompts_sessions_v1", JSON.stringify(sessions));
   };
 
+  const seedSetup = (setup: object) => {
+    localStorage.setItem("frontend_meta_prompts_setup_v1", JSON.stringify(setup));
+  };
+
   it("renders initial layout", () => {
     renderApp();
 
@@ -113,7 +117,7 @@ describe("App", () => {
     });
   });
 
-  it("clears sessions list", async () => {
+  it("clears sessions list after confirming", async () => {
     const user = userEvent.setup();
     renderApp();
 
@@ -124,7 +128,29 @@ describe("App", () => {
     await waitFor(() => expect(screen.getByText(/Session:/)).toBeInTheDocument());
 
     await user.click(screen.getByRole("button", { name: "Clear sessions" }));
-    expect(screen.getByText("No saved sessions yet.")).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Clear all sessions?" })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Yes, clear all" }));
+    await waitFor(() => {
+      expect(screen.getByText("No saved sessions yet.")).toBeInTheDocument();
+    });
+  });
+
+  it("keeps sessions when canceling the clear confirmation", async () => {
+    const user = userEvent.setup();
+    renderApp();
+
+    const generateButton = screen.getByRole("button", { name: "Generate Prompt" });
+    await waitFor(() => expect(generateButton).toBeEnabled());
+    await user.click(generateButton);
+
+    await waitFor(() => expect(screen.getByText(/Session:/)).toBeInTheDocument());
+
+    await user.click(screen.getByRole("button", { name: "Clear sessions" }));
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(screen.queryByText("No saved sessions yet.")).not.toBeInTheDocument();
+    expect(screen.getByText(/Session:/)).toBeInTheDocument();
   });
 
   it("filters sessions by level and score status", async () => {
@@ -346,5 +372,129 @@ describe("App", () => {
 
     const copyButton = within(dialog).getByRole("button", { name: "Copy prompt" });
     expect(copyButton).toBeDisabled();
+  });
+
+  it("restores setup state from localStorage on mount", async () => {
+    seedSetup({
+      templateId: "react-hooks-internals",
+      level: "middle",
+      stackInput: "Solid, Qwik, Astro",
+      focusInput: "signals, server-only",
+      extraContext: "Persisted setup",
+      simulation: false,
+      timebox: 17,
+      persistSession: false,
+    });
+
+    renderApp();
+
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("Solid, Qwik, Astro")).toBeInTheDocument();
+    });
+    expect(screen.getByDisplayValue("signals, server-only")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("Persisted setup")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("17")).toBeInTheDocument();
+  });
+
+  it("persists setup edits to localStorage", async () => {
+    const user = userEvent.setup();
+    renderApp();
+
+    const stackInput = screen.getByLabelText("Stack (comma separated)");
+    await waitFor(() => expect(stackInput).toBeEnabled());
+    await user.clear(stackInput);
+    await user.type(stackInput, "Solid");
+
+    await waitFor(() => {
+      const raw = localStorage.getItem("frontend_meta_prompts_setup_v1");
+      expect(raw).not.toBeNull();
+      const parsed: { stackInput?: string } = JSON.parse(raw!) as { stackInput?: string };
+      expect(parsed.stackInput).toBe("Solid");
+    });
+  });
+
+  it("exports sessions as JSON", async () => {
+    const user = userEvent.setup();
+    seedSessions([
+      {
+        id: "export-test-session",
+        date: "2026-03-01T10:00:00.000Z",
+        templateId: "react-hooks-internals",
+        level: "middle",
+        score: 9,
+      },
+    ]);
+    renderApp();
+
+    const createObjectURLSpy = vi
+      .spyOn(URL, "createObjectURL")
+      .mockReturnValue("blob:fake-url-export");
+    const revokeObjectURLSpy = vi.spyOn(URL, "revokeObjectURL").mockReturnValue(undefined);
+    const clickSpy = vi
+      .spyOn(HTMLAnchorElement.prototype, "click")
+      .mockImplementation(() => undefined);
+
+    await user.click(screen.getByRole("button", { name: "Export JSON" }));
+
+    expect(createObjectURLSpy).toHaveBeenCalledTimes(1);
+    expect(clickSpy).toHaveBeenCalledTimes(1);
+    expect(revokeObjectURLSpy).toHaveBeenCalledWith("blob:fake-url-export");
+    await waitFor(() => {
+      expect(screen.getByText("Exported 1 session as JSON")).toBeInTheDocument();
+    });
+
+    createObjectURLSpy.mockRestore();
+    revokeObjectURLSpy.mockRestore();
+    clickSpy.mockRestore();
+  });
+
+  it("imports sessions from a JSON file and merges by id", async () => {
+    const user = userEvent.setup();
+    seedSessions([
+      {
+        id: "session-existing",
+        date: "2026-03-01T10:00:00.000Z",
+        templateId: "react-hooks-internals",
+        level: "middle",
+        score: 6,
+      },
+    ]);
+    renderApp();
+
+    const importPayload = JSON.stringify([
+      {
+        id: "session-existing",
+        date: "2026-03-01T10:00:00.000Z",
+        templateId: "react-hooks-internals",
+        level: "middle",
+      },
+      {
+        id: "session-imported",
+        date: "2026-03-05T10:00:00.000Z",
+        templateId: "react-hooks-internals",
+        level: "senior",
+        score: 9,
+      },
+      { id: "garbage", level: "wizard" },
+    ]);
+    const file = new File([importPayload], "sessions.json", { type: "application/json" });
+
+    const fileInput = document.querySelector(
+      "input[type='file'][accept='application/json,.json']",
+    ) as HTMLInputElement | null;
+    expect(fileInput).not.toBeNull();
+
+    await user.upload(fileInput!, file);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Imported 1 new/)).toBeInTheDocument();
+    });
+    const stored: unknown = JSON.parse(
+      localStorage.getItem("frontend_meta_prompts_sessions_v1") ?? "[]",
+    );
+    expect(Array.isArray(stored)).toBe(true);
+    expect((stored as { id: string }[]).map((session) => session.id).sort()).toEqual(
+      ["session-existing", "session-imported"].sort(),
+    );
   });
 });
