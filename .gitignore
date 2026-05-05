@@ -5,3 +5,4 @@ sessions.json
 playwright-report
 test-results
 coverage
+.lighthouseci
