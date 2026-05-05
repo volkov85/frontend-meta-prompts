@@ -75,6 +75,8 @@ Separation of concerns:
 - CLI mode to record external LLM evaluation
 - Session persistence in JSON (CLI) and `localStorage` (Web UI)
 - Interview progress chart in Web UI with recent scores, averages, and coverage
+- Installable as a Progressive Web App (manifest, icons, theme color)
+- Open Graph + Twitter card meta for rich link previews on social platforms
 
 ## Shared Core
 
@@ -289,7 +291,7 @@ Workflows:
   - `quality-gate`: typecheck + lint + Prettier + Vitest
   - `e2e`: Playwright Chromium against the dev server (uploads `playwright-report/` on failure)
   - `size-limit`: builds the production bundle and enforces gzip size budgets; fails the job if any chunk exceeds its limit
-- `Lighthouse CI` (`.github/workflows/lighthouse.yml`) — runs Lighthouse against the production build and uploads the HTML report to temporary public storage. Asserts category scores (perf ≥ 0.85, a11y ≥ 0.9, best-practices ≥ 0.9, SEO ≥ 0.7) at warn level.
+- `Lighthouse CI` (`.github/workflows/lighthouse.yml`) — runs Lighthouse against the production build and uploads the HTML report to temporary public storage. Asserts category scores (perf ≥ 0.9, a11y ≥ 0.9, best-practices ≥ 0.9, SEO ≥ 0.9) at warn level, plus hard-error assertions for `meta-description`, `viewport`, and `document-title` audits.
 - `Deploy to GitHub Pages` (`.github/workflows/deploy-pages.yml`)
 
 Pipeline logic:

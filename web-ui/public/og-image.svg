@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Frontend Meta Prompts">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f1320" />
+      <stop offset="100%" stop-color="#1f2433" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7c3aed" />
+      <stop offset="100%" stop-color="#22d3ee" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <g transform="translate(80 200)" fill="none" stroke="url(#accent)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="100,40 30,150 100,260" />
+    <polyline points="280,40 350,150 280,260" />
+    <line x1="220" y1="20" x2="160" y2="280" />
+  </g>
+  <g font-family="'Space Grotesk', system-ui, sans-serif" fill="#f4f4f5">
+    <text x="500" y="240" font-size="68" font-weight="700">Frontend Meta</text>
+    <text x="500" y="320" font-size="68" font-weight="700">Prompts</text>
+    <text x="500" y="400" font-size="32" fill="#94a3b8" font-weight="500">Structured interview prep for senior</text>
+    <text x="500" y="446" font-size="32" fill="#94a3b8" font-weight="500">frontend engineers</text>
+    <text x="500" y="540" font-size="24" fill="#7c3aed" font-weight="600">React · TypeScript · System Design</text>
+  </g>
+</svg>
