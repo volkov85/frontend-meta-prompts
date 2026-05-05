@@ -9,6 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useMemo, useState } from "react";
+import { SessionPromptDialog } from "./SessionPromptDialog";
 import { LEVEL_LABELS, UI_COPY } from "../lib/uiCopy";
 import { InterviewLanguage, Session } from "../lib/types";
 
@@ -17,6 +18,7 @@ type SessionsCardProps = {
   language: InterviewLanguage;
   refreshSessions: () => void;
   sessions: Session[];
+  onCopyPrompt?: (prompt: string) => void;
 };
 
 export const SessionsCard = ({
@@ -24,12 +26,21 @@ export const SessionsCard = ({
   language,
   refreshSessions,
   sessions,
+  onCopyPrompt,
 }: SessionsCardProps) => {
   const [searchValue, setSearchValue] = useState("");
   const [levelFilter, setLevelFilter] = useState<"all" | Session["level"]>("all");
   const [scoreFilter, setScoreFilter] = useState<"all" | "rated" | "unrated">("all");
+  const [activePromptSessionId, setActivePromptSessionId] = useState<string | null>(null);
   const copy = UI_COPY[language];
   const levelLabels = LEVEL_LABELS[language];
+  const activePromptSession = useMemo(
+    () =>
+      activePromptSessionId
+        ? (sessions.find((session) => session.id === activePromptSessionId) ?? null)
+        : null,
+    [activePromptSessionId, sessions],
+  );
   const filteredSessions = useMemo(() => {
     const normalizedQuery = searchValue.trim().toLowerCase();
 
@@ -114,21 +125,46 @@ export const SessionsCard = ({
               sx={{ backgroundColor: "rgba(30, 41, 59, 0.65)" }}
             >
               <CardContent sx={{ py: 1.2 }}>
-                <Typography sx={{ fontWeight: 700 }}>{session.templateId}</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {levelLabels[session.level]} | {new Date(session.date).toLocaleString(language)}
-                </Typography>
-                <Typography variant="body2">
-                  {copy.sessionPrefix}: {session.id}
-                </Typography>
-                <Typography variant="body2">
-                  {copy.scorePrefix}: {session.score === undefined ? copy.notRated : session.score}
-                </Typography>
+                <Stack
+                  direction={{ xs: "column", sm: "row" }}
+                  alignItems={{ xs: "flex-start", sm: "center" }}
+                  justifyContent="space-between"
+                  spacing={1}
+                >
+                  <Stack spacing={0.25} sx={{ minWidth: 0, flex: 1 }}>
+                    <Typography sx={{ fontWeight: 700 }}>{session.templateId}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {levelLabels[session.level]} |{" "}
+                      {new Date(session.date).toLocaleString(language)}
+                    </Typography>
+                    <Typography variant="body2" sx={{ wordBreak: "break-all" }}>
+                      {copy.sessionPrefix}: {session.id}
+                    </Typography>
+                    <Typography variant="body2">
+                      {copy.scorePrefix}:{" "}
+                      {session.score === undefined ? copy.notRated : session.score}
+                    </Typography>
+                  </Stack>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => setActivePromptSessionId(session.id)}
+                  >
+                    {copy.viewPrompt}
+                  </Button>
+                </Stack>
               </CardContent>
             </Card>
           ))}
         </Stack>
       </CardContent>
+      <SessionPromptDialog
+        language={language}
+        open={Boolean(activePromptSession)}
+        onClose={() => setActivePromptSessionId(null)}
+        session={activePromptSession}
+        onCopyPrompt={(prompt) => onCopyPrompt?.(prompt)}
+      />
     </Card>
   );
 };

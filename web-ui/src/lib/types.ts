@@ -5,4 +5,5 @@ export type {
   InterviewTemplate,
   Level,
   Session,
+  SessionContext,
 } from "../../../core/types";

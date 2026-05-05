@@ -72,15 +72,18 @@ const App = () => {
     }
   };
 
-  const handleCopyPrompt = async () => {
-    if (!prompt) return;
-
+  const copyPromptText = async (text: string) => {
     try {
-      await navigator.clipboard.writeText(prompt);
+      await navigator.clipboard.writeText(text);
       setSnack(copy.promptCopied);
     } catch {
       setError(copy.promptCopyFailed);
     }
+  };
+
+  const handleCopyPrompt = async () => {
+    if (!prompt) return;
+    await copyPromptText(prompt);
   };
 
   const handleSharePrompt = async () => {
@@ -231,6 +234,7 @@ const App = () => {
               language={language}
               refreshSessions={refreshSessions}
               sessions={sessions}
+              onCopyPrompt={copyPromptText}
             />
           </Grid>
         </Grid>

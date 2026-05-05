@@ -55,6 +55,23 @@ type UiCopy = {
   promptShareFailed: string;
   promptSharedFallback: string;
   newSessionStarted: string;
+  viewPrompt: string;
+  viewPromptDialogTitle: string;
+  viewPromptUnavailable: string;
+  viewPromptContextTitle: string;
+  viewPromptContextStack: string;
+  viewPromptContextFocus: string;
+  viewPromptContextExtra: string;
+  viewPromptContextTimebox: string;
+  viewPromptContextSimulation: string;
+  viewPromptContextLanguage: string;
+  viewPromptContextCompanyBar: string;
+  viewPromptContextEmpty: string;
+  viewPromptCopy: string;
+  viewPromptClose: string;
+  yes: string;
+  no: string;
+  notAvailable: string;
 };
 
 export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
@@ -113,6 +130,24 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     promptShareFailed: "Unable to share prompt",
     promptSharedFallback: "Share not available, prompt copied instead",
     newSessionStarted: "Ready for a new session",
+    viewPrompt: "View prompt",
+    viewPromptDialogTitle: "Session prompt",
+    viewPromptUnavailable:
+      "This session was saved before the prompt-history feature was added, so the original prompt is not available.",
+    viewPromptContextTitle: "Session context",
+    viewPromptContextStack: "Stack",
+    viewPromptContextFocus: "Focus",
+    viewPromptContextExtra: "Extra context",
+    viewPromptContextTimebox: "Timebox (minutes)",
+    viewPromptContextSimulation: "Simulation",
+    viewPromptContextLanguage: "Language",
+    viewPromptContextCompanyBar: "Company bar",
+    viewPromptContextEmpty: "No context was saved for this session.",
+    viewPromptCopy: "Copy prompt",
+    viewPromptClose: "Close",
+    yes: "Yes",
+    no: "No",
+    notAvailable: "\u2014",
   },
   ru: {
     appTitle: "Frontend Meta Prompts",
@@ -169,6 +204,24 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     promptShareFailed: "Не удалось поделиться промптом",
     promptSharedFallback: "Шаринг недоступен, промпт скопирован",
     newSessionStarted: "Готово к новой сессии",
+    viewPrompt: "Открыть промпт",
+    viewPromptDialogTitle: "Промпт сессии",
+    viewPromptUnavailable:
+      "Эта сессия была сохранена до появления истории промптов, исходный текст недоступен.",
+    viewPromptContextTitle: "Контекст сессии",
+    viewPromptContextStack: "Стек",
+    viewPromptContextFocus: "Фокус",
+    viewPromptContextExtra: "Доп. контекст",
+    viewPromptContextTimebox: "Таймбокс (минуты)",
+    viewPromptContextSimulation: "Симуляция",
+    viewPromptContextLanguage: "Язык",
+    viewPromptContextCompanyBar: "Уровень компании",
+    viewPromptContextEmpty: "Контекст для этой сессии не сохранён.",
+    viewPromptCopy: "Копировать промпт",
+    viewPromptClose: "Закрыть",
+    yes: "Да",
+    no: "Нет",
+    notAvailable: "\u2014",
   },
 };
 

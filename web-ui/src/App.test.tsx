@@ -1,5 +1,5 @@
 import { CssBaseline, ThemeProvider } from "@mui/material";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
@@ -275,5 +275,76 @@ describe("App", () => {
       expect(screen.getByText("Generated prompt will appear here.")).toBeInTheDocument();
     });
     expect(screen.queryByText(/ROLE:/)).not.toBeInTheDocument();
+  });
+
+  it("opens the View prompt dialog with the historical prompt and context", async () => {
+    const user = userEvent.setup();
+    renderApp();
+
+    const generateButton = screen.getByRole("button", { name: "Generate Prompt" });
+    await waitFor(() => expect(generateButton).toBeEnabled());
+    await user.click(generateButton);
+
+    await waitFor(() => expect(screen.getByText(/Session:/)).toBeInTheDocument());
+
+    const viewPromptButton = screen.getByRole("button", { name: "View prompt" });
+    await user.click(viewPromptButton);
+
+    const dialog = await screen.findByRole("dialog", { name: "Session prompt" });
+    expect(dialog).toBeInTheDocument();
+
+    const dialogScope = within(dialog);
+    expect(dialogScope.getByText(/ROLE:/)).toBeInTheDocument();
+    expect(dialogScope.getByText("Session context")).toBeInTheDocument();
+    expect(dialogScope.getByText("Stack")).toBeInTheDocument();
+    expect(dialogScope.getByText("Timebox (minutes)")).toBeInTheDocument();
+    expect(dialogScope.getByText("30")).toBeInTheDocument();
+  });
+
+  it("copies the historical prompt from the View prompt dialog", async () => {
+    const user = userEvent.setup();
+    renderApp();
+
+    const generateButton = screen.getByRole("button", { name: "Generate Prompt" });
+    await waitFor(() => expect(generateButton).toBeEnabled());
+    await user.click(generateButton);
+
+    await waitFor(() => expect(screen.getByText(/Session:/)).toBeInTheDocument());
+
+    await user.click(screen.getByRole("button", { name: "View prompt" }));
+
+    const dialog = await screen.findByRole("dialog", { name: "Session prompt" });
+    const copyButton = within(dialog).getByRole("button", { name: "Copy prompt" });
+    await user.click(copyButton);
+
+    await waitFor(() => {
+      expect(screen.getByText("Prompt copied")).toBeInTheDocument();
+    });
+  });
+
+  it("shows unavailable notice for legacy sessions without a stored prompt", async () => {
+    const user = userEvent.setup();
+    seedSessions([
+      {
+        id: "legacy-session-no-prompt",
+        date: "2026-02-26T12:20:55.985Z",
+        templateId: "react-hooks-internals",
+        level: "middle",
+        score: 7,
+      },
+    ]);
+    renderApp();
+
+    await user.click(screen.getByRole("button", { name: "View prompt" }));
+
+    const dialog = await screen.findByRole("dialog", { name: "Session prompt" });
+    expect(
+      within(dialog).getByText(
+        "This session was saved before the prompt-history feature was added, so the original prompt is not available.",
+      ),
+    ).toBeInTheDocument();
+
+    const copyButton = within(dialog).getByRole("button", { name: "Copy prompt" });
+    expect(copyButton).toBeDisabled();
   });
 });

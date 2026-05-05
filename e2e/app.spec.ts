@@ -27,6 +27,14 @@ test.describe("Frontend Meta Prompts", () => {
 
     await expect(page.getByText("Score: 9")).toBeVisible();
 
+    await page.getByRole("button", { name: "View prompt" }).click();
+    const dialog = page.getByRole("dialog", { name: "Session prompt" });
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByText("ROLE:")).toBeVisible();
+    await expect(dialog.getByText("Session context")).toBeVisible();
+    await dialog.getByRole("button", { name: "Close" }).click();
+    await expect(dialog).not.toBeVisible();
+
     await page.getByRole("button", { name: "Clear sessions" }).click();
     await expect(page.getByText("No saved sessions yet.")).toBeVisible();
   });
