@@ -25,6 +25,8 @@ const App = () => {
   const {
     activeSessionId,
     busy,
+    companyBar,
+    companyBarPresets,
     error,
     extraContext,
     focusInput,
@@ -36,6 +38,7 @@ const App = () => {
     handleImportJson,
     language,
     level,
+    levelTargets,
     notes,
     persistSession,
     prompt,
@@ -45,6 +48,7 @@ const App = () => {
     sessions,
     startNewSession,
     setActiveSessionId,
+    setCompanyBar,
     setError,
     setExtraContext,
     setFocusInput,
@@ -141,7 +145,13 @@ const App = () => {
 
       <Container maxWidth="xl" sx={{ py: 3 }}>
         {error && (
-          <Alert sx={{ mb: 2 }} severity="error" onClose={() => setError("")}>
+          <Alert
+            sx={{ mb: 2 }}
+            severity="error"
+            role="alert"
+            aria-live="assertive"
+            onClose={() => setError("")}
+          >
             {error}
           </Alert>
         )}
@@ -150,6 +160,8 @@ const App = () => {
           <Grid size={{ xs: 12, md: 5 }}>
             <InterviewSetupCard
               busy={busy}
+              companyBar={companyBar}
+              companyBarPresets={companyBarPresets}
               extraContext={extraContext}
               focusInput={focusInput}
               generatePrompt={generatePrompt}
@@ -157,6 +169,7 @@ const App = () => {
               language={language}
               level={level}
               persistSession={persistSession}
+              setCompanyBar={setCompanyBar}
               setExtraContext={setExtraContext}
               setFocusInput={setFocusInput}
               setLevel={setLevel}
@@ -233,7 +246,11 @@ const App = () => {
                 )}
               </CardContent>
             </Card>
-            <ProgressChartCard language={language} sessions={sessions} />
+            <ProgressChartCard
+              language={language}
+              sessions={sessions}
+              levelTargets={levelTargets}
+            />
             <SessionsCard
               handleClearSessions={handleClearSessions}
               language={language}
@@ -249,7 +266,13 @@ const App = () => {
       </Container>
 
       <Snackbar open={Boolean(snack)} autoHideDuration={2500} onClose={() => setSnack("")}>
-        <Alert severity="success" variant="filled" onClose={() => setSnack("")}>
+        <Alert
+          severity="success"
+          variant="filled"
+          role="status"
+          aria-live="polite"
+          onClose={() => setSnack("")}
+        >
           {snack}
         </Alert>
       </Snackbar>

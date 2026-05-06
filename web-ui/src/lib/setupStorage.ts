@@ -8,6 +8,7 @@ export type StoredSetup = {
   stackInput: string;
   focusInput: string;
   extraContext: string;
+  companyBar: string;
   simulation: boolean;
   timebox: number;
   persistSession: boolean;
@@ -39,6 +40,7 @@ export const readStoredSetup = (): Partial<StoredSetup> | null => {
     if (typeof record.stackInput === "string") out.stackInput = record.stackInput;
     if (typeof record.focusInput === "string") out.focusInput = record.focusInput;
     if (typeof record.extraContext === "string") out.extraContext = record.extraContext;
+    if (typeof record.companyBar === "string") out.companyBar = record.companyBar;
     if (typeof record.simulation === "boolean") out.simulation = record.simulation;
     if (typeof record.timebox === "number" && Number.isFinite(record.timebox)) {
       out.timebox = record.timebox;
@@ -58,6 +60,7 @@ export const writeStoredSetup = (setup: StoredSetup): void => {
       stackInput: sanitizeString(setup.stackInput),
       focusInput: sanitizeString(setup.focusInput),
       extraContext: sanitizeString(setup.extraContext),
+      companyBar: sanitizeString(setup.companyBar),
       simulation: sanitizeBoolean(setup.simulation, true),
       timebox: sanitizeFiniteNumber(setup.timebox, 30),
       persistSession: sanitizeBoolean(setup.persistSession, true),

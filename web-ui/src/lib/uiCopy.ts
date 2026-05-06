@@ -10,6 +10,9 @@ type UiCopy = {
   stack: string;
   focusBoost: string;
   extraContext: string;
+  companyBar: string;
+  companyBarHelper: string;
+  companyBarPresets: string;
   timebox: string;
   simulation: string;
   createSession: string;
@@ -101,6 +104,9 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     stack: "Stack (comma separated)",
     focusBoost: "Focus boost (comma separated)",
     extraContext: "Extra context",
+    companyBar: "Company bar",
+    companyBarHelper: "Sets the interviewer's company tier in the prompt",
+    companyBarPresets: "Company bar presets",
     timebox: "Timebox (minutes)",
     simulation: "Simulation",
     createSession: "Create session",
@@ -201,6 +207,9 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     stack: "Стек (через запятую)",
     focusBoost: "Фокус тем (через запятую)",
     extraContext: "Доп. контекст",
+    companyBar: "Уровень компании",
+    companyBarHelper: "Задаёт уровень компании интервьюера в промпте",
+    companyBarPresets: "Пресеты уровня компании",
     timebox: "Лимит времени (минуты)",
     simulation: "Симуляция",
     createSession: "Создавать сессию",

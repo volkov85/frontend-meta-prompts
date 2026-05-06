@@ -13,6 +13,7 @@ const SAMPLE: ShareableConfig = {
   stackInput: "React, TypeScript, Vite",
   focusInput: "hooks, suspense",
   extraContext: "fintech onboarding flow with 100k DAU",
+  companyBar: "Series-A startup",
   simulation: true,
   timebox: 45,
   language: "ru",
@@ -29,6 +30,7 @@ describe("encodeConfigToUrl", () => {
     expect(url.searchParams.get("stack")).toBe(SAMPLE.stackInput);
     expect(url.searchParams.get("focus")).toBe(SAMPLE.focusInput);
     expect(url.searchParams.get("extra")).toBe(SAMPLE.extraContext);
+    expect(url.searchParams.get("company")).toBe(SAMPLE.companyBar);
     expect(url.searchParams.get("simulation")).toBe("1");
     expect(url.searchParams.get("timebox")).toBe(String(SAMPLE.timebox));
     expect(url.searchParams.get("lang")).toBe(SAMPLE.language);
@@ -41,11 +43,13 @@ describe("encodeConfigToUrl", () => {
         stackInput: "",
         focusInput: "   ",
         extraContext: "",
+        companyBar: "  ",
       }),
     );
     expect(url.searchParams.has("stack")).toBe(false);
     expect(url.searchParams.has("focus")).toBe(false);
     expect(url.searchParams.has("extra")).toBe(false);
+    expect(url.searchParams.has("company")).toBe(false);
     expect(url.searchParams.has("template")).toBe(true);
   });
 
@@ -72,6 +76,7 @@ describe("parseConfigFromUrl", () => {
       stackInput: SAMPLE.stackInput,
       focusInput: SAMPLE.focusInput,
       extraContext: SAMPLE.extraContext,
+      companyBar: SAMPLE.companyBar,
       simulation: true,
       timebox: SAMPLE.timebox,
       language: SAMPLE.language,

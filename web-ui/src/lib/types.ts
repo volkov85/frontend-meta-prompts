@@ -4,6 +4,7 @@ export type {
   InterviewLanguage,
   InterviewTemplate,
   Level,
+  LevelTarget,
   Session,
   SessionContext,
 } from "../../../core/types";

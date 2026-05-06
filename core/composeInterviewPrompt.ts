@@ -14,6 +14,10 @@ export const composeInterviewPrompt = (
   const stack = opts.stack ?? config.defaults.stack;
   const simulation = opts.mode?.simulation ?? config.defaults.simulation;
   const timeboxed = opts.mode?.timeboxedMinutes ?? config.defaults.timeboxedMinutes;
+  const companyBar =
+    typeof opts.companyBar === "string" && opts.companyBar.trim().length > 0
+      ? opts.companyBar.trim()
+      : config.defaults.companyBar;
   const promptLanguage =
     opts.mode?.language ??
     (opts.mode?.english === undefined ? config.defaults.language : opts.mode.english ? "en" : "ru");
@@ -38,8 +42,8 @@ export const composeInterviewPrompt = (
   lines.push(
     isEnglish ? "ROLE:" : "РОЛЬ:",
     isEnglish
-      ? `You are a senior frontend interviewer at a ${config.defaults.companyBar}.`
-      : `Ты senior frontend интервьюер в ${config.defaults.companyBar}.`,
+      ? `You are a senior frontend interviewer at a ${companyBar}.`
+      : `Ты senior frontend интервьюер в ${companyBar}.`,
   );
 
   lines.push(
