@@ -1,22 +1,19 @@
 import { Box, Card, CardContent, Chip, Stack, Typography } from "@mui/material";
 import { useId } from "react";
 import { LEVEL_LABELS, UI_COPY } from "../lib/uiCopy";
-import { InterviewLanguage, Session } from "../lib/types";
+import { InterviewLanguage, Level, LevelTarget, Session } from "../lib/types";
 
 type ProgressChartCardProps = {
   language: InterviewLanguage;
   sessions: Session[];
+  levelTargets: Record<Level, LevelTarget>;
 };
 
 const MAX_POINTS = 6;
 const CHART_WIDTH = 560;
 const CHART_HEIGHT = 220;
 const CHART_PADDING = { top: 18, right: 18, bottom: 34, left: 18 };
-const LEVEL_TARGETS = [
-  { level: "junior", score: 4, color: "#38bdf8" },
-  { level: "middle", score: 6.5, color: "#f59e0b" },
-  { level: "senior", score: 8.5, color: "#34d399" },
-] as const;
+const LEVEL_ORDER: Level[] = ["junior", "middle", "senior"];
 
 const formatScore = (value: number) => {
   return value % 1 === 0 ? value.toFixed(0) : value.toFixed(1);
@@ -27,10 +24,11 @@ const formatCoverage = (ratedCount: number, totalCount: number) => {
   return `${Math.round((ratedCount / totalCount) * 100)}%`;
 };
 
-export const ProgressChartCard = ({ language, sessions }: ProgressChartCardProps) => {
+export const ProgressChartCard = ({ language, sessions, levelTargets }: ProgressChartCardProps) => {
   const copy = UI_COPY[language];
   const levelLabels = LEVEL_LABELS[language];
   const chartId = useId().replace(/:/g, "");
+  const orderedTargets = LEVEL_ORDER.map((level) => ({ level, ...levelTargets[level] }));
   const ratedSessions = sessions
     .filter((session) => session.score !== undefined)
     .slice(0, MAX_POINTS)
@@ -90,7 +88,7 @@ export const ProgressChartCard = ({ language, sessions }: ProgressChartCardProps
               <Typography color="text.secondary">{copy.progressChartSubtitle}</Typography>
             </Box>
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-              {LEVEL_TARGETS.map((target) => (
+              {orderedTargets.map((target) => (
                 <Chip
                   key={target.level}
                   label={`${levelLabels[target.level]} ${formatScore(target.score)}+`}
@@ -195,7 +193,7 @@ export const ProgressChartCard = ({ language, sessions }: ProgressChartCardProps
                       );
                     })}
 
-                    {LEVEL_TARGETS.map((target) => {
+                    {orderedTargets.map((target) => {
                       const y = yForScore(target.score);
                       return (
                         <g key={target.level}>

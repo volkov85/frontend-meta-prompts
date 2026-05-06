@@ -27,16 +27,23 @@ export type InterviewTemplate = {
   };
 };
 
+export type LevelTarget = {
+  score: number;
+  color: string;
+};
+
 export type InterviewConfig = {
   version: string;
   defaults: {
     companyBar: string;
+    companyBarPresets?: string[];
     stack: string[];
     language: InterviewLanguage;
     followUps: number;
     include: IncludeSection[];
     simulation: boolean;
     timeboxedMinutes: number;
+    levelTargets?: Record<Level, LevelTarget>;
   };
   templates: InterviewTemplate[];
 };
@@ -53,6 +60,7 @@ export type ComposeInterviewPromptOptions = {
   };
   extraContext?: string;
   focusBoost?: string[];
+  companyBar?: string;
 };
 
 export type SessionContext = {

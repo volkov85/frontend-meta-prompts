@@ -1,7 +1,9 @@
 import {
+  Box,
   Button,
   Card,
   CardContent,
+  Chip,
   FormControlLabel,
   MenuItem,
   Stack,
@@ -15,6 +17,8 @@ import { InterviewLanguage, InterviewTemplate, Level } from "../lib/types";
 
 type InterviewSetupCardProps = {
   busy: boolean;
+  companyBar: string;
+  companyBarPresets: readonly string[];
   extraContext: string;
   focusInput: string;
   generatePrompt: () => Promise<void>;
@@ -22,6 +26,7 @@ type InterviewSetupCardProps = {
   language: InterviewLanguage;
   level: Level;
   persistSession: boolean;
+  setCompanyBar: (value: string) => void;
   setExtraContext: (value: string) => void;
   setFocusInput: (value: string) => void;
   setLevel: (value: Level) => void;
@@ -39,6 +44,8 @@ type InterviewSetupCardProps = {
 
 export const InterviewSetupCard = ({
   busy,
+  companyBar,
+  companyBarPresets,
   extraContext,
   focusInput,
   generatePrompt,
@@ -46,6 +53,7 @@ export const InterviewSetupCard = ({
   language,
   level,
   persistSession,
+  setCompanyBar,
   setExtraContext,
   setFocusInput,
   setLevel,
@@ -118,6 +126,40 @@ export const InterviewSetupCard = ({
             minRows={2}
             fullWidth
           />
+          <Box>
+            <TextField
+              label={copy.companyBar}
+              value={companyBar}
+              onChange={(event) => setCompanyBar(event.target.value)}
+              fullWidth
+              helperText={copy.companyBarHelper}
+            />
+            {companyBarPresets.length > 0 && (
+              <Stack
+                direction="row"
+                spacing={0.75}
+                useFlexGap
+                flexWrap="wrap"
+                sx={{ mt: 1 }}
+                role="group"
+                aria-label={copy.companyBarPresets}
+              >
+                {companyBarPresets.map((preset) => {
+                  const selected = companyBar.trim() === preset;
+                  return (
+                    <Chip
+                      key={preset}
+                      label={preset}
+                      size="small"
+                      onClick={() => setCompanyBar(preset)}
+                      color={selected ? "primary" : "default"}
+                      variant={selected ? "filled" : "outlined"}
+                    />
+                  );
+                })}
+              </Stack>
+            )}
+          </Box>
           <TextField
             type="number"
             label={copy.timebox}

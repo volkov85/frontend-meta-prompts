@@ -66,6 +66,7 @@ type InterviewAppState = {
   stackInput: string;
   focusInput: string;
   extraContext: string;
+  companyBar: string;
   simulation: boolean;
   language: InterviewLanguage;
   timebox: number;
@@ -88,6 +89,7 @@ const initialState: InterviewAppState = {
   stackInput: "",
   focusInput: "",
   extraContext: "",
+  companyBar: "",
   simulation: true,
   language: "en",
   timebox: 30,
@@ -174,6 +176,8 @@ export const useInterviewAppState = () => {
           stackInput: urlSetup.stackInput ?? storedSetup?.stackInput ?? defaultStackInput,
           focusInput: urlSetup.focusInput ?? storedSetup?.focusInput ?? "",
           extraContext: urlSetup.extraContext ?? storedSetup?.extraContext ?? "",
+          companyBar:
+            urlSetup.companyBar ?? storedSetup?.companyBar ?? config.defaults.companyBar ?? "",
           language: urlSetup.language ?? storedLanguage ?? config.defaults.language ?? "en",
           simulation: urlSetup.simulation ?? storedSetup?.simulation ?? defaultSimulation,
           timebox: urlSetup.timebox ?? storedSetup?.timebox ?? defaultTimebox,
@@ -230,6 +234,7 @@ export const useInterviewAppState = () => {
       stackInput: state.stackInput,
       focusInput: state.focusInput,
       extraContext: state.extraContext,
+      companyBar: state.companyBar,
       simulation: state.simulation,
       timebox: state.timebox,
       persistSession: state.persistSession,
@@ -241,10 +246,27 @@ export const useInterviewAppState = () => {
     state.stackInput,
     state.focusInput,
     state.extraContext,
+    state.companyBar,
     state.simulation,
     state.timebox,
     state.persistSession,
   ]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Enter") return;
+      if (!event.ctrlKey && !event.metaKey) return;
+      if (state.busy || !state.templateId) return;
+      event.preventDefault();
+      void generatePrompt();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+    // generatePrompt is recreated every render; refreshing the listener is
+    // cheap and ensures the closure sees current state.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.busy, state.templateId]);
 
   const generatePrompt = async () => {
     try {
@@ -253,12 +275,16 @@ export const useInterviewAppState = () => {
       const focusBoost = parseCsv(state.focusInput);
       const extraContext = state.extraContext;
       const timeboxedMinutes = Number(state.timebox);
+      const trimmedCompanyBar = state.companyBar.trim();
+      const effectiveCompanyBar =
+        trimmedCompanyBar.length > 0 ? trimmedCompanyBar : config.defaults.companyBar;
       const nextPrompt = composeInterviewPrompt(config, {
         templateId: state.templateId,
         level: state.level,
         stack,
         focusBoost,
         extraContext,
+        companyBar: effectiveCompanyBar,
         mode: {
           simulation: state.simulation,
           language: state.language,
@@ -278,7 +304,7 @@ export const useInterviewAppState = () => {
             simulation: state.simulation,
             language: state.language,
             timeboxedMinutes,
-            companyBar: config.defaults.companyBar,
+            companyBar: effectiveCompanyBar,
           },
         });
         dispatch({
@@ -339,6 +365,7 @@ export const useInterviewAppState = () => {
         stackInput: state.stackInput,
         focusInput: state.focusInput,
         extraContext: state.extraContext,
+        companyBar: state.companyBar,
         simulation: state.simulation,
         timebox: state.timebox,
         language: state.language,
@@ -475,6 +502,8 @@ export const useInterviewAppState = () => {
   const setError = (value: string) => dispatch({ type: "patch", payload: { error: value } });
   const setExtraContext = (value: string) =>
     dispatch({ type: "patch", payload: { extraContext: value } });
+  const setCompanyBar = (value: string) =>
+    dispatch({ type: "patch", payload: { companyBar: value } });
   const setFocusInput = (value: string) =>
     dispatch({ type: "patch", payload: { focusInput: value } });
   const setLanguage = (value: InterviewLanguage) =>
@@ -496,6 +525,8 @@ export const useInterviewAppState = () => {
   return {
     activeSessionId: state.activeSessionId,
     busy: state.busy,
+    companyBar: state.companyBar,
+    companyBarPresets: (config.defaults.companyBarPresets ?? []) as readonly string[],
     error: state.error,
     extraContext: state.extraContext,
     focusInput: state.focusInput,
@@ -516,6 +547,7 @@ export const useInterviewAppState = () => {
     startNewSession,
     sessions: state.sessions,
     setActiveSessionId,
+    setCompanyBar,
     setError,
     setExtraContext,
     setFocusInput,
@@ -534,6 +566,11 @@ export const useInterviewAppState = () => {
     stackInput: state.stackInput,
     templateId: state.templateId,
     templatesForLevel,
+    levelTargets: (config.defaults.levelTargets ?? {
+      junior: { score: 4, color: "#38bdf8" },
+      middle: { score: 6.5, color: "#f59e0b" },
+      senior: { score: 8.5, color: "#34d399" },
+    }) as Record<Level, { score: number; color: string }>,
     timebox: state.timebox,
   };
 };

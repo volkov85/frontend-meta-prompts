@@ -2,6 +2,12 @@
   "version": "1.0",
   "defaults": {
     "companyBar": "top-tier product company",
+    "companyBarPresets": [
+      "BigTech FAANG",
+      "top-tier product company",
+      "Series-A startup",
+      "outsource / agency"
+    ],
     "stack": ["React", "TypeScript", "JavaScript"],
     "language": "en",
     "followUps": 3,
@@ -17,7 +23,12 @@
       "securityConsiderations"
     ],
     "simulation": true,
-    "timeboxedMinutes": 30
+    "timeboxedMinutes": 30,
+    "levelTargets": {
+      "junior": { "score": 4, "color": "#38bdf8" },
+      "middle": { "score": 6.5, "color": "#f59e0b" },
+      "senior": { "score": 8.5, "color": "#34d399" }
+    }
   },
   "templates": [
     {

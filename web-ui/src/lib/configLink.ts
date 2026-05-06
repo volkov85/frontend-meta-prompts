@@ -12,6 +12,7 @@ const SHARE_PARAM_KEYS = [
   "stack",
   "focus",
   "extra",
+  "company",
   "simulation",
   "timebox",
   "lang",
@@ -23,6 +24,7 @@ export type ShareableConfig = {
   stackInput: string;
   focusInput: string;
   extraContext: string;
+  companyBar: string;
   simulation: boolean;
   timebox: number;
   language: InterviewLanguage;
@@ -59,6 +61,7 @@ export const encodeConfigToUrl = (base: string, config: ShareableConfig): string
   if (config.stackInput.trim()) sp.set("stack", config.stackInput);
   if (config.focusInput.trim()) sp.set("focus", config.focusInput);
   if (config.extraContext.trim()) sp.set("extra", config.extraContext);
+  if (config.companyBar.trim()) sp.set("company", config.companyBar);
   sp.set("simulation", config.simulation ? "1" : "0");
   if (Number.isFinite(config.timebox)) sp.set("timebox", String(Math.trunc(config.timebox)));
   if (config.language) sp.set("lang", config.language);
@@ -87,6 +90,9 @@ export const parseConfigFromUrl = (searchParams: URLSearchParams): Partial<Share
 
   const extra = searchParams.get("extra");
   if (extra !== null) out.extraContext = extra;
+
+  const company = searchParams.get("company");
+  if (company !== null) out.companyBar = company;
 
   const simulation = parseBooleanParam(searchParams.get("simulation"));
   if (simulation !== undefined) out.simulation = simulation;

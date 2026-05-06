@@ -41,3 +41,18 @@ body {
   white-space: pre-wrap;
   line-height: 1.45;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .fade-up {
+    animation: none;
+  }
+}

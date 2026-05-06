@@ -543,6 +543,39 @@ describe("App", () => {
     expect(copied).toContain("lang=");
   });
 
+  it("triggers Generate Prompt with Ctrl+Enter shortcut", async () => {
+    const user = userEvent.setup();
+    renderApp();
+
+    const generateButton = screen.getByRole("button", { name: "Generate Prompt" });
+    await waitFor(() => expect(generateButton).toBeEnabled());
+
+    await user.keyboard("{Control>}{Enter}{/Control}");
+
+    await waitFor(() => {
+      expect(screen.getByText(/ROLE:/)).toBeInTheDocument();
+    });
+  });
+
+  it("applies a company-bar preset chip and reflects it in the prompt", async () => {
+    const user = userEvent.setup();
+    renderApp();
+
+    const presetChip = await screen.findByRole("button", { name: "Series-A startup" });
+    await user.click(presetChip);
+
+    expect(screen.getByLabelText("Company bar")).toHaveValue("Series-A startup");
+
+    const generateButton = screen.getByRole("button", { name: "Generate Prompt" });
+    await waitFor(() => expect(generateButton).toBeEnabled());
+    await user.click(generateButton);
+
+    await waitFor(() => {
+      const prompt = document.querySelector(".prompt-output");
+      expect(prompt?.textContent ?? "").toContain("Series-A startup");
+    });
+  });
+
   it("URL params win over saved setup", async () => {
     seedSetup({
       templateId: "react-hooks-internals",
