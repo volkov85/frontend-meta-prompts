@@ -6,6 +6,7 @@ test.describe("Frontend Meta Prompts", () => {
 
     await expect(page.getByText("Frontend Meta Prompts")).toBeVisible();
     await expect(page.getByText("Generated prompt will appear here.")).toBeVisible();
+    await page.getByRole("tab", { name: "Sessions" }).click();
     await expect(page.getByText("No saved sessions yet.")).toBeVisible();
   });
 
@@ -27,8 +28,11 @@ test.describe("Frontend Meta Prompts", () => {
     await page.getByLabel("Notes").fill("Great problem decomposition and trade-offs");
     await page.getByRole("button", { name: "Save score" }).click();
 
-    await expect(page.getByText("Score: 9").first()).toBeVisible();
+    await page.getByRole("tab", { name: "Charts" }).click();
     await expect(page.getByText("Rubric breakdown").first()).toBeVisible();
+
+    await page.getByRole("tab", { name: "Sessions" }).click();
+    await expect(page.getByText("Score: 9").first()).toBeVisible();
 
     await page.getByRole("button", { name: "View prompt" }).click();
     const dialog = page.getByRole("dialog", { name: "Session prompt" });

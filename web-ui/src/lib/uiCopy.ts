@@ -46,6 +46,10 @@ type UiCopy = {
   rubricRadarAverage: string;
   rubricRadarSourceLabel: string;
   rubricMarkdownLabel: string;
+  workspaceTabPrompt: string;
+  workspaceTabCharts: string;
+  workspaceTabSessions: string;
+  workspaceTabsAriaLabel: string;
   promptOutputTitle: string;
   promptOutputEmpty: string;
   progressChartTitle: string;
@@ -160,6 +164,10 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     rubricRadarAverage: "Average",
     rubricRadarSourceLabel: "Source",
     rubricMarkdownLabel: "Rubric",
+    workspaceTabPrompt: "Prompt",
+    workspaceTabCharts: "Charts",
+    workspaceTabSessions: "Sessions",
+    workspaceTabsAriaLabel: "Workspace sections",
     promptOutputTitle: "Prompt Output",
     promptOutputEmpty: "Generated prompt will appear here.",
     progressChartTitle: "Interview Momentum",
@@ -283,6 +291,10 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     rubricRadarAverage: "Среднее",
     rubricRadarSourceLabel: "Источник",
     rubricMarkdownLabel: "Рубрика",
+    workspaceTabPrompt: "Промпт",
+    workspaceTabCharts: "Графики",
+    workspaceTabSessions: "Сессии",
+    workspaceTabsAriaLabel: "Разделы рабочей области",
     promptOutputTitle: "Сгенерированный промпт",
     promptOutputEmpty: "Здесь появится сгенерированный промпт.",
     progressChartTitle: "Динамика интервью",

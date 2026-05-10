@@ -1,6 +1,6 @@
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { render, screen, waitFor, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import userEvent, { UserEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 import { appTheme } from "./theme";
@@ -12,6 +12,10 @@ const renderApp = () =>
       <App />
     </ThemeProvider>,
   );
+
+const switchToTab = async (user: UserEvent, label: "Prompt" | "Charts" | "Sessions") => {
+  await user.click(screen.getByRole("tab", { name: label }));
+};
 
 describe("App", () => {
   beforeEach(() => {
@@ -37,12 +41,20 @@ describe("App", () => {
     localStorage.setItem("frontend_meta_prompts_setup_v1", JSON.stringify(setup));
   };
 
-  it("renders initial layout", () => {
+  it("renders initial layout", async () => {
+    const user = userEvent.setup();
     renderApp();
 
     expect(screen.getByText("Frontend Meta Prompts")).toBeInTheDocument();
-    expect(screen.getByText("Interview Momentum")).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Prompt" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Charts" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Sessions" })).toBeInTheDocument();
     expect(screen.getByText("Generated prompt will appear here.")).toBeInTheDocument();
+
+    await switchToTab(user, "Charts");
+    expect(screen.getByText("Interview Momentum")).toBeInTheDocument();
+
+    await switchToTab(user, "Sessions");
     expect(screen.getByText("No saved sessions yet.")).toBeInTheDocument();
   });
 
@@ -59,6 +71,8 @@ describe("App", () => {
       expect(screen.getByText(/ROLE:/)).toBeInTheDocument();
     });
     expect(screen.getByText(/Session created:/)).toBeInTheDocument();
+
+    await switchToTab(user, "Sessions");
     expect(screen.getByText(/Session:/)).toBeInTheDocument();
   });
 
@@ -86,7 +100,7 @@ describe("App", () => {
     await waitFor(() => expect(generateButton).toBeEnabled());
     await user.click(generateButton);
 
-    await waitFor(() => expect(screen.getByText(/Session:/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/Session created:/)).toBeInTheDocument());
 
     const axisInput = (label: string) => {
       const candidates = screen.getAllByLabelText(label);
@@ -109,6 +123,8 @@ describe("App", () => {
     await waitFor(() => {
       expect(screen.getByText("Evaluation saved")).toBeInTheDocument();
     });
+
+    await switchToTab(user, "Sessions");
     expect(screen.getByText("Score: 8.5")).toBeInTheDocument();
     expect(screen.getByText("Rubric")).toBeInTheDocument();
   }, 15000);
@@ -121,7 +137,7 @@ describe("App", () => {
     await waitFor(() => expect(generateButton).toBeEnabled());
     await user.click(generateButton);
 
-    await waitFor(() => expect(screen.getAllByText(/Session:/).length).toBeGreaterThan(0));
+    await waitFor(() => expect(screen.getByText(/Session created:/)).toBeInTheDocument());
 
     const saveButton = screen.getByRole("button", { name: "Save score" });
     expect(saveButton).toBeDisabled();
@@ -160,6 +176,9 @@ describe("App", () => {
     await waitFor(() => expect(generateButton).toBeEnabled());
     await user.click(generateButton);
 
+    await waitFor(() => expect(screen.getByText(/Session created:/)).toBeInTheDocument());
+
+    await switchToTab(user, "Sessions");
     await waitFor(() => expect(screen.getByText(/Session:/)).toBeInTheDocument());
 
     await user.click(screen.getByRole("button", { name: "Clear sessions" }));
@@ -179,6 +198,9 @@ describe("App", () => {
     await waitFor(() => expect(generateButton).toBeEnabled());
     await user.click(generateButton);
 
+    await waitFor(() => expect(screen.getByText(/Session created:/)).toBeInTheDocument());
+
+    await switchToTab(user, "Sessions");
     await waitFor(() => expect(screen.getByText(/Session:/)).toBeInTheDocument());
 
     await user.click(screen.getByRole("button", { name: "Clear sessions" }));
@@ -207,6 +229,7 @@ describe("App", () => {
     ]);
     renderApp();
 
+    await switchToTab(user, "Sessions");
     await user.click(screen.getByLabelText("Level filter"));
     await user.click(screen.getByRole("option", { name: "Junior" }));
 
@@ -238,13 +261,15 @@ describe("App", () => {
     ]);
     renderApp();
 
+    await switchToTab(user, "Sessions");
     await user.type(screen.getByLabelText("Search"), "closure");
 
     expect(screen.getByText("react-hooks-internals")).toBeInTheDocument();
     expect(screen.queryByText("junior-react-fundamentals")).not.toBeInTheDocument();
   });
 
-  it("renders progress chart stats from rated sessions", () => {
+  it("renders progress chart stats from rated sessions", async () => {
+    const user = userEvent.setup();
     seedSessions([
       {
         id: "session-1",
@@ -270,6 +295,7 @@ describe("App", () => {
 
     renderApp();
 
+    await switchToTab(user, "Charts");
     expect(screen.getByText("Average")).toBeInTheDocument();
     expect(screen.getByText("7.8")).toBeInTheDocument();
     expect(screen.getByText("Latest")).toBeInTheDocument();
@@ -346,9 +372,10 @@ describe("App", () => {
     await waitFor(() => expect(generateButton).toBeEnabled());
     await user.click(generateButton);
 
-    await waitFor(() => expect(screen.getByText(/Session:/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/Session created:/)).toBeInTheDocument());
 
-    const viewPromptButton = screen.getByRole("button", { name: "View prompt" });
+    await switchToTab(user, "Sessions");
+    const viewPromptButton = await screen.findByRole("button", { name: "View prompt" });
     await user.click(viewPromptButton);
 
     const dialog = await screen.findByRole("dialog", { name: "Session prompt" });
@@ -370,9 +397,10 @@ describe("App", () => {
     await waitFor(() => expect(generateButton).toBeEnabled());
     await user.click(generateButton);
 
-    await waitFor(() => expect(screen.getByText(/Session:/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/Session created:/)).toBeInTheDocument());
 
-    await user.click(screen.getByRole("button", { name: "View prompt" }));
+    await switchToTab(user, "Sessions");
+    await user.click(await screen.findByRole("button", { name: "View prompt" }));
 
     const dialog = await screen.findByRole("dialog", { name: "Session prompt" });
     const copyButton = within(dialog).getByRole("button", { name: "Copy prompt" });
@@ -396,7 +424,8 @@ describe("App", () => {
     ]);
     renderApp();
 
-    await user.click(screen.getByRole("button", { name: "View prompt" }));
+    await switchToTab(user, "Sessions");
+    await user.click(await screen.findByRole("button", { name: "View prompt" }));
 
     const dialog = await screen.findByRole("dialog", { name: "Session prompt" });
     expect(
@@ -469,6 +498,7 @@ describe("App", () => {
       .spyOn(HTMLAnchorElement.prototype, "click")
       .mockImplementation(() => undefined);
 
+    await switchToTab(user, "Sessions");
     await user.click(screen.getByRole("button", { name: "Export JSON" }));
 
     expect(createObjectURLSpy).toHaveBeenCalledTimes(1);
@@ -514,6 +544,7 @@ describe("App", () => {
     ]);
     const file = new File([importPayload], "sessions.json", { type: "application/json" });
 
+    await switchToTab(user, "Sessions");
     const fileInput = document.querySelector(
       "input[type='file'][accept='application/json,.json']",
     ) as HTMLInputElement | null;

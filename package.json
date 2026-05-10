@@ -93,7 +93,7 @@
     {
       "name": "mui vendor (gzip)",
       "path": "web-ui/dist/assets/mui-vendor-*.js",
-      "limit": "110 KB",
+      "limit": "115 KB",
       "gzip": true
     },
     {
