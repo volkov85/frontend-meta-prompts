@@ -24,6 +24,7 @@ import {
   stripShareableParams,
 } from "./configLink";
 import { readStoredSetup, writeStoredSetup } from "./setupStorage";
+import { recommendNextSession } from "./recommendNextSession";
 import { UI_COPY } from "./uiCopy";
 import {
   InterviewConfig,
@@ -87,6 +88,7 @@ type InterviewAppState = {
   notes: string;
   snack: string;
   setupInitialized: boolean;
+  dismissedRecommendations: string[];
 };
 
 const emptyRubricInputs = (): Record<RubricAxis, string> =>
@@ -118,6 +120,7 @@ const initialState: InterviewAppState = {
   rubricInputs: emptyRubricInputs(),
   notes: "",
   snack: "",
+  dismissedRecommendations: [],
   setupInitialized: false,
 };
 
@@ -577,6 +580,41 @@ export const useInterviewAppState = () => {
     dispatch({ type: "patch", payload: { templateId: value } });
   const setTimebox = (value: number) => dispatch({ type: "patch", payload: { timebox: value } });
 
+  const recommendation = useMemo(
+    () => recommendNextSession(state.sessions, state.templates),
+    [state.sessions, state.templates],
+  );
+
+  const visibleRecommendation = useMemo(() => {
+    if (!recommendation) return null;
+    if (state.dismissedRecommendations.includes(recommendation.templateId)) return null;
+    return recommendation;
+  }, [recommendation, state.dismissedRecommendations]);
+
+  const applyRecommendation = () => {
+    if (!recommendation) return;
+    const copy = UI_COPY[state.language];
+    dispatch({
+      type: "patch",
+      payload: {
+        level: recommendation.level,
+        templateId: recommendation.templateId,
+        snack: copy.recommendationApplied(recommendation.templateTitle),
+      },
+    });
+  };
+
+  const dismissRecommendation = () => {
+    if (!recommendation) return;
+    if (state.dismissedRecommendations.includes(recommendation.templateId)) return;
+    dispatch({
+      type: "patch",
+      payload: {
+        dismissedRecommendations: [...state.dismissedRecommendations, recommendation.templateId],
+      },
+    });
+  };
+
   return {
     activeSessionId: state.activeSessionId,
     busy: state.busy,
@@ -596,6 +634,9 @@ export const useInterviewAppState = () => {
     notes: state.notes,
     persistSession: state.persistSession,
     prompt: state.prompt,
+    recommendation: visibleRecommendation,
+    applyRecommendation,
+    dismissRecommendation,
     refreshSessions,
     rubricAggregate,
     rubricInputs: state.rubricInputs,

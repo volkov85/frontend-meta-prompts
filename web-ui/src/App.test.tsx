@@ -665,4 +665,83 @@ describe("App", () => {
     );
     expect(screen.getByLabelText("Extra context")).toHaveValue("from-storage-extra");
   });
+
+  it("shows recommended next session and applies it when clicked", async () => {
+    const user = userEvent.setup();
+    seedSessions([
+      {
+        id: "weak-tradeoffs-1",
+        date: "2026-03-18T10:00:00.000Z",
+        templateId: "react-hooks-internals",
+        level: "middle",
+        score: 6,
+        rubric: {
+          correctness: 9,
+          depth: 9,
+          clarity: 8,
+          tradeOffs: 3,
+          practicality: 8,
+        },
+      },
+    ]);
+    renderApp();
+
+    await waitFor(() => {
+      expect(screen.getByText("Recommended next session")).toBeInTheDocument();
+    });
+    expect(screen.getByText(/Trade-offs scored lowest/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Apply" }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Applied recommendation:/)).toBeInTheDocument();
+    });
+  });
+
+  it("dismisses the recommendation banner when the user clicks dismiss", async () => {
+    const user = userEvent.setup();
+    seedSessions([
+      {
+        id: "weak-clarity-1",
+        date: "2026-03-18T10:00:00.000Z",
+        templateId: "react-hooks-internals",
+        level: "middle",
+        score: 6,
+        rubric: {
+          correctness: 9,
+          depth: 9,
+          clarity: 2,
+          tradeOffs: 8,
+          practicality: 8,
+        },
+      },
+    ]);
+    renderApp();
+
+    await waitFor(() => {
+      expect(screen.getByText("Recommended next session")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole("button", { name: "Dismiss recommendation" }));
+
+    expect(screen.queryByText("Recommended next session")).not.toBeInTheDocument();
+  });
+
+  it("does not show the recommendation banner without rated sessions", async () => {
+    seedSessions([
+      {
+        id: "unrated-1",
+        date: "2026-03-18T10:00:00.000Z",
+        templateId: "react-hooks-internals",
+        level: "middle",
+      },
+    ]);
+    renderApp();
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Generate Prompt" })).toBeEnabled();
+    });
+
+    expect(screen.queryByText("Recommended next session")).not.toBeInTheDocument();
+  });
 });
