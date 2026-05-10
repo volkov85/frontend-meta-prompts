@@ -22,6 +22,7 @@ import {
   EvaluationCard,
   InterviewSetupCard,
   ProgressChartCard,
+  RecommendedNextAlert,
   RubricRadarCard,
   SessionsCard,
 } from "./components";
@@ -50,6 +51,9 @@ const App = () => {
     notes,
     persistSession,
     prompt,
+    recommendation,
+    applyRecommendation,
+    dismissRecommendation,
     refreshSessions,
     rubricAggregate,
     rubricInputs,
@@ -171,6 +175,14 @@ const App = () => {
 
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, md: 5 }}>
+            {recommendation && (
+              <RecommendedNextAlert
+                language={language}
+                recommendation={recommendation}
+                onApply={applyRecommendation}
+                onDismiss={dismissRecommendation}
+              />
+            )}
             <InterviewSetupCard
               busy={busy}
               companyBar={companyBar}

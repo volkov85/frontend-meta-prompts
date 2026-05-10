@@ -50,6 +50,11 @@ type UiCopy = {
   workspaceTabCharts: string;
   workspaceTabSessions: string;
   workspaceTabsAriaLabel: string;
+  recommendationTitle: string;
+  recommendationBody: (axis: string, score: string, template: string) => string;
+  recommendationApply: string;
+  recommendationDismiss: string;
+  recommendationApplied: (template: string) => string;
   promptOutputTitle: string;
   promptOutputEmpty: string;
   progressChartTitle: string;
@@ -168,6 +173,12 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     workspaceTabCharts: "Charts",
     workspaceTabSessions: "Sessions",
     workspaceTabsAriaLabel: "Workspace sections",
+    recommendationTitle: "Recommended next session",
+    recommendationBody: (axis: string, score: string, template: string) =>
+      `${axis} scored lowest in your recent rubrics (${score}/10). Try ${template} to focus on it.`,
+    recommendationApply: "Apply",
+    recommendationDismiss: "Dismiss recommendation",
+    recommendationApplied: (template: string) => `Applied recommendation: ${template}`,
     promptOutputTitle: "Prompt Output",
     promptOutputEmpty: "Generated prompt will appear here.",
     progressChartTitle: "Interview Momentum",
@@ -295,6 +306,12 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     workspaceTabCharts: "Графики",
     workspaceTabSessions: "Сессии",
     workspaceTabsAriaLabel: "Разделы рабочей области",
+    recommendationTitle: "Рекомендация для следующей сессии",
+    recommendationBody: (axis: string, score: string, template: string) =>
+      `${axis} — самая слабая ось в последних рубриках (${score}/10). Попробуй ${template}, чтобы прокачать её.`,
+    recommendationApply: "Применить",
+    recommendationDismiss: "Скрыть рекомендацию",
+    recommendationApplied: (template: string) => `Применена рекомендация: ${template}`,
     promptOutputTitle: "Сгенерированный промпт",
     promptOutputEmpty: "Здесь появится сгенерированный промпт.",
     progressChartTitle: "Динамика интервью",
