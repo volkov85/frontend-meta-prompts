@@ -9,8 +9,8 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { LEVEL_LABELS, UI_COPY } from "../lib/uiCopy";
-import { InterviewLanguage, Session, SessionContext } from "../lib/types";
+import { LEVEL_LABELS, rubricAxisLabel, UI_COPY } from "../lib/uiCopy";
+import { InterviewLanguage, RUBRIC_AXES, Session, SessionContext } from "../lib/types";
 
 type SessionPromptDialogProps = {
   language: InterviewLanguage;
@@ -146,6 +146,33 @@ export const SessionPromptDialog = ({
               </Typography>
             ) : (
               <Alert severity="info">{copy.viewPromptUnavailable}</Alert>
+            )}
+
+            {session.rubric && (
+              <>
+                <Divider />
+                <Stack spacing={1}>
+                  <Typography variant="subtitle2">{copy.rubricMarkdownLabel}</Typography>
+                  <Stack spacing={0.5}>
+                    {RUBRIC_AXES.map((axis) => (
+                      <Stack
+                        key={axis}
+                        direction={{ xs: "column", sm: "row" }}
+                        spacing={{ xs: 0, sm: 1 }}
+                      >
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ minWidth: { sm: 180 } }}
+                        >
+                          {rubricAxisLabel(language, axis)}
+                        </Typography>
+                        <Typography variant="body2">{session.rubric![axis]}</Typography>
+                      </Stack>
+                    ))}
+                  </Stack>
+                </Stack>
+              </>
             )}
 
             <Divider />

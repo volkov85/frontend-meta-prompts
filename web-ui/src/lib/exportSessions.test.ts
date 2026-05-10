@@ -46,6 +46,26 @@ describe("sanitizeSession", () => {
     expect(result?.id).toBe(validSession.id);
   });
 
+  it("round-trips a rubric and drops invalid rubric payloads", () => {
+    const sessionWithRubric: Session = {
+      ...validSession,
+      rubric: {
+        correctness: 8,
+        depth: 7,
+        clarity: 9,
+        tradeOffs: 6,
+        practicality: 10,
+      },
+    };
+    expect(sanitizeSession(sessionWithRubric)?.rubric).toEqual(sessionWithRubric.rubric);
+    const withBadRubric = sanitizeSession({
+      ...validSession,
+      rubric: { correctness: 11, depth: 7, clarity: 9, tradeOffs: 6, practicality: 10 },
+    });
+    expect(withBadRubric?.rubric).toBeUndefined();
+    expect(withBadRubric?.id).toBe(validSession.id);
+  });
+
   it("drops invalid context fields and keeps valid ones", () => {
     const result = sanitizeSession({
       ...validSession,
@@ -135,6 +155,24 @@ describe("buildSessionsMarkdown", () => {
     expect(md).toContain("- Language: en");
     expect(md).toContain("- Company bar: FAANG");
     expect(md).toContain("ROLE:");
+  });
+
+  it("includes a rubric line when the session has rubric data", () => {
+    const md = buildSessionsMarkdown([
+      {
+        ...validSession,
+        rubric: {
+          correctness: 8,
+          depth: 7,
+          clarity: 9,
+          tradeOffs: 6,
+          practicality: 10,
+        },
+      },
+    ]);
+    expect(md).toContain(
+      "- **Rubric:** correctness=8, depth=7, clarity=9, tradeOffs=6, practicality=10",
+    );
   });
 
   it("renders an empty-history report when sessions are empty", () => {

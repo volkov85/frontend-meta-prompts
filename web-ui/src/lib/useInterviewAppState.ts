@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useReducer } from "react";
 import interviewsData from "../../../data/interviews.json";
 import { composeInterviewPrompt } from "./composePrompt";
+import { computeAggregateScore } from "../../../core/rubric";
 import {
   clearSessions,
   createSession,
   listSessions,
   readRawSessions,
   replaceSessions,
-  updateSessionScore,
+  updateSessionEvaluation,
 } from "./localSessions";
 import {
   buildExportFilename,
@@ -24,7 +25,16 @@ import {
 } from "./configLink";
 import { readStoredSetup, writeStoredSetup } from "./setupStorage";
 import { UI_COPY } from "./uiCopy";
-import { InterviewConfig, InterviewLanguage, InterviewTemplate, Level, Session } from "./types";
+import {
+  InterviewConfig,
+  InterviewLanguage,
+  InterviewTemplate,
+  Level,
+  RUBRIC_AXES,
+  Rubric,
+  RubricAxis,
+  Session,
+} from "./types";
 
 export const ALL_LEVELS: Level[] = ["junior", "middle", "senior"];
 
@@ -73,11 +83,20 @@ type InterviewAppState = {
   persistSession: boolean;
   prompt: string;
   activeSessionId: string;
-  score: string;
+  rubricInputs: Record<RubricAxis, string>;
   notes: string;
   snack: string;
   setupInitialized: boolean;
 };
+
+const emptyRubricInputs = (): Record<RubricAxis, string> =>
+  RUBRIC_AXES.reduce(
+    (acc, axis) => {
+      acc[axis] = "";
+      return acc;
+    },
+    {} as Record<RubricAxis, string>,
+  );
 
 const initialState: InterviewAppState = {
   templates: [],
@@ -96,7 +115,7 @@ const initialState: InterviewAppState = {
   persistSession: true,
   prompt: "",
   activeSessionId: "",
-  score: "",
+  rubricInputs: emptyRubricInputs(),
   notes: "",
   snack: "",
   setupInitialized: false,
@@ -335,11 +354,26 @@ export const useInterviewAppState = () => {
   const saveEvaluation = async () => {
     try {
       dispatch({ type: "patch", payload: { busy: true, error: "" } });
-      updateSessionScore(state.activeSessionId, Number(state.score), state.notes);
+
+      const rubric = {} as Rubric;
+      for (const axis of RUBRIC_AXES) {
+        const raw = state.rubricInputs[axis];
+        const parsed = Number(raw);
+        if (raw === "" || !Number.isFinite(parsed) || parsed < 0 || parsed > 10) {
+          throw new Error(UI_COPY[state.language].rubricValidationError);
+        }
+        rubric[axis] = parsed;
+      }
+
+      updateSessionEvaluation(state.activeSessionId, { rubric, notes: state.notes });
 
       dispatch({
         type: "patch",
-        payload: { snack: UI_COPY[state.language].evaluationSaved, score: "", notes: "" },
+        payload: {
+          snack: UI_COPY[state.language].evaluationSaved,
+          rubricInputs: emptyRubricInputs(),
+          notes: "",
+        },
       });
       refreshSessions();
     } catch (requestError) {
@@ -491,7 +525,7 @@ export const useInterviewAppState = () => {
         error: "",
         notes: "",
         prompt: "",
-        score: "",
+        rubricInputs: emptyRubricInputs(),
         snack: UI_COPY[state.language].newSessionStarted,
       },
     });
@@ -512,7 +546,28 @@ export const useInterviewAppState = () => {
   const setNotes = (value: string) => dispatch({ type: "patch", payload: { notes: value } });
   const setPersistSession = (value: boolean) =>
     dispatch({ type: "patch", payload: { persistSession: value } });
-  const setScore = (value: string) => dispatch({ type: "patch", payload: { score: value } });
+  const setRubricAxis = (axis: RubricAxis, value: string) =>
+    dispatch({
+      type: "patch",
+      payload: { rubricInputs: { ...state.rubricInputs, [axis]: value } },
+    });
+  const rubricAggregate = useMemo(() => {
+    const numbers = RUBRIC_AXES.map((axis) => Number(state.rubricInputs[axis]));
+    const allValid = numbers.every(
+      (value, index) =>
+        state.rubricInputs[RUBRIC_AXES[index]] !== "" &&
+        Number.isFinite(value) &&
+        value >= 0 &&
+        value <= 10,
+    );
+    if (!allValid) return null;
+    return computeAggregateScore(
+      RUBRIC_AXES.reduce<Rubric>((acc, axis, index) => {
+        acc[axis] = numbers[index];
+        return acc;
+      }, {} as Rubric),
+    );
+  }, [state.rubricInputs]);
   const setSimulation = (value: boolean) =>
     dispatch({ type: "patch", payload: { simulation: value } });
   const setSnack = (value: string) => dispatch({ type: "patch", payload: { snack: value } });
@@ -542,8 +597,9 @@ export const useInterviewAppState = () => {
     persistSession: state.persistSession,
     prompt: state.prompt,
     refreshSessions,
+    rubricAggregate,
+    rubricInputs: state.rubricInputs,
     saveEvaluation,
-    score: state.score,
     startNewSession,
     sessions: state.sessions,
     setActiveSessionId,
@@ -555,7 +611,7 @@ export const useInterviewAppState = () => {
     setLevel,
     setNotes,
     setPersistSession,
-    setScore,
+    setRubricAxis,
     setSimulation,
     setSnack,
     setStackInput,

@@ -307,7 +307,7 @@ Bundle size budgets (`size-limit` config in `package.json`, gzip):
 | ----------------- | ------ |
 | App entry chunk   | 30 KB  |
 | `react-vendor`    | 65 KB  |
-| `mui-vendor`      | 110 KB |
+| `mui-vendor`      | 115 KB |
 | Total JS (assets) | 200 KB |
 
 Run locally:

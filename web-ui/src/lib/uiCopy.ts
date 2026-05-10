@@ -1,4 +1,4 @@
-import { InterviewLanguage, Level } from "./types";
+import { InterviewLanguage, Level, RubricAxis } from "./types";
 
 type UiCopy = {
   appTitle: string;
@@ -26,6 +26,30 @@ type UiCopy = {
   score: string;
   notes: string;
   saveScore: string;
+  rubricSubtitle: string;
+  rubricAggregateLabel: string;
+  rubricAggregatePending: string;
+  rubricValidationError: string;
+  rubricAxisCorrectness: string;
+  rubricAxisDepth: string;
+  rubricAxisClarity: string;
+  rubricAxisTradeOffs: string;
+  rubricAxisPracticality: string;
+  rubricAxisCorrectnessHint: string;
+  rubricAxisDepthHint: string;
+  rubricAxisClarityHint: string;
+  rubricAxisTradeOffsHint: string;
+  rubricAxisPracticalityHint: string;
+  rubricRadarTitle: string;
+  rubricRadarEmpty: string;
+  rubricRadarLatest: string;
+  rubricRadarAverage: string;
+  rubricRadarSourceLabel: string;
+  rubricMarkdownLabel: string;
+  workspaceTabPrompt: string;
+  workspaceTabCharts: string;
+  workspaceTabSessions: string;
+  workspaceTabsAriaLabel: string;
   promptOutputTitle: string;
   promptOutputEmpty: string;
   progressChartTitle: string;
@@ -120,6 +144,30 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     score: "Score (0..10)",
     notes: "Notes",
     saveScore: "Save score",
+    rubricSubtitle: "Score each axis from 0 to 10",
+    rubricAggregateLabel: "Overall score",
+    rubricAggregatePending: "Fill in all 5 axes to see the overall score",
+    rubricValidationError: "Each rubric axis must be a number between 0 and 10",
+    rubricAxisCorrectness: "Correctness",
+    rubricAxisDepth: "Depth",
+    rubricAxisClarity: "Clarity",
+    rubricAxisTradeOffs: "Trade-offs",
+    rubricAxisPracticality: "Practicality",
+    rubricAxisCorrectnessHint: "Did the answer match what was asked?",
+    rubricAxisDepthHint: "How deep did the candidate go into the problem?",
+    rubricAxisClarityHint: "Were explanations clear and structured?",
+    rubricAxisTradeOffsHint: "Were alternatives and trade-offs discussed?",
+    rubricAxisPracticalityHint: "Could this run in real production?",
+    rubricRadarTitle: "Rubric breakdown",
+    rubricRadarEmpty: "Rate a session with the 5-axis rubric to unlock the radar.",
+    rubricRadarLatest: "Latest",
+    rubricRadarAverage: "Average",
+    rubricRadarSourceLabel: "Source",
+    rubricMarkdownLabel: "Rubric",
+    workspaceTabPrompt: "Prompt",
+    workspaceTabCharts: "Charts",
+    workspaceTabSessions: "Sessions",
+    workspaceTabsAriaLabel: "Workspace sections",
     promptOutputTitle: "Prompt Output",
     promptOutputEmpty: "Generated prompt will appear here.",
     progressChartTitle: "Interview Momentum",
@@ -223,6 +271,30 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     score: "Оценка (0..10)",
     notes: "Заметки",
     saveScore: "Сохранить оценку",
+    rubricSubtitle: "Оцени каждую ось от 0 до 10",
+    rubricAggregateLabel: "Общая оценка",
+    rubricAggregatePending: "Заполни все 5 осей, чтобы увидеть общую оценку",
+    rubricValidationError: "Каждая ось рубрики должна быть числом от 0 до 10",
+    rubricAxisCorrectness: "Точность",
+    rubricAxisDepth: "Глубина",
+    rubricAxisClarity: "Ясность",
+    rubricAxisTradeOffs: "Компромиссы",
+    rubricAxisPracticality: "Практичность",
+    rubricAxisCorrectnessHint: "Ответ соответствует вопросу?",
+    rubricAxisDepthHint: "Насколько глубоко копнули в проблему?",
+    rubricAxisClarityHint: "Объяснения чёткие и структурированные?",
+    rubricAxisTradeOffsHint: "Обсуждались альтернативы и компромиссы?",
+    rubricAxisPracticalityHint: "Решение применимо в реальном проде?",
+    rubricRadarTitle: "Разбор по рубрике",
+    rubricRadarEmpty: "Оцени сессию по 5 осям, чтобы разлочить радар.",
+    rubricRadarLatest: "Последняя",
+    rubricRadarAverage: "Среднее",
+    rubricRadarSourceLabel: "Источник",
+    rubricMarkdownLabel: "Рубрика",
+    workspaceTabPrompt: "Промпт",
+    workspaceTabCharts: "Графики",
+    workspaceTabSessions: "Сессии",
+    workspaceTabsAriaLabel: "Разделы рабочей области",
     promptOutputTitle: "Сгенерированный промпт",
     promptOutputEmpty: "Здесь появится сгенерированный промпт.",
     progressChartTitle: "Динамика интервью",
@@ -307,4 +379,36 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
 export const LEVEL_LABELS: Record<InterviewLanguage, Record<Level, string>> = {
   en: { junior: "Junior", middle: "Middle", senior: "Senior" },
   ru: { junior: "Джун", middle: "Мидл", senior: "Сеньор" },
+};
+
+export const rubricAxisLabel = (language: InterviewLanguage, axis: RubricAxis): string => {
+  const copy = UI_COPY[language];
+  switch (axis) {
+    case "correctness":
+      return copy.rubricAxisCorrectness;
+    case "depth":
+      return copy.rubricAxisDepth;
+    case "clarity":
+      return copy.rubricAxisClarity;
+    case "tradeOffs":
+      return copy.rubricAxisTradeOffs;
+    case "practicality":
+      return copy.rubricAxisPracticality;
+  }
+};
+
+export const rubricAxisHint = (language: InterviewLanguage, axis: RubricAxis): string => {
+  const copy = UI_COPY[language];
+  switch (axis) {
+    case "correctness":
+      return copy.rubricAxisCorrectnessHint;
+    case "depth":
+      return copy.rubricAxisDepthHint;
+    case "clarity":
+      return copy.rubricAxisClarityHint;
+    case "tradeOffs":
+      return copy.rubricAxisTradeOffsHint;
+    case "practicality":
+      return copy.rubricAxisPracticalityHint;
+  }
 };

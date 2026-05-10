@@ -1,4 +1,5 @@
-import { Level, Session, SessionContext } from "./types";
+import { sanitizeRubric } from "../../../core/rubric";
+import { Level, RUBRIC_AXES, Session, SessionContext } from "./types";
 
 export const SESSIONS_EXPORT_VERSION = 1;
 
@@ -56,6 +57,8 @@ export const sanitizeSession = (raw: unknown): Session | null => {
   if (isFiniteNumber(record.score) && record.score >= 0 && record.score <= 10) {
     session.score = record.score;
   }
+  const rubric = sanitizeRubric(record.rubric);
+  if (rubric) session.rubric = rubric;
   if (isString(record.notes)) session.notes = record.notes;
   if (isString(record.prompt)) session.prompt = record.prompt;
   const context = sanitizeContext(record.context);
@@ -160,6 +163,10 @@ const buildSessionMarkdown = (session: Session): string => {
   lines.push(`- **Session ID:** \`${session.id}\``);
   lines.push(`- **Date:** ${dateLabel}`);
   lines.push(`- **Score:** ${session.score === undefined ? "not rated" : session.score}`);
+  if (session.rubric) {
+    const parts = RUBRIC_AXES.map((axis) => `${axis}=${session.rubric![axis]}`);
+    lines.push(`- **Rubric:** ${parts.join(", ")}`);
+  }
   if (session.notes) {
     lines.push(`- **Notes:** ${escapeMarkdownText(session.notes)}`);
   }

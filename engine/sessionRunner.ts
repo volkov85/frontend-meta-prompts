@@ -1,7 +1,8 @@
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";
-import { Level, Session, SessionContext } from "../core";
+import { Level, Rubric, Session, SessionContext } from "../core";
+import { computeAggregateScore, isRubric } from "../core/rubric";
 
 const sessionsPath = path.resolve(process.cwd(), "data/sessions.json");
 
@@ -16,13 +17,21 @@ const isValidSession = (value: unknown): value is Session => {
     (candidate.level === "junior" || candidate.level === "middle" || candidate.level === "senior");
 
   const hasValidScore = candidate.score === undefined || Number.isFinite(candidate.score);
+  const hasValidRubric = candidate.rubric === undefined || isRubric(candidate.rubric);
   const hasValidNotes = candidate.notes === undefined || typeof candidate.notes === "string";
   const hasValidPrompt = candidate.prompt === undefined || typeof candidate.prompt === "string";
   const hasValidContext =
     candidate.context === undefined ||
     (typeof candidate.context === "object" && candidate.context !== null);
 
-  return hasValidCore && hasValidScore && hasValidNotes && hasValidPrompt && hasValidContext;
+  return (
+    hasValidCore &&
+    hasValidScore &&
+    hasValidRubric &&
+    hasValidNotes &&
+    hasValidPrompt &&
+    hasValidContext
+  );
 };
 
 const validateScore = (score: number) => {
@@ -97,6 +106,39 @@ export const updateSessionScore = (sessionId: string, score: number, notes?: str
   }
 
   writeSessions(sessions);
+};
+
+export type SessionEvaluationInput = {
+  rubric?: Rubric;
+  score?: number;
+  notes?: string;
+};
+
+export const updateSessionEvaluation = (
+  sessionId: string,
+  input: SessionEvaluationInput,
+): Session => {
+  const sessions = readSessions();
+  const session = sessions.find((s) => s.id === sessionId);
+  if (!session) throw new Error("Session not found");
+
+  if (input.rubric !== undefined) {
+    if (!isRubric(input.rubric)) {
+      throw new Error("Rubric values must be numbers between 0 and 10");
+    }
+    session.rubric = input.rubric;
+    session.score = computeAggregateScore(input.rubric);
+  } else if (input.score !== undefined) {
+    validateScore(input.score);
+    session.score = input.score;
+  }
+
+  if (input.notes !== undefined) {
+    session.notes = input.notes;
+  }
+
+  writeSessions(sessions);
+  return session;
 };
 
 export const listSessions = (): Session[] => {
