@@ -2,6 +2,7 @@ import {
   Button,
   Card,
   CardContent,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
@@ -11,12 +12,13 @@ import {
   MenuItem,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useMemo, useRef, useState } from "react";
 import { SessionPromptDialog } from "./SessionPromptDialog";
-import { LEVEL_LABELS, UI_COPY } from "../lib/uiCopy";
-import { InterviewLanguage, Session } from "../lib/types";
+import { LEVEL_LABELS, rubricAxisLabel, UI_COPY } from "../lib/uiCopy";
+import { InterviewLanguage, RUBRIC_AXES, Session } from "../lib/types";
 
 type SessionsCardProps = {
   handleClearSessions: () => void;
@@ -208,10 +210,27 @@ export const SessionsCard = ({
                     <Typography variant="body2" sx={{ wordBreak: "break-all" }}>
                       {copy.sessionPrefix}: {session.id}
                     </Typography>
-                    <Typography variant="body2">
-                      {copy.scorePrefix}:{" "}
-                      {session.score === undefined ? copy.notRated : session.score}
-                    </Typography>
+                    <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                      <Typography variant="body2">
+                        {copy.scorePrefix}:{" "}
+                        {session.score === undefined ? copy.notRated : session.score}
+                      </Typography>
+                      {session.rubric && (
+                        <Tooltip
+                          title={RUBRIC_AXES.map(
+                            (axis) =>
+                              `${rubricAxisLabel(language, axis)}: ${session.rubric![axis]}`,
+                          ).join(" • ")}
+                        >
+                          <Chip
+                            size="small"
+                            color="primary"
+                            variant="outlined"
+                            label={copy.rubricMarkdownLabel}
+                          />
+                        </Tooltip>
+                      )}
+                    </Stack>
                   </Stack>
                   <Button
                     size="small"

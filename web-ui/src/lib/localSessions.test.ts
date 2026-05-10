@@ -1,5 +1,11 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { clearSessions, createSession, listSessions, updateSessionScore } from "./localSessions";
+import {
+  clearSessions,
+  createSession,
+  listSessions,
+  updateSessionEvaluation,
+  updateSessionScore,
+} from "./localSessions";
 
 const SESSIONS_KEY = "frontend_meta_prompts_sessions_v1";
 
@@ -110,6 +116,70 @@ describe("localSessions", () => {
     expect(() => updateSessionScore("abc", 11)).toThrowError(
       "Score must be a number between 0 and 10",
     );
+  });
+
+  it("updateSessionEvaluation stores rubric and derives aggregate score", () => {
+    localStorage.setItem(
+      SESSIONS_KEY,
+      JSON.stringify([
+        {
+          id: "abc",
+          date: "2026-01-01T00:00:00.000Z",
+          templateId: "junior-testing-basics",
+          level: "junior",
+        },
+      ]),
+    );
+
+    const updated = updateSessionEvaluation("abc", {
+      rubric: {
+        correctness: 8,
+        depth: 7,
+        clarity: 9,
+        tradeOffs: 6,
+        practicality: 10,
+      },
+      notes: "deep dive",
+    });
+    expect(updated.rubric?.correctness).toBe(8);
+    expect(updated.score).toBe(8);
+    expect(updated.notes).toBe("deep dive");
+
+    const persisted = listSessions().find((session) => session.id === "abc");
+    expect(persisted?.rubric).toEqual({
+      correctness: 8,
+      depth: 7,
+      clarity: 9,
+      tradeOffs: 6,
+      practicality: 10,
+    });
+    expect(persisted?.score).toBe(8);
+  });
+
+  it("updateSessionEvaluation rejects rubrics with out-of-range axes", () => {
+    localStorage.setItem(
+      SESSIONS_KEY,
+      JSON.stringify([
+        {
+          id: "abc",
+          date: "2026-01-01T00:00:00.000Z",
+          templateId: "junior-testing-basics",
+          level: "junior",
+        },
+      ]),
+    );
+
+    expect(() =>
+      updateSessionEvaluation("abc", {
+        rubric: {
+          correctness: 11,
+          depth: 7,
+          clarity: 9,
+          tradeOffs: 6,
+          practicality: 10,
+        },
+      }),
+    ).toThrowError("Rubric values must be numbers between 0 and 10");
   });
 
   it("returns empty list for malformed storage and supports clear", () => {

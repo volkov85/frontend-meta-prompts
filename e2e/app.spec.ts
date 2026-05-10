@@ -20,12 +20,15 @@ test.describe("Frontend Meta Prompts", () => {
     await expect(page.getByText("ROLE:")).toBeVisible();
     await expect(page.getByText(/Session created:/)).toBeVisible();
 
-    const scoreInput = page.getByLabel("Score (0..10)");
-    await scoreInput.fill("9");
+    for (const axis of ["Correctness", "Depth", "Clarity", "Trade-offs", "Practicality"]) {
+      const input = page.getByLabel(axis, { exact: true }).first();
+      await input.fill("9");
+    }
     await page.getByLabel("Notes").fill("Great problem decomposition and trade-offs");
     await page.getByRole("button", { name: "Save score" }).click();
 
-    await expect(page.getByText("Score: 9")).toBeVisible();
+    await expect(page.getByText("Score: 9").first()).toBeVisible();
+    await expect(page.getByText("Rubric breakdown").first()).toBeVisible();
 
     await page.getByRole("button", { name: "View prompt" }).click();
     const dialog = page.getByRole("dialog", { name: "Session prompt" });

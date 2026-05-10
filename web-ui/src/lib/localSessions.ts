@@ -1,4 +1,5 @@
-import { Level, Session, SessionContext } from "./types";
+import { computeAggregateScore, isRubric } from "../../../core/rubric";
+import { Level, Rubric, Session, SessionContext } from "./types";
 
 const SESSIONS_KEY = "frontend_meta_prompts_sessions_v1";
 
@@ -59,6 +60,43 @@ export const updateSessionScore = (sessionId: string, score: number, notes?: str
 
   session.score = score;
   session.notes = notes ?? session.notes;
+  writeSessions(sessions);
+  return session;
+};
+
+export type SessionEvaluationInput = {
+  rubric?: Rubric;
+  score?: number;
+  notes?: string;
+};
+
+export const updateSessionEvaluation = (
+  sessionId: string,
+  input: SessionEvaluationInput,
+): Session => {
+  const sessions = readSessions();
+  const session = sessions.find((item) => item.id === sessionId);
+  if (!session) {
+    throw new Error("Session not found");
+  }
+
+  if (input.rubric !== undefined) {
+    if (!isRubric(input.rubric)) {
+      throw new Error("Rubric values must be numbers between 0 and 10");
+    }
+    session.rubric = input.rubric;
+    session.score = computeAggregateScore(input.rubric);
+  } else if (input.score !== undefined) {
+    if (!Number.isFinite(input.score) || input.score < 0 || input.score > 10) {
+      throw new Error("Score must be a number between 0 and 10");
+    }
+    session.score = input.score;
+  }
+
+  if (input.notes !== undefined) {
+    session.notes = input.notes;
+  }
+
   writeSessions(sessions);
   return session;
 };

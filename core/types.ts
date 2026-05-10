@@ -1,6 +1,16 @@
 export type Level = "junior" | "middle" | "senior";
 export type InterviewLanguage = "en" | "ru";
 
+export const RUBRIC_AXES = [
+  "correctness",
+  "depth",
+  "clarity",
+  "tradeOffs",
+  "practicality",
+] as const;
+export type RubricAxis = (typeof RUBRIC_AXES)[number];
+export type Rubric = Record<RubricAxis, number>;
+
 export type IncludeSection =
   | "idealAnswer"
   | "commonMistakes"
@@ -79,6 +89,7 @@ export type Session = {
   templateId: string;
   level: Level;
   score?: number;
+  rubric?: Rubric;
   notes?: string;
   prompt?: string;
   context?: SessionContext;

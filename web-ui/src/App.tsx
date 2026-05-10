@@ -16,7 +16,13 @@ import {
   Typography,
 } from "@mui/material";
 import { MouseEvent } from "react";
-import { EvaluationCard, InterviewSetupCard, ProgressChartCard, SessionsCard } from "./components";
+import {
+  EvaluationCard,
+  InterviewSetupCard,
+  ProgressChartCard,
+  RubricRadarCard,
+  SessionsCard,
+} from "./components";
 import { useInterviewAppState } from "./lib/useInterviewAppState";
 import { UI_COPY } from "./lib/uiCopy";
 import { InterviewLanguage } from "./lib/types";
@@ -43,8 +49,9 @@ const App = () => {
     persistSession,
     prompt,
     refreshSessions,
+    rubricAggregate,
+    rubricInputs,
     saveEvaluation,
-    score,
     sessions,
     startNewSession,
     setActiveSessionId,
@@ -56,7 +63,7 @@ const App = () => {
     setLevel,
     setNotes,
     setPersistSession,
-    setScore,
+    setRubricAxis,
     setSimulation,
     setSnack,
     setStackInput,
@@ -188,13 +195,14 @@ const App = () => {
             <EvaluationCard
               activeSessionId={activeSessionId}
               busy={busy}
+              rubricAggregate={rubricAggregate}
+              rubricInputs={rubricInputs}
               language={language}
               notes={notes}
               saveEvaluation={saveEvaluation}
-              score={score}
               setActiveSessionId={setActiveSessionId}
               setNotes={setNotes}
-              setScore={setScore}
+              setRubricAxis={setRubricAxis}
             />
           </Grid>
 
@@ -251,6 +259,7 @@ const App = () => {
               sessions={sessions}
               levelTargets={levelTargets}
             />
+            <RubricRadarCard language={language} sessions={sessions} />
             <SessionsCard
               handleClearSessions={handleClearSessions}
               language={language}

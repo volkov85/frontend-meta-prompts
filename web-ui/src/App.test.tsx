@@ -78,8 +78,8 @@ describe("App", () => {
     expect(screen.getByText(/Сессия создана:/)).toBeInTheDocument();
   });
 
-  it("saves evaluation and updates session score", async () => {
-    const user = userEvent.setup();
+  it("saves evaluation with rubric and aggregates to overall score", async () => {
+    const user = userEvent.setup({ delay: null });
     renderApp();
 
     const generateButton = screen.getByRole("button", { name: "Generate Prompt" });
@@ -88,8 +88,21 @@ describe("App", () => {
 
     await waitFor(() => expect(screen.getByText(/Session:/)).toBeInTheDocument());
 
-    await user.clear(screen.getByLabelText("Score (0..10)"));
-    await user.type(screen.getByLabelText("Score (0..10)"), "8.5");
+    const axisInput = (label: string) => {
+      const candidates = screen.getAllByLabelText(label);
+      const input = candidates.find(
+        (element): element is HTMLInputElement =>
+          element instanceof HTMLInputElement && element.type === "number",
+      );
+      expect(input).toBeDefined();
+      return input!;
+    };
+
+    for (const axisLabel of ["Correctness", "Depth", "Clarity", "Trade-offs", "Practicality"]) {
+      const input = axisInput(axisLabel);
+      await user.clear(input);
+      await user.type(input, "8.5");
+    }
     await user.type(screen.getByLabelText("Notes"), "Strong trade-off analysis");
     await user.click(screen.getByRole("button", { name: "Save score" }));
 
@@ -97,26 +110,47 @@ describe("App", () => {
       expect(screen.getByText("Evaluation saved")).toBeInTheDocument();
     });
     expect(screen.getByText("Score: 8.5")).toBeInTheDocument();
-  });
+    expect(screen.getByText("Rubric")).toBeInTheDocument();
+  }, 15000);
 
-  it("shows validation error for out-of-range score", async () => {
-    const user = userEvent.setup();
+  it("disables save until all rubric axes are filled and rejects out-of-range values", async () => {
+    const user = userEvent.setup({ delay: null });
     renderApp();
 
     const generateButton = screen.getByRole("button", { name: "Generate Prompt" });
     await waitFor(() => expect(generateButton).toBeEnabled());
     await user.click(generateButton);
 
-    await waitFor(() => expect(screen.getByText(/Session:/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByText(/Session:/).length).toBeGreaterThan(0));
 
-    await user.clear(screen.getByLabelText("Score (0..10)"));
-    await user.type(screen.getByLabelText("Score (0..10)"), "11");
-    await user.click(screen.getByRole("button", { name: "Save score" }));
+    const saveButton = screen.getByRole("button", { name: "Save score" });
+    expect(saveButton).toBeDisabled();
+
+    const axisInput = (label: string) => {
+      const candidates = screen.getAllByLabelText(label);
+      const input = candidates.find(
+        (element): element is HTMLInputElement =>
+          element instanceof HTMLInputElement && element.type === "number",
+      );
+      expect(input).toBeDefined();
+      return input!;
+    };
+
+    await user.clear(axisInput("Correctness"));
+    await user.type(axisInput("Correctness"), "11");
+    for (const label of ["Depth", "Clarity", "Trade-offs", "Practicality"]) {
+      await user.clear(axisInput(label));
+      await user.type(axisInput(label), "5");
+    }
+    expect(saveButton).toBeEnabled();
+    await user.click(saveButton);
 
     await waitFor(() => {
-      expect(screen.getByText("Score must be a number between 0 and 10")).toBeInTheDocument();
+      expect(
+        screen.getByText("Each rubric axis must be a number between 0 and 10"),
+      ).toBeInTheDocument();
     });
-  });
+  }, 15000);
 
   it("clears sessions list after confirming", async () => {
     const user = userEvent.setup();
