@@ -17,7 +17,7 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import { MouseEvent, SyntheticEvent, useState } from "react";
+import { MouseEvent, SyntheticEvent, useEffect, useState } from "react";
 import {
   EvaluationCard,
   InterviewSetupCard,
@@ -32,7 +32,14 @@ import { useInterviewAppState } from "./lib/useInterviewAppState";
 import { UI_COPY } from "./lib/uiCopy";
 import { InterviewLanguage } from "./lib/types";
 
-const App = () => {
+import type { ThemeMode } from "./theme";
+
+type AppProps = {
+  themeMode: ThemeMode;
+  onThemeModeChange: (mode: ThemeMode) => void;
+};
+
+const App = ({ themeMode, onThemeModeChange }: AppProps) => {
   const {
     activeSessionId,
     busy,
@@ -105,6 +112,30 @@ const App = () => {
     setWorkspaceTab("sessions");
   };
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const TAB_BY_KEY: Record<string, "prompt" | "charts" | "sessions"> = {
+      "1": "prompt",
+      "2": "charts",
+      "3": "sessions",
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (!event.altKey) return;
+      if (event.ctrlKey || event.metaKey || event.shiftKey) return;
+      const target = event.target as HTMLElement | null;
+      const tag = target?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || target?.isContentEditable) {
+        return;
+      }
+      const next = TAB_BY_KEY[event.key];
+      if (!next) return;
+      event.preventDefault();
+      setWorkspaceTab(next);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
   const handleLanguageChange = (
     _: MouseEvent<HTMLElement>,
     nextLanguage: InterviewLanguage | null,
@@ -153,7 +184,10 @@ const App = () => {
       <AppBar
         position="static"
         elevation={0}
-        sx={{ backdropFilter: "blur(10px)", background: "rgba(2, 6, 23, 0.9)" }}
+        sx={{
+          backdropFilter: "blur(10px)",
+          background: themeMode === "dark" ? "rgba(2, 6, 23, 0.9)" : "rgba(255, 255, 255, 0.88)",
+        }}
       >
         <Toolbar>
           <Typography variant="h6">{copy.appTitle}</Typography>
@@ -171,6 +205,19 @@ const App = () => {
             >
               <ToggleButton value="en">EN</ToggleButton>
               <ToggleButton value="ru">RU</ToggleButton>
+            </ToggleButtonGroup>
+            <Divider orientation="vertical" flexItem sx={{ mx: 0.5, opacity: 0.3 }} />
+            <ToggleButtonGroup
+              size="small"
+              exclusive
+              value={themeMode}
+              onChange={(_, next: ThemeMode | null) => {
+                if (next) onThemeModeChange(next);
+              }}
+              aria-label={copy.themeToggleAriaLabel}
+            >
+              <ToggleButton value="dark">{copy.themeToggleDark}</ToggleButton>
+              <ToggleButton value="light">{copy.themeToggleLight}</ToggleButton>
             </ToggleButtonGroup>
             <Chip label={copy.techChip} color="secondary" />
           </Box>
@@ -253,18 +300,24 @@ const App = () => {
                   value="prompt"
                   id="workspace-tab-prompt"
                   aria-controls="workspace-panel-prompt"
+                  aria-keyshortcuts="Alt+1"
+                  title={copy.workspaceTabShortcut(1)}
                 />
                 <Tab
                   label={copy.workspaceTabCharts}
                   value="charts"
                   id="workspace-tab-charts"
                   aria-controls="workspace-panel-charts"
+                  aria-keyshortcuts="Alt+2"
+                  title={copy.workspaceTabShortcut(2)}
                 />
                 <Tab
                   label={copy.workspaceTabSessions}
                   value="sessions"
                   id="workspace-tab-sessions"
                   aria-controls="workspace-panel-sessions"
+                  aria-keyshortcuts="Alt+3"
+                  title={copy.workspaceTabShortcut(3)}
                 />
               </Tabs>
             </Box>

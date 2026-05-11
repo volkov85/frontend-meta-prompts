@@ -70,9 +70,9 @@ export const ProgressChartCard = ({ language, sessions, levelTargets }: Progress
       className="fade-up"
       sx={{
         overflow: "hidden",
-        border: "1px solid rgba(125, 211, 252, 0.16)",
+        border: "1px solid var(--card-border)",
         background:
-          "radial-gradient(circle at top left, rgba(125, 211, 252, 0.2), transparent 34%), linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.78))",
+          "radial-gradient(circle at top left, var(--card-radial), transparent 34%), linear-gradient(180deg, var(--card-bg-top), var(--card-bg-bottom))",
       }}
     >
       <CardContent sx={{ p: { xs: 2, sm: 2.5 } }}>
@@ -93,7 +93,7 @@ export const ProgressChartCard = ({ language, sessions, levelTargets }: Progress
                   label={`${levelLabels[target.level]} ${formatScore(target.score)}+`}
                   size="small"
                   sx={{
-                    backgroundColor: "rgba(15, 23, 42, 0.78)",
+                    backgroundColor: "var(--card-bg-bottom)",
                     border: `1px solid ${target.color}55`,
                     color: "text.primary",
                   }}
@@ -111,8 +111,7 @@ export const ProgressChartCard = ({ language, sessions, levelTargets }: Progress
                 px: { xs: 1.25, sm: 1.5 },
                 py: { xs: 1.5, sm: 1.75 },
                 border: "1px solid rgba(148, 163, 184, 0.18)",
-                background:
-                  "linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.55))",
+                background: "linear-gradient(180deg, var(--card-bg-top), var(--card-bg-bottom))",
               }}
             >
               {points.length === 0 ? (

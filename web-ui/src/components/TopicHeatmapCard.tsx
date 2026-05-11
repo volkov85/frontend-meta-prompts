@@ -131,7 +131,13 @@ export const TopicHeatmapCard = ({
                       count,
                     );
                     return (
-                      <Tooltip key={`${row.tag}-${index}`} title={tooltipText} arrow>
+                      <Tooltip
+                        key={`${row.tag}-${index}`}
+                        title={tooltipText}
+                        arrow
+                        enterDelay={400}
+                        enterNextDelay={150}
+                      >
                         <Box
                           role="cell"
                           aria-label={tooltipText}

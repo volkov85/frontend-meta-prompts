@@ -115,7 +115,13 @@ export const StreakCalendarCard = ({
                     ? formatDate(language, cell.date)
                     : copy.streakCalendarCellTooltip(formatDate(language, cell.date), cell.count);
                   return (
-                    <Tooltip key={cell.dateKey} title={tooltipText} arrow>
+                    <Tooltip
+                      key={cell.dateKey}
+                      title={tooltipText}
+                      arrow
+                      enterDelay={400}
+                      enterNextDelay={150}
+                    >
                       <Box
                         role="gridcell"
                         aria-label={tooltipText}

@@ -315,7 +315,7 @@ export const SessionsCard = ({
             <Card
               key={session.id}
               variant="outlined"
-              sx={{ backgroundColor: "rgba(30, 41, 59, 0.65)" }}
+              sx={{ backgroundColor: "var(--card-surface)" }}
             >
               <CardContent sx={{ py: 1.2 }}>
                 <Stack

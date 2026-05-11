@@ -50,6 +50,10 @@ type UiCopy = {
   workspaceTabCharts: string;
   workspaceTabSessions: string;
   workspaceTabsAriaLabel: string;
+  workspaceTabShortcut: (number: number) => string;
+  themeToggleAriaLabel: string;
+  themeToggleDark: string;
+  themeToggleLight: string;
   recommendationTitle: string;
   recommendationBody: (axis: string, score: string, template: string) => string;
   recommendationApply: string;
@@ -207,6 +211,10 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     workspaceTabCharts: "Charts",
     workspaceTabSessions: "Sessions",
     workspaceTabsAriaLabel: "Workspace sections",
+    workspaceTabShortcut: (number: number) => `Shortcut: Alt + ${number}`,
+    themeToggleAriaLabel: "Theme",
+    themeToggleDark: "Dark",
+    themeToggleLight: "Light",
     recommendationTitle: "Recommended next session",
     recommendationBody: (axis: string, score: string, template: string) =>
       `${axis} scored lowest in your recent rubrics (${score}/10). Try ${template} to focus on it.`,
@@ -383,6 +391,10 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     workspaceTabCharts: "Графики",
     workspaceTabSessions: "Сессии",
     workspaceTabsAriaLabel: "Разделы рабочей области",
+    workspaceTabShortcut: (number: number) => `Горячая клавиша: Alt + ${number}`,
+    themeToggleAriaLabel: "Тема",
+    themeToggleDark: "Тёмная",
+    themeToggleLight: "Светлая",
     recommendationTitle: "Рекомендация для следующей сессии",
     recommendationBody: (axis: string, score: string, template: string) =>
       `${axis} — самая слабая ось в последних рубриках (${score}/10). Попробуй ${template}, чтобы прокачать её.`,
