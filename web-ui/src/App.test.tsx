@@ -727,6 +727,41 @@ describe("App", () => {
     expect(screen.queryByText("Recommended next session")).not.toBeInTheDocument();
   });
 
+  it("renders the streak calendar with current streak when sessions exist", async () => {
+    const user = userEvent.setup();
+    const today = new Date();
+    const todayIso = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      12,
+    ).toISOString();
+    seedSessions([
+      {
+        id: "today-1",
+        date: todayIso,
+        templateId: "react-hooks-internals",
+        level: "middle",
+      },
+    ]);
+    renderApp();
+
+    await switchToTab(user, "Charts");
+    expect(screen.getByText("Practice streak")).toBeInTheDocument();
+    expect(screen.getByText(/1 day current streak/)).toBeInTheDocument();
+  });
+
+  it("shows the streak calendar empty state with no sessions", async () => {
+    const user = userEvent.setup();
+    renderApp();
+
+    await switchToTab(user, "Charts");
+    expect(screen.getByText("Practice streak")).toBeInTheDocument();
+    expect(
+      screen.getByText("No sessions yet — save one to start your streak."),
+    ).toBeInTheDocument();
+  });
+
   it("does not show the recommendation banner without rated sessions", async () => {
     seedSessions([
       {

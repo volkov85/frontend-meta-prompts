@@ -5,3 +5,4 @@ export { RecommendedNextAlert } from "./RecommendedNextAlert";
 export { RubricRadarCard } from "./RubricRadarCard";
 export { SessionPromptDialog } from "./SessionPromptDialog";
 export { SessionsCard } from "./SessionsCard";
+export { StreakCalendarCard } from "./StreakCalendarCard";

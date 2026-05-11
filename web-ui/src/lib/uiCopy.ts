@@ -55,6 +55,16 @@ type UiCopy = {
   recommendationApply: string;
   recommendationDismiss: string;
   recommendationApplied: (template: string) => string;
+  streakCalendarTitle: string;
+  streakCalendarSubtitle: string;
+  streakCalendarEmpty: string;
+  streakCurrentChip: (days: number) => string;
+  streakLongestChip: (days: number) => string;
+  streakActiveDaysChip: (days: number) => string;
+  streakCalendarCellTooltip: (date: string, sessions: number) => string;
+  streakCalendarLegend: string;
+  streakCalendarLegendLess: string;
+  streakCalendarLegendMore: string;
   promptOutputTitle: string;
   promptOutputEmpty: string;
   progressChartTitle: string;
@@ -122,6 +132,14 @@ type UiCopy = {
   notAvailable: string;
 };
 
+const plural = (count: number, one: string, few: string, many: string): string => {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few;
+  return many;
+};
+
 export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
   en: {
     appTitle: "Frontend Meta Prompts",
@@ -179,6 +197,24 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     recommendationApply: "Apply",
     recommendationDismiss: "Dismiss recommendation",
     recommendationApplied: (template: string) => `Applied recommendation: ${template}`,
+    streakCalendarTitle: "Practice streak",
+    streakCalendarSubtitle: "Activity over the last 12 weeks",
+    streakCalendarEmpty: "No sessions yet — save one to start your streak.",
+    streakCurrentChip: (days: number) =>
+      days === 1 ? "1 day current streak" : `${days} days current streak`,
+    streakLongestChip: (days: number) =>
+      days === 1 ? "1 day longest streak" : `${days} days longest streak`,
+    streakActiveDaysChip: (days: number) =>
+      days === 1 ? "1 active day total" : `${days} active days total`,
+    streakCalendarCellTooltip: (date: string, sessions: number) =>
+      sessions === 0
+        ? `${date} — no sessions`
+        : sessions === 1
+          ? `${date} — 1 session`
+          : `${date} — ${sessions} sessions`,
+    streakCalendarLegend: "Activity intensity legend",
+    streakCalendarLegendLess: "Less",
+    streakCalendarLegendMore: "More",
     promptOutputTitle: "Prompt Output",
     promptOutputEmpty: "Generated prompt will appear here.",
     progressChartTitle: "Interview Momentum",
@@ -312,6 +348,21 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     recommendationApply: "Применить",
     recommendationDismiss: "Скрыть рекомендацию",
     recommendationApplied: (template: string) => `Применена рекомендация: ${template}`,
+    streakCalendarTitle: "Серия практик",
+    streakCalendarSubtitle: "Активность за последние 12 недель",
+    streakCalendarEmpty: "Сессий пока нет — сохрани первую, чтобы начать серию.",
+    streakCurrentChip: (days: number) =>
+      `Текущая серия: ${days} ${plural(days, "день", "дня", "дней")}`,
+    streakLongestChip: (days: number) =>
+      `Лучшая серия: ${days} ${plural(days, "день", "дня", "дней")}`,
+    streakActiveDaysChip: (days: number) => `Активных дней всего: ${days}`,
+    streakCalendarCellTooltip: (date: string, sessions: number) =>
+      sessions === 0
+        ? `${date} — нет сессий`
+        : `${date} — ${sessions} ${plural(sessions, "сессия", "сессии", "сессий")}`,
+    streakCalendarLegend: "Легенда интенсивности",
+    streakCalendarLegendLess: "Меньше",
+    streakCalendarLegendMore: "Больше",
     promptOutputTitle: "Сгенерированный промпт",
     promptOutputEmpty: "Здесь появится сгенерированный промпт.",
     progressChartTitle: "Динамика интервью",
