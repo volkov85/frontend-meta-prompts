@@ -95,6 +95,8 @@ type UiCopy = {
   sessionSearchPlaceholder: string;
   levelFilterLabel: string;
   scoreFilterLabel: string;
+  tagFilterLabel: string;
+  tagFilterClear: string;
   filterAllLevels: string;
   filterAllScores: string;
   filterRated: string;
@@ -255,6 +257,8 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     sessionSearchPlaceholder: "Session ID, template, note",
     levelFilterLabel: "Level filter",
     scoreFilterLabel: "Score filter",
+    tagFilterLabel: "Tags",
+    tagFilterClear: "Clear tags",
     filterAllLevels: "All levels",
     filterAllScores: "All scores",
     filterRated: "Rated",
@@ -405,6 +409,8 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     sessionSearchPlaceholder: "ID сессии, шаблон, заметка",
     levelFilterLabel: "Фильтр уровня",
     scoreFilterLabel: "Фильтр оценки",
+    tagFilterLabel: "Теги",
+    tagFilterClear: "Сбросить теги",
     filterAllLevels: "Все уровни",
     filterAllScores: "Все оценки",
     filterRated: "С оценкой",

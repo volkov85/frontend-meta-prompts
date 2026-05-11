@@ -18,13 +18,15 @@ import {
 import { useMemo, useRef, useState } from "react";
 import { SessionPromptDialog } from "./SessionPromptDialog";
 import { LEVEL_LABELS, rubricAxisLabel, UI_COPY } from "../lib/uiCopy";
-import { InterviewLanguage, RUBRIC_AXES, Session } from "../lib/types";
+import { collectTagPool, filterSessionsByTags } from "../lib/templateTags";
+import { InterviewLanguage, InterviewTemplate, RUBRIC_AXES, Session } from "../lib/types";
 
 type SessionsCardProps = {
   handleClearSessions: () => void;
   language: InterviewLanguage;
   refreshSessions: () => void;
   sessions: Session[];
+  templates: InterviewTemplate[];
   onCopyPrompt?: (prompt: string) => void;
   onExportJson?: () => void;
   onExportMarkdown?: () => void;
@@ -36,6 +38,7 @@ export const SessionsCard = ({
   language,
   refreshSessions,
   sessions,
+  templates,
   onCopyPrompt,
   onExportJson,
   onExportMarkdown,
@@ -44,6 +47,7 @@ export const SessionsCard = ({
   const [searchValue, setSearchValue] = useState("");
   const [levelFilter, setLevelFilter] = useState<"all" | Session["level"]>("all");
   const [scoreFilter, setScoreFilter] = useState<"all" | "rated" | "unrated">("all");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [activePromptSessionId, setActivePromptSessionId] = useState<string | null>(null);
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
   const importInputRef = useRef<HTMLInputElement | null>(null);
@@ -56,10 +60,17 @@ export const SessionsCard = ({
         : null,
     [activePromptSessionId, sessions],
   );
+  const tagPool = useMemo(() => collectTagPool(sessions, templates), [sessions, templates]);
+
+  const tagFilteredSessions = useMemo(
+    () => filterSessionsByTags(sessions, templates, selectedTags),
+    [sessions, templates, selectedTags],
+  );
+
   const filteredSessions = useMemo(() => {
     const normalizedQuery = searchValue.trim().toLowerCase();
 
-    return sessions.filter((session) => {
+    return tagFilteredSessions.filter((session) => {
       const matchesQuery =
         normalizedQuery.length === 0 ||
         session.id.toLowerCase().includes(normalizedQuery) ||
@@ -74,7 +85,15 @@ export const SessionsCard = ({
 
       return matchesQuery && matchesLevel && matchesScore;
     });
-  }, [levelFilter, scoreFilter, searchValue, sessions]);
+  }, [levelFilter, scoreFilter, searchValue, tagFilteredSessions]);
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((value) => value !== tag) : [...prev, tag],
+    );
+  };
+
+  const clearTagFilter = () => setSelectedTags([]);
 
   return (
     <Card className="fade-up">
@@ -181,6 +200,41 @@ export const SessionsCard = ({
             <MenuItem value="unrated">{copy.filterUnrated}</MenuItem>
           </TextField>
         </Stack>
+        {tagPool.length > 0 && (
+          <Stack
+            direction="row"
+            spacing={1}
+            useFlexGap
+            flexWrap="wrap"
+            alignItems="center"
+            sx={{ mb: 1.5 }}
+            aria-label={copy.tagFilterLabel}
+          >
+            <Typography variant="caption" color="text.secondary" sx={{ mr: 0.5 }}>
+              {copy.tagFilterLabel}
+            </Typography>
+            {tagPool.map((tag) => {
+              const selected = selectedTags.includes(tag);
+              return (
+                <Chip
+                  key={tag}
+                  label={tag}
+                  size="small"
+                  clickable
+                  color={selected ? "primary" : "default"}
+                  variant={selected ? "filled" : "outlined"}
+                  onClick={() => toggleTag(tag)}
+                  aria-pressed={selected}
+                />
+              );
+            })}
+            {selectedTags.length > 0 && (
+              <Button size="small" onClick={clearTagFilter} sx={{ ml: 0.5 }}>
+                {copy.tagFilterClear}
+              </Button>
+            )}
+          </Stack>
+        )}
         <Stack spacing={1}>
           {sessions.length === 0 && (
             <Typography color="text.secondary">{copy.noSessions}</Typography>
