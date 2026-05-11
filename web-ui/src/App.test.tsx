@@ -1,17 +1,9 @@
-import { CssBaseline, ThemeProvider } from "@mui/material";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent, { UserEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import App from "./App";
-import { appTheme } from "./theme";
+import { AppRoot } from "./AppRoot";
 
-const renderApp = () =>
-  render(
-    <ThemeProvider theme={appTheme}>
-      <CssBaseline />
-      <App />
-    </ThemeProvider>,
-  );
+const renderApp = () => render(<AppRoot initialMode="dark" />);
 
 const switchToTab = async (user: UserEvent, label: "Prompt" | "Charts" | "Sessions") => {
   await user.click(screen.getByRole("tab", { name: label }));
@@ -1068,5 +1060,38 @@ describe("App", () => {
       screen.queryByRole("navigation", { name: "Sessions pagination" }),
     ).not.toBeInTheDocument();
     expect(screen.queryByText(/Page 1 of/)).not.toBeInTheDocument();
+  });
+
+  it("toggles between dark and light theme", async () => {
+    const user = userEvent.setup();
+    renderApp();
+
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+
+    const lightBtn = screen.getByRole("button", { name: "Light" });
+    await user.click(lightBtn);
+
+    expect(document.documentElement.getAttribute("data-theme")).toBe("light");
+
+    const darkBtn = screen.getByRole("button", { name: "Dark" });
+    await user.click(darkBtn);
+
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+  });
+
+  it("switches tabs with Alt+1/2/3 keyboard shortcuts", async () => {
+    const user = userEvent.setup();
+    renderApp();
+
+    expect(screen.getByRole("tab", { name: "Prompt", selected: true })).toBeInTheDocument();
+
+    await user.keyboard("{Alt>}2{/Alt}");
+    expect(screen.getByRole("tab", { name: "Charts", selected: true })).toBeInTheDocument();
+
+    await user.keyboard("{Alt>}3{/Alt}");
+    expect(screen.getByRole("tab", { name: "Sessions", selected: true })).toBeInTheDocument();
+
+    await user.keyboard("{Alt>}1{/Alt}");
+    expect(screen.getByRole("tab", { name: "Prompt", selected: true })).toBeInTheDocument();
   });
 });
