@@ -67,14 +67,36 @@ Separation of concerns:
 
 ## Features
 
+Core (CLI + Web):
+
 - Structured interview templates (junior/middle/senior)
 - Prompt generation with mode overrides from a shared core module
-- Bilingual prompt generation (`en` / `ru`) in Web UI
 - Template-level prompt overrides (`promptOverrides`) for per-template tuning
-- CLI to list templates and generate interviews
-- CLI mode to record external LLM evaluation
+- CLI to list templates and generate interviews; CLI mode to record external LLM evaluation
 - Session persistence in JSON (CLI) and `localStorage` (Web UI)
-- Interview progress chart in Web UI with recent scores, averages, and coverage
+
+Web UI (Prompt / Charts / Sessions tabs):
+
+- Bilingual interface (`EN` / `RU`) with locale-aware copy and Russian plural helper
+- **Prompt tab** — template + level setup, stack/focus/context/timebox/simulation controls,
+  generated prompt with copy/share, deep-link `?template=…&level=…` hydration,
+  company preset bar, keyboard shortcut to regenerate, persisted setup state
+- **Charts tab** — four analytics cards laid out responsively (single column ≤ lg,
+  Momentum full-width + Rubric/Streak/Topic in a 2×2 grid at xl ≥ 1536px):
+  - **Interview Momentum** — score trend chart with averages and level coverage
+  - **Rubric breakdown** — 5-axis radar (correctness, depth, communication,
+    trade-offs, practicality), latest session vs. recent average
+  - **Practice streak** — current / longest / total-active-days chips plus a
+    12 / 26 / 52-week activity heatmap (right-aligned on today)
+  - **Topic coverage** — `tag × week` heatmap derived from session templates,
+    rows sorted by total volume; click a row to jump to the filtered Sessions tab
+- **Sessions tab** — recent sessions list with multi-axis filters (level, score,
+  search, tags, date range), per-session rubric / prompt / notes, evaluation editing,
+  JSON / Markdown export, JSON import with merge + 5-per-page pagination
+- **Next-session recommendation** — dismissible alert that picks the next
+  template based on the weakest rubric axis from recent sessions
+- **Cross-tab linking** — heatmap row → Sessions filtered by that tag,
+  current-streak chip → Sessions filtered by the last N days
 - Installable as a Progressive Web App (manifest, icons, theme color)
 - Open Graph + Twitter card meta for rich link previews on social platforms
 
@@ -205,27 +227,35 @@ This mode is fully static and GitHub Pages compatible.
 
 Capabilities:
 
-- Select template and level
-- Configure stack, focus, context, timebox, simulation mode
-- Switch interface language (`EN` / `RU`) in the top bar
+- Three-tab workspace: **Prompt** (setup + generated prompt), **Charts**
+  (Momentum, rubric radar, streak calendar, topic heatmap),
+  **Sessions** (history + filters + pagination)
+- Switch interface language (`EN` / `RU`) in the top bar — persisted
 - Generate interview prompt in browser in selected language
-- Auto-create session id in browser
-- Save score + notes into localStorage
-- Track recent interview momentum with a score trend chart and summary stats
-- View latest local sessions
-- Persist selected UI language in localStorage between reloads
+- Auto-create session id; save score, 5-axis rubric, and notes into `localStorage`
+- Rubric-based recommendation for the next session based on the weakest axis
+- Track recent interview momentum, streak, and topic coverage
+- Multi-axis filtering of session history (level, score, tags, date range, search)
+- Cross-tab linking from charts to filtered Sessions view
+- Persist selected UI language and setup form in `localStorage` between reloads
+- Export sessions as JSON or Markdown; import JSON with merge
 
 Implementation:
 
-- `web-ui/vite.config.ts` - Vite config
-- `web-ui/src/App.tsx` - main UI
-- `web-ui/src/components/ProgressChartCard.tsx` - scored session trend chart and KPI cards
-- `web-ui/src/main.tsx` - frontend entry
-- `web-ui/src/theme.ts` - MUI theme
-- `web-ui/src/styles.css` - visual theme and layout styles
-- `web-ui/src/lib/composePrompt.ts` - Web-facing re-export of shared prompt composition logic
-- `web-ui/src/lib/types.ts` - Web-facing re-export of shared interview types
-- `web-ui/src/lib/localSessions.ts` - localStorage persistence
+- `web-ui/vite.config.ts` — Vite config and per-chunk split
+  (`react-vendor` / `mui-vendor` / `mui-styling` / app entry)
+- `web-ui/src/App.tsx` — main UI shell, tabs, cross-tab state
+- `web-ui/src/components/` — `InterviewSetupCard`, `EvaluationCard`,
+  `ProgressChartCard`, `RubricRadarCard`, `StreakCalendarCard`,
+  `TopicHeatmapCard`, `SessionsCard`, `SessionPromptDialog`,
+  `RecommendedNextAlert`, `HorizonToggle`
+- `web-ui/src/lib/` — pure helpers for prompt composition,
+  rubric math, recommendation, streak/calendar, topic heatmap,
+  template tag taxonomy, session export/import, deep-link hydration,
+  setup persistence, and the `useInterviewAppState` hook
+- `web-ui/src/main.tsx` — frontend entry
+- `web-ui/src/theme.ts` / `web-ui/src/styles.css` — MUI theme and global styles
+- `web-ui/src/lib/localSessions.ts` — `localStorage` persistence for sessions
 
 Production build:
 
@@ -305,10 +335,15 @@ Bundle size budgets (`size-limit` config in `package.json`, gzip):
 
 | Target            | Budget |
 | ----------------- | ------ |
-| App entry chunk   | 30 KB  |
+| App entry chunk   | 32 KB  |
 | `react-vendor`    | 65 KB  |
-| `mui-vendor`      | 115 KB |
-| Total JS (assets) | 200 KB |
+| `mui-vendor`      | 85 KB  |
+| `mui-styling`     | 38 KB  |
+| Total JS (assets) | 210 KB |
+
+`mui-vendor` holds `@mui/material` components; `mui-styling` holds the
+emotion runtime and `@mui/system` / `@mui/utils` / `@mui/private-theming`
+so component code and styling caches are split across separate chunks.
 
 Run locally:
 
@@ -350,9 +385,21 @@ npm run interview -- --record-eval --session-id <id> --score 8 --notes "Good dep
   "templateId": "react-performance-profiling",
   "level": "senior",
   "score": 8.5,
-  "notes": "Strong architecture trade-offs"
+  "notes": "Strong architecture trade-offs",
+  "rubric": {
+    "correctness": 9,
+    "depth": 8,
+    "communication": 8,
+    "tradeOffs": 7,
+    "practicality": 9
+  }
 }
 ```
+
+`rubric` is optional and only populated for sessions evaluated in the Web UI
+through the 5-axis Rubric Radar. CLI-only sessions and legacy sessions
+without rubric data still render normally; they just sit alongside rated
+sessions in the history and contribute to averages where applicable.
 
 ## Tech Stack
 
