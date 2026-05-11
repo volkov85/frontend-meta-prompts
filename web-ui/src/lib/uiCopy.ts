@@ -56,7 +56,7 @@ type UiCopy = {
   recommendationDismiss: string;
   recommendationApplied: (template: string) => string;
   streakCalendarTitle: string;
-  streakCalendarSubtitle: string;
+  streakCalendarSubtitle: (weeks: number) => string;
   streakCalendarEmpty: string;
   streakCurrentChip: (days: number) => string;
   streakLongestChip: (days: number) => string;
@@ -66,8 +66,9 @@ type UiCopy = {
   streakCalendarLegendLess: string;
   streakCalendarLegendMore: string;
   topicHeatmapTitle: string;
-  topicHeatmapSubtitle: string;
+  topicHeatmapSubtitle: (weeks: number) => string;
   topicHeatmapEmpty: string;
+  topicHeatmapTagAriaLabel: (tag: string) => string;
   topicHeatmapCellTooltip: (tag: string, weekLabel: string, sessions: number) => string;
   topicHeatmapLegend: string;
   topicHeatmapLegendLess: string;
@@ -104,6 +105,10 @@ type UiCopy = {
   scoreFilterLabel: string;
   tagFilterLabel: string;
   tagFilterClear: string;
+  sessionsDateFilterChip: (days: number) => string;
+  sessionsDateFilterAriaLabel: string;
+  horizonToggleAriaLabel: string;
+  horizonToggleOption: (weeks: number) => string;
   filterAllLevels: string;
   filterAllScores: string;
   filterRated: string;
@@ -207,7 +212,7 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     recommendationDismiss: "Dismiss recommendation",
     recommendationApplied: (template: string) => `Applied recommendation: ${template}`,
     streakCalendarTitle: "Practice streak",
-    streakCalendarSubtitle: "Activity over the last 12 weeks",
+    streakCalendarSubtitle: (weeks: number) => `Activity over the last ${weeks} weeks`,
     streakCalendarEmpty: "No sessions yet — save one to start your streak.",
     streakCurrentChip: (days: number) =>
       days === 1 ? "1 day current streak" : `${days} days current streak`,
@@ -225,8 +230,10 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     streakCalendarLegendLess: "Less",
     streakCalendarLegendMore: "More",
     topicHeatmapTitle: "Topic coverage",
-    topicHeatmapSubtitle: "Sessions by topic over the last 12 weeks",
+    topicHeatmapSubtitle: (weeks: number) =>
+      `Sessions by topic over the last ${weeks} weeks. Click a tag to filter sessions.`,
     topicHeatmapEmpty: "Save a few sessions to see which topics you focus on.",
+    topicHeatmapTagAriaLabel: (tag: string) => `Filter sessions by tag ${tag}`,
     topicHeatmapCellTooltip: (tag: string, weekLabel: string, sessions: number) =>
       sessions === 0
         ? `${tag} — week of ${weekLabel}: no sessions`
@@ -278,6 +285,10 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     scoreFilterLabel: "Score filter",
     tagFilterLabel: "Tags",
     tagFilterClear: "Clear tags",
+    sessionsDateFilterChip: (days: number) => (days === 1 ? "Last 1 day" : `Last ${days} days`),
+    sessionsDateFilterAriaLabel: "Date range filter",
+    horizonToggleAriaLabel: "Time horizon",
+    horizonToggleOption: (weeks: number) => `${weeks}w`,
     filterAllLevels: "All levels",
     filterAllScores: "All scores",
     filterRated: "Rated",
@@ -372,7 +383,8 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     recommendationDismiss: "Скрыть рекомендацию",
     recommendationApplied: (template: string) => `Применена рекомендация: ${template}`,
     streakCalendarTitle: "Серия практик",
-    streakCalendarSubtitle: "Активность за последние 12 недель",
+    streakCalendarSubtitle: (weeks: number) =>
+      `Активность за последние ${weeks} ${plural(weeks, "неделю", "недели", "недель")}`,
     streakCalendarEmpty: "Сессий пока нет — сохрани первую, чтобы начать серию.",
     streakCurrentChip: (days: number) =>
       `Текущая серия: ${days} ${plural(days, "день", "дня", "дней")}`,
@@ -387,8 +399,10 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     streakCalendarLegendLess: "Меньше",
     streakCalendarLegendMore: "Больше",
     topicHeatmapTitle: "Покрытие тем",
-    topicHeatmapSubtitle: "Сессии по темам за последние 12 недель",
+    topicHeatmapSubtitle: (weeks: number) =>
+      `Сессии по темам за последние ${weeks} ${plural(weeks, "неделю", "недели", "недель")}. Кликни тег, чтобы отфильтровать сессии.`,
     topicHeatmapEmpty: "Сохрани несколько сессий, чтобы увидеть, какие темы прорабатываешь.",
+    topicHeatmapTagAriaLabel: (tag: string) => `Фильтр сессий по тегу ${tag}`,
     topicHeatmapCellTooltip: (tag: string, weekLabel: string, sessions: number) =>
       sessions === 0
         ? `${tag} — неделя ${weekLabel}: нет сессий`
@@ -440,6 +454,11 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     scoreFilterLabel: "Фильтр оценки",
     tagFilterLabel: "Теги",
     tagFilterClear: "Сбросить теги",
+    sessionsDateFilterChip: (days: number) =>
+      `За последние ${days} ${plural(days, "день", "дня", "дней")}`,
+    sessionsDateFilterAriaLabel: "Фильтр по диапазону дат",
+    horizonToggleAriaLabel: "Горизонт времени",
+    horizonToggleOption: (weeks: number) => `${weeks}н`,
     filterAllLevels: "Все уровни",
     filterAllScores: "Все оценки",
     filterRated: "С оценкой",

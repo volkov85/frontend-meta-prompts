@@ -1,5 +1,6 @@
-import { Box, Card, CardContent, Stack, Tooltip, Typography } from "@mui/material";
-import { useMemo } from "react";
+import { Box, ButtonBase, Card, CardContent, Stack, Tooltip, Typography } from "@mui/material";
+import { useMemo, useState } from "react";
+import { HorizonToggle, HorizonWeeks } from "./HorizonToggle";
 import { UI_COPY } from "../lib/uiCopy";
 import { computeTopicHeatmap, heatmapIntensityLevel } from "../lib/topicHeatmap";
 import { InterviewLanguage, InterviewTemplate, Session } from "../lib/types";
@@ -8,6 +9,7 @@ type TopicHeatmapCardProps = {
   language: InterviewLanguage;
   sessions: Session[];
   templates: InterviewTemplate[];
+  onTagSelect?: (tag: string) => void;
 };
 
 const CELL_HEIGHT = 18;
@@ -26,25 +28,41 @@ const formatWeekStart = (language: InterviewLanguage, date: Date): string => {
   return date.toLocaleDateString(locale, { month: "short", day: "numeric" });
 };
 
-export const TopicHeatmapCard = ({ language, sessions, templates }: TopicHeatmapCardProps) => {
+export const TopicHeatmapCard = ({
+  language,
+  sessions,
+  templates,
+  onTagSelect,
+}: TopicHeatmapCardProps) => {
   const copy = UI_COPY[language];
   const now = useMemo(() => new Date(), []);
+  const [weeks, setWeeks] = useState<HorizonWeeks>(12);
   const heatmap = useMemo(
-    () => computeTopicHeatmap(sessions, templates, now),
-    [sessions, templates, now],
+    () => computeTopicHeatmap(sessions, templates, now, weeks),
+    [sessions, templates, now, weeks],
   );
 
   const hasData = heatmap.rows.length > 0 && heatmap.totalSessions > 0;
+  const tagClickable = Boolean(onTagSelect);
 
   return (
     <Card className="fade-up">
       <CardContent>
-        <Typography variant="h6" sx={{ mb: 1 }}>
-          {copy.topicHeatmapTitle}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          {copy.topicHeatmapSubtitle}
-        </Typography>
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          justifyContent="space-between"
+          alignItems={{ xs: "flex-start", sm: "center" }}
+          spacing={1}
+          sx={{ mb: 1 }}
+        >
+          <Box>
+            <Typography variant="h6">{copy.topicHeatmapTitle}</Typography>
+            <Typography variant="body2" color="text.secondary">
+              {copy.topicHeatmapSubtitle(weeks)}
+            </Typography>
+          </Box>
+          <HorizonToggle language={language} value={weeks} onChange={setWeeks} />
+        </Stack>
 
         {!hasData ? (
           <Typography variant="body2" color="text.secondary">
@@ -66,18 +84,44 @@ export const TopicHeatmapCard = ({ language, sessions, templates }: TopicHeatmap
             >
               {heatmap.rows.map((row) => (
                 <Box key={row.tag} role="row" sx={{ display: "contents" }}>
-                  <Typography
-                    role="rowheader"
-                    variant="caption"
-                    sx={{
-                      fontFamily: "monospace",
-                      color: "text.primary",
-                      pr: 1,
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {row.tag}
-                  </Typography>
+                  {tagClickable ? (
+                    <ButtonBase
+                      onClick={() => onTagSelect?.(row.tag)}
+                      aria-label={copy.topicHeatmapTagAriaLabel(row.tag)}
+                      sx={{
+                        justifyContent: "flex-start",
+                        fontFamily: "monospace",
+                        fontSize: "0.75rem",
+                        color: "text.primary",
+                        pr: 1,
+                        whiteSpace: "nowrap",
+                        borderRadius: "3px",
+                        "&:hover": {
+                          color: "primary.main",
+                          textDecoration: "underline",
+                        },
+                        "&:focus-visible": {
+                          outline: (theme) => `2px solid ${theme.palette.primary.main}`,
+                          outlineOffset: 2,
+                        },
+                      }}
+                    >
+                      {row.tag}
+                    </ButtonBase>
+                  ) : (
+                    <Typography
+                      role="rowheader"
+                      variant="caption"
+                      sx={{
+                        fontFamily: "monospace",
+                        color: "text.primary",
+                        pr: 1,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {row.tag}
+                    </Typography>
+                  )}
                   {row.cells.map((count, index) => {
                     const intensity = heatmapIntensityLevel(count, heatmap.maxCount);
                     const week = heatmap.weeks[index];
