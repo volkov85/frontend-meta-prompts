@@ -996,4 +996,77 @@ describe("App", () => {
     expect(screen.getByText(/recent-1/)).toBeInTheDocument();
     expect(screen.queryByText(/stale-1/)).not.toBeInTheDocument();
   });
+
+  it("paginates the sessions list with 5 sessions per page", async () => {
+    const user = userEvent.setup();
+    const baseDate = new Date("2026-03-18T10:00:00.000Z").getTime();
+    const sessions = Array.from({ length: 12 }, (_, idx) => ({
+      id: `pg-${String(idx).padStart(2, "0")}`,
+      date: new Date(baseDate - idx * 60_000).toISOString(),
+      templateId: "react-hooks-internals",
+      level: "middle" as const,
+    }));
+    seedSessions(sessions);
+    renderApp();
+
+    await switchToTab(user, "Sessions");
+
+    expect(screen.getByText(/Page 1 of 3 \(12 sessions\)/)).toBeInTheDocument();
+    expect(screen.getByText(/pg-00/)).toBeInTheDocument();
+    expect(screen.getByText(/pg-04/)).toBeInTheDocument();
+    expect(screen.queryByText(/pg-05/)).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Go to page 2" }));
+
+    expect(screen.getByText(/Page 2 of 3 \(12 sessions\)/)).toBeInTheDocument();
+    expect(screen.queryByText(/pg-04/)).not.toBeInTheDocument();
+    expect(screen.getByText(/pg-05/)).toBeInTheDocument();
+    expect(screen.getByText(/pg-09/)).toBeInTheDocument();
+    expect(screen.queryByText(/pg-10/)).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Go to page 3" }));
+    expect(screen.getByText(/pg-10/)).toBeInTheDocument();
+    expect(screen.getByText(/pg-11/)).toBeInTheDocument();
+  });
+
+  it("resets pagination to page 1 when filters change", async () => {
+    const user = userEvent.setup();
+    const baseDate = new Date("2026-03-18T10:00:00.000Z").getTime();
+    const sessions = Array.from({ length: 8 }, (_, idx) => ({
+      id: `pg-${String(idx).padStart(2, "0")}`,
+      date: new Date(baseDate - idx * 60_000).toISOString(),
+      templateId: "react-hooks-internals",
+      level: idx < 4 ? ("middle" as const) : ("senior" as const),
+    }));
+    seedSessions(sessions);
+    renderApp();
+
+    await switchToTab(user, "Sessions");
+    await user.click(screen.getByRole("button", { name: "Go to page 2" }));
+    expect(screen.getByText(/Page 2 of 2/)).toBeInTheDocument();
+
+    await user.click(screen.getByLabelText("Level filter"));
+    await user.click(screen.getByRole("option", { name: "Middle" }));
+
+    expect(screen.queryByText(/Page 2 of/)).not.toBeInTheDocument();
+  });
+
+  it("hides pagination when there are 5 or fewer sessions", async () => {
+    const user = userEvent.setup();
+    const baseDate = new Date("2026-03-18T10:00:00.000Z").getTime();
+    const sessions = Array.from({ length: 4 }, (_, idx) => ({
+      id: `pg-${idx}`,
+      date: new Date(baseDate - idx * 60_000).toISOString(),
+      templateId: "react-hooks-internals",
+      level: "middle" as const,
+    }));
+    seedSessions(sessions);
+    renderApp();
+
+    await switchToTab(user, "Sessions");
+    expect(
+      screen.queryByRole("navigation", { name: "Sessions pagination" }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/Page 1 of/)).not.toBeInTheDocument();
+  });
 });

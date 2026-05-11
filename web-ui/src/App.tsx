@@ -10,7 +10,6 @@ import {
   Divider,
   Grid,
   Snackbar,
-  Stack,
   Tab,
   Tabs,
   ToggleButton,
@@ -334,7 +333,14 @@ const App = () => {
               aria-labelledby="workspace-tab-charts"
             >
               {workspaceTab === "charts" && (
-                <Stack spacing={2}>
+                <Box
+                  sx={{
+                    display: "grid",
+                    gap: 2,
+                    gridTemplateColumns: { xs: "1fr", xl: "1fr 1fr" },
+                    alignItems: "start",
+                  }}
+                >
                   <ProgressChartCard
                     language={language}
                     sessions={sessions}
@@ -352,7 +358,7 @@ const App = () => {
                     templates={templates}
                     onTagSelect={handleSelectTagFromHeatmap}
                   />
-                </Stack>
+                </Box>
               )}
             </Box>
 

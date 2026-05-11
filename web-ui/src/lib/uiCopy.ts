@@ -109,6 +109,8 @@ type UiCopy = {
   sessionsDateFilterAriaLabel: string;
   horizonToggleAriaLabel: string;
   horizonToggleOption: (weeks: number) => string;
+  sessionsPaginationAriaLabel: string;
+  sessionsPaginationSummary: (page: number, pageCount: number, total: number) => string;
   filterAllLevels: string;
   filterAllScores: string;
   filterRated: string;
@@ -289,6 +291,11 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     sessionsDateFilterAriaLabel: "Date range filter",
     horizonToggleAriaLabel: "Time horizon",
     horizonToggleOption: (weeks: number) => `${weeks}w`,
+    sessionsPaginationAriaLabel: "Sessions pagination",
+    sessionsPaginationSummary: (page: number, pageCount: number, total: number) =>
+      total === 1
+        ? `Page ${page} of ${pageCount} (1 session)`
+        : `Page ${page} of ${pageCount} (${total} sessions)`,
     filterAllLevels: "All levels",
     filterAllScores: "All scores",
     filterRated: "Rated",
@@ -459,6 +466,9 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     sessionsDateFilterAriaLabel: "Фильтр по диапазону дат",
     horizonToggleAriaLabel: "Горизонт времени",
     horizonToggleOption: (weeks: number) => `${weeks}н`,
+    sessionsPaginationAriaLabel: "Пагинация сессий",
+    sessionsPaginationSummary: (page: number, pageCount: number, total: number) =>
+      `Стр. ${page} из ${pageCount} (${total} ${plural(total, "сессия", "сессии", "сессий")})`,
     filterAllLevels: "Все уровни",
     filterAllScores: "Все оценки",
     filterRated: "С оценкой",

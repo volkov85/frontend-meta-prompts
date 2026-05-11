@@ -10,6 +10,7 @@ import {
   DialogTitle,
   Divider,
   MenuItem,
+  Pagination,
   Stack,
   TextField,
   Tooltip,
@@ -38,6 +39,7 @@ type SessionsCardProps = {
 };
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
+const SESSIONS_PAGE_SIZE = 5;
 
 export const SessionsCard = ({
   handleClearSessions,
@@ -115,6 +117,33 @@ export const SessionsCard = ({
 
   const clearTagFilter = () => onSelectedTagsChange([]);
   const clearDateFilter = () => onDateFilterChange(null);
+
+  const filterKey = useMemo(
+    () =>
+      JSON.stringify({
+        searchValue,
+        levelFilter,
+        scoreFilter,
+        selectedTags,
+        dateFilterDays,
+      }),
+    [searchValue, levelFilter, scoreFilter, selectedTags, dateFilterDays],
+  );
+
+  const [page, setPage] = useState(1);
+  const [lastFilterKey, setLastFilterKey] = useState(filterKey);
+  if (filterKey !== lastFilterKey) {
+    setLastFilterKey(filterKey);
+    setPage(1);
+  }
+
+  const pageCount = Math.max(1, Math.ceil(filteredSessions.length / SESSIONS_PAGE_SIZE));
+  const safePage = Math.min(Math.max(1, page), pageCount);
+
+  const pagedSessions = useMemo(() => {
+    const start = (safePage - 1) * SESSIONS_PAGE_SIZE;
+    return filteredSessions.slice(start, start + SESSIONS_PAGE_SIZE);
+  }, [filteredSessions, safePage]);
 
   return (
     <Card className="fade-up">
@@ -282,7 +311,7 @@ export const SessionsCard = ({
           {sessions.length > 0 && filteredSessions.length === 0 && (
             <Typography color="text.secondary">{copy.noFilteredSessions}</Typography>
           )}
-          {filteredSessions.slice(0, 10).map((session) => (
+          {pagedSessions.map((session) => (
             <Card
               key={session.id}
               variant="outlined"
@@ -338,6 +367,27 @@ export const SessionsCard = ({
             </Card>
           ))}
         </Stack>
+        {filteredSessions.length > SESSIONS_PAGE_SIZE && (
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            alignItems="center"
+            justifyContent="space-between"
+            spacing={1}
+            sx={{ mt: 1.5 }}
+          >
+            <Typography variant="caption" color="text.secondary">
+              {copy.sessionsPaginationSummary(safePage, pageCount, filteredSessions.length)}
+            </Typography>
+            <Pagination
+              size="small"
+              color="primary"
+              page={safePage}
+              count={pageCount}
+              onChange={(_, next) => setPage(next)}
+              aria-label={copy.sessionsPaginationAriaLabel}
+            />
+          </Stack>
+        )}
       </CardContent>
       <SessionPromptDialog
         language={language}
