@@ -69,7 +69,6 @@ export const ProgressChartCard = ({ language, sessions, levelTargets }: Progress
     <Card
       className="fade-up"
       sx={{
-        mb: 2,
         overflow: "hidden",
         border: "1px solid rgba(125, 211, 252, 0.16)",
         background:

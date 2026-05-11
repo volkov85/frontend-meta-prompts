@@ -341,11 +341,13 @@ const App = () => {
                     alignItems: "start",
                   }}
                 >
-                  <ProgressChartCard
-                    language={language}
-                    sessions={sessions}
-                    levelTargets={levelTargets}
-                  />
+                  <Box sx={{ gridColumn: { xl: "1 / -1" } }}>
+                    <ProgressChartCard
+                      language={language}
+                      sessions={sessions}
+                      levelTargets={levelTargets}
+                    />
+                  </Box>
                   <RubricRadarCard language={language} sessions={sessions} />
                   <StreakCalendarCard
                     language={language}
