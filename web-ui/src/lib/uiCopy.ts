@@ -65,6 +65,13 @@ type UiCopy = {
   streakCalendarLegend: string;
   streakCalendarLegendLess: string;
   streakCalendarLegendMore: string;
+  topicHeatmapTitle: string;
+  topicHeatmapSubtitle: string;
+  topicHeatmapEmpty: string;
+  topicHeatmapCellTooltip: (tag: string, weekLabel: string, sessions: number) => string;
+  topicHeatmapLegend: string;
+  topicHeatmapLegendLess: string;
+  topicHeatmapLegendMore: string;
   promptOutputTitle: string;
   promptOutputEmpty: string;
   progressChartTitle: string;
@@ -217,6 +224,18 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     streakCalendarLegend: "Activity intensity legend",
     streakCalendarLegendLess: "Less",
     streakCalendarLegendMore: "More",
+    topicHeatmapTitle: "Topic coverage",
+    topicHeatmapSubtitle: "Sessions by topic over the last 12 weeks",
+    topicHeatmapEmpty: "Save a few sessions to see which topics you focus on.",
+    topicHeatmapCellTooltip: (tag: string, weekLabel: string, sessions: number) =>
+      sessions === 0
+        ? `${tag} — week of ${weekLabel}: no sessions`
+        : sessions === 1
+          ? `${tag} — week of ${weekLabel}: 1 session`
+          : `${tag} — week of ${weekLabel}: ${sessions} sessions`,
+    topicHeatmapLegend: "Topic intensity legend",
+    topicHeatmapLegendLess: "Less",
+    topicHeatmapLegendMore: "More",
     promptOutputTitle: "Prompt Output",
     promptOutputEmpty: "Generated prompt will appear here.",
     progressChartTitle: "Interview Momentum",
@@ -367,6 +386,16 @@ export const UI_COPY: Record<InterviewLanguage, UiCopy> = {
     streakCalendarLegend: "Легенда интенсивности",
     streakCalendarLegendLess: "Меньше",
     streakCalendarLegendMore: "Больше",
+    topicHeatmapTitle: "Покрытие тем",
+    topicHeatmapSubtitle: "Сессии по темам за последние 12 недель",
+    topicHeatmapEmpty: "Сохрани несколько сессий, чтобы увидеть, какие темы прорабатываешь.",
+    topicHeatmapCellTooltip: (tag: string, weekLabel: string, sessions: number) =>
+      sessions === 0
+        ? `${tag} — неделя ${weekLabel}: нет сессий`
+        : `${tag} — неделя ${weekLabel}: ${sessions} ${plural(sessions, "сессия", "сессии", "сессий")}`,
+    topicHeatmapLegend: "Легенда интенсивности тем",
+    topicHeatmapLegendLess: "Меньше",
+    topicHeatmapLegendMore: "Больше",
     promptOutputTitle: "Сгенерированный промпт",
     promptOutputEmpty: "Здесь появится сгенерированный промпт.",
     progressChartTitle: "Динамика интервью",

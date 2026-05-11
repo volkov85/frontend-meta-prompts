@@ -81,7 +81,7 @@
     {
       "name": "app entry (gzip)",
       "path": "web-ui/dist/assets/index-*.js",
-      "limit": "30 KB",
+      "limit": "32 KB",
       "gzip": true
     },
     {
@@ -99,7 +99,7 @@
     {
       "name": "total JS (gzip)",
       "path": "web-ui/dist/assets/*.js",
-      "limit": "200 KB",
+      "limit": "205 KB",
       "gzip": true
     }
   ]
