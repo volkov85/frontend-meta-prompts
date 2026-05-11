@@ -796,6 +796,42 @@ describe("App", () => {
     ).toBeInTheDocument();
   });
 
+  it("renders the topic heatmap with rows for active tags", async () => {
+    const user = userEvent.setup();
+    const today = new Date();
+    const todayIso = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      12,
+    ).toISOString();
+    seedSessions([
+      {
+        id: "topic-react",
+        date: todayIso,
+        templateId: "react-hooks-internals",
+        level: "middle",
+      },
+    ]);
+    renderApp();
+
+    await switchToTab(user, "Charts");
+    expect(screen.getByText("Topic coverage")).toBeInTheDocument();
+    expect(screen.getByText("react")).toBeInTheDocument();
+    expect(screen.getByText("internals")).toBeInTheDocument();
+  });
+
+  it("shows the topic heatmap empty state when no sessions exist", async () => {
+    const user = userEvent.setup();
+    renderApp();
+
+    await switchToTab(user, "Charts");
+    expect(screen.getByText("Topic coverage")).toBeInTheDocument();
+    expect(
+      screen.getByText("Save a few sessions to see which topics you focus on."),
+    ).toBeInTheDocument();
+  });
+
   it("does not show the recommendation banner without rated sessions", async () => {
     seedSessions([
       {

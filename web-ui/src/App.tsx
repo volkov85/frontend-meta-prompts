@@ -26,6 +26,7 @@ import {
   RubricRadarCard,
   SessionsCard,
   StreakCalendarCard,
+  TopicHeatmapCard,
 } from "./components";
 import { useInterviewAppState } from "./lib/useInterviewAppState";
 import { UI_COPY } from "./lib/uiCopy";
@@ -326,6 +327,7 @@ const App = () => {
                   />
                   <RubricRadarCard language={language} sessions={sessions} />
                   <StreakCalendarCard language={language} sessions={sessions} />
+                  <TopicHeatmapCard language={language} sessions={sessions} templates={templates} />
                 </>
               )}
             </Box>
