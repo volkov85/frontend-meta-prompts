@@ -1,5 +1,6 @@
 import { Box, Card, CardContent, Chip, Stack, Tooltip, Typography } from "@mui/material";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { HorizonToggle, HorizonWeeks } from "./HorizonToggle";
 import { UI_COPY } from "../lib/uiCopy";
 import {
   calendarIntensityLevel,
@@ -11,6 +12,7 @@ import { InterviewLanguage, Session } from "../lib/types";
 type StreakCalendarCardProps = {
   language: InterviewLanguage;
   sessions: Session[];
+  onCurrentStreakClick?: (days: number) => void;
 };
 
 const CELL_SIZE = 14;
@@ -31,23 +33,41 @@ const formatDate = (language: InterviewLanguage, date: Date): string => {
   return date.toLocaleDateString(locale, { year: "numeric", month: "short", day: "numeric" });
 };
 
-export const StreakCalendarCard = ({ language, sessions }: StreakCalendarCardProps) => {
+export const StreakCalendarCard = ({
+  language,
+  sessions,
+  onCurrentStreakClick,
+}: StreakCalendarCardProps) => {
   const copy = UI_COPY[language];
   const now = useMemo(() => new Date(), []);
-  const calendar = useMemo(() => computeActivityCalendar(sessions, now), [sessions, now]);
+  const [weeks, setWeeks] = useState<HorizonWeeks>(12);
+  const calendar = useMemo(
+    () => computeActivityCalendar(sessions, now, weeks),
+    [sessions, now, weeks],
+  );
   const streak = useMemo(() => computeStreak(sessions, now), [sessions, now]);
 
   const hasActivity = calendar.totalSessions > 0;
+  const currentChipClickable = streak.current > 0 && Boolean(onCurrentStreakClick);
 
   return (
     <Card className="fade-up">
       <CardContent>
-        <Typography variant="h6" sx={{ mb: 1 }}>
-          {copy.streakCalendarTitle}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          {copy.streakCalendarSubtitle}
-        </Typography>
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          justifyContent="space-between"
+          alignItems={{ xs: "flex-start", sm: "center" }}
+          spacing={1}
+          sx={{ mb: 1 }}
+        >
+          <Box>
+            <Typography variant="h6">{copy.streakCalendarTitle}</Typography>
+            <Typography variant="body2" color="text.secondary">
+              {copy.streakCalendarSubtitle(weeks)}
+            </Typography>
+          </Box>
+          <HorizonToggle language={language} value={weeks} onChange={setWeeks} />
+        </Stack>
 
         <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mb: 2 }} useFlexGap>
           <Chip
@@ -55,6 +75,10 @@ export const StreakCalendarCard = ({ language, sessions }: StreakCalendarCardPro
             color={streak.current > 0 ? "primary" : "default"}
             variant={streak.current > 0 ? "filled" : "outlined"}
             label={copy.streakCurrentChip(streak.current)}
+            clickable={currentChipClickable}
+            onClick={
+              currentChipClickable ? () => onCurrentStreakClick?.(streak.current) : undefined
+            }
           />
           <Chip size="small" variant="outlined" label={copy.streakLongestChip(streak.longest)} />
           <Chip

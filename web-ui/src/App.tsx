@@ -10,6 +10,7 @@ import {
   Divider,
   Grid,
   Snackbar,
+  Stack,
   Tab,
   Tabs,
   ToggleButton,
@@ -87,8 +88,22 @@ const App = () => {
   } = useInterviewAppState();
   const copy = UI_COPY[language];
   const [workspaceTab, setWorkspaceTab] = useState<"prompt" | "charts" | "sessions">("prompt");
+  const [sessionsSelectedTags, setSessionsSelectedTags] = useState<string[]>([]);
+  const [sessionsDateFilterDays, setSessionsDateFilterDays] = useState<number | null>(null);
   const handleWorkspaceTabChange = (_: SyntheticEvent, next: "prompt" | "charts" | "sessions") => {
     setWorkspaceTab(next);
+  };
+
+  const handleSelectTagFromHeatmap = (tag: string) => {
+    setSessionsSelectedTags([tag]);
+    setSessionsDateFilterDays(null);
+    setWorkspaceTab("sessions");
+  };
+
+  const handleSelectCurrentStreakWindow = (days: number) => {
+    setSessionsDateFilterDays(days);
+    setSessionsSelectedTags([]);
+    setWorkspaceTab("sessions");
   };
 
   const handleLanguageChange = (
@@ -319,16 +334,25 @@ const App = () => {
               aria-labelledby="workspace-tab-charts"
             >
               {workspaceTab === "charts" && (
-                <>
+                <Stack spacing={2}>
                   <ProgressChartCard
                     language={language}
                     sessions={sessions}
                     levelTargets={levelTargets}
                   />
                   <RubricRadarCard language={language} sessions={sessions} />
-                  <StreakCalendarCard language={language} sessions={sessions} />
-                  <TopicHeatmapCard language={language} sessions={sessions} templates={templates} />
-                </>
+                  <StreakCalendarCard
+                    language={language}
+                    sessions={sessions}
+                    onCurrentStreakClick={handleSelectCurrentStreakWindow}
+                  />
+                  <TopicHeatmapCard
+                    language={language}
+                    sessions={sessions}
+                    templates={templates}
+                    onTagSelect={handleSelectTagFromHeatmap}
+                  />
+                </Stack>
               )}
             </Box>
 
@@ -345,6 +369,10 @@ const App = () => {
                   refreshSessions={refreshSessions}
                   sessions={sessions}
                   templates={templates}
+                  selectedTags={sessionsSelectedTags}
+                  onSelectedTagsChange={setSessionsSelectedTags}
+                  dateFilterDays={sessionsDateFilterDays}
+                  onDateFilterChange={setSessionsDateFilterDays}
                   onCopyPrompt={copyPromptText}
                   onExportJson={handleExportJson}
                   onExportMarkdown={handleExportMarkdown}

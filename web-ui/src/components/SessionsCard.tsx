@@ -27,11 +27,17 @@ type SessionsCardProps = {
   refreshSessions: () => void;
   sessions: Session[];
   templates: InterviewTemplate[];
+  selectedTags: string[];
+  onSelectedTagsChange: (next: string[]) => void;
+  dateFilterDays: number | null;
+  onDateFilterChange: (next: number | null) => void;
   onCopyPrompt?: (prompt: string) => void;
   onExportJson?: () => void;
   onExportMarkdown?: () => void;
   onImportJson?: (file: File) => void;
 };
+
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 export const SessionsCard = ({
   handleClearSessions,
@@ -39,6 +45,10 @@ export const SessionsCard = ({
   refreshSessions,
   sessions,
   templates,
+  selectedTags,
+  onSelectedTagsChange,
+  dateFilterDays,
+  onDateFilterChange,
   onCopyPrompt,
   onExportJson,
   onExportMarkdown,
@@ -47,12 +57,12 @@ export const SessionsCard = ({
   const [searchValue, setSearchValue] = useState("");
   const [levelFilter, setLevelFilter] = useState<"all" | Session["level"]>("all");
   const [scoreFilter, setScoreFilter] = useState<"all" | "rated" | "unrated">("all");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [activePromptSessionId, setActivePromptSessionId] = useState<string | null>(null);
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
   const importInputRef = useRef<HTMLInputElement | null>(null);
   const copy = UI_COPY[language];
   const levelLabels = LEVEL_LABELS[language];
+  const nowMs = useMemo(() => new Date().getTime(), []);
   const activePromptSession = useMemo(
     () =>
       activePromptSessionId
@@ -69,6 +79,8 @@ export const SessionsCard = ({
 
   const filteredSessions = useMemo(() => {
     const normalizedQuery = searchValue.trim().toLowerCase();
+    const dateFloor =
+      dateFilterDays !== null && dateFilterDays > 0 ? nowMs - dateFilterDays * MS_PER_DAY : null;
 
     return tagFilteredSessions.filter((session) => {
       const matchesQuery =
@@ -82,18 +94,27 @@ export const SessionsCard = ({
         scoreFilter === "all" ||
         (scoreFilter === "rated" && isRated) ||
         (scoreFilter === "unrated" && !isRated);
+      const matchesDate =
+        dateFloor === null ||
+        (() => {
+          const ts = new Date(session.date).getTime();
+          return Number.isFinite(ts) && ts >= dateFloor;
+        })();
 
-      return matchesQuery && matchesLevel && matchesScore;
+      return matchesQuery && matchesLevel && matchesScore && matchesDate;
     });
-  }, [levelFilter, scoreFilter, searchValue, tagFilteredSessions]);
+  }, [levelFilter, scoreFilter, searchValue, tagFilteredSessions, dateFilterDays, nowMs]);
 
   const toggleTag = (tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((value) => value !== tag) : [...prev, tag],
+    onSelectedTagsChange(
+      selectedTags.includes(tag)
+        ? selectedTags.filter((value) => value !== tag)
+        : [...selectedTags, tag],
     );
   };
 
-  const clearTagFilter = () => setSelectedTags([]);
+  const clearTagFilter = () => onSelectedTagsChange([]);
+  const clearDateFilter = () => onDateFilterChange(null);
 
   return (
     <Card className="fade-up">
@@ -200,6 +221,25 @@ export const SessionsCard = ({
             <MenuItem value="unrated">{copy.filterUnrated}</MenuItem>
           </TextField>
         </Stack>
+        {dateFilterDays !== null && dateFilterDays > 0 && (
+          <Stack
+            direction="row"
+            spacing={1}
+            useFlexGap
+            flexWrap="wrap"
+            alignItems="center"
+            sx={{ mb: 1.5 }}
+            aria-label={copy.sessionsDateFilterAriaLabel}
+          >
+            <Chip
+              size="small"
+              color="primary"
+              variant="filled"
+              label={copy.sessionsDateFilterChip(dateFilterDays)}
+              onDelete={clearDateFilter}
+            />
+          </Stack>
+        )}
         {tagPool.length > 0 && (
           <Stack
             direction="row"

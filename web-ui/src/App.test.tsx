@@ -849,4 +849,151 @@ describe("App", () => {
 
     expect(screen.queryByText("Recommended next session")).not.toBeInTheDocument();
   });
+
+  it("toggles the topic heatmap horizon between 12/26/52 weeks", async () => {
+    const user = userEvent.setup();
+    const today = new Date();
+    const todayIso = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      12,
+    ).toISOString();
+    seedSessions([
+      {
+        id: "topic-react",
+        date: todayIso,
+        templateId: "react-hooks-internals",
+        level: "middle",
+      },
+    ]);
+    renderApp();
+
+    await switchToTab(user, "Charts");
+    expect(screen.getByText(/Sessions by topic over the last 12 weeks/)).toBeInTheDocument();
+
+    const topicCard = screen.getByText("Topic coverage").closest(".MuiCard-root");
+    expect(topicCard).toBeTruthy();
+    const toggle26 = within(topicCard as HTMLElement).getByRole("button", { name: "26w" });
+    await user.click(toggle26);
+    expect(screen.getByText(/Sessions by topic over the last 26 weeks/)).toBeInTheDocument();
+
+    const toggle52 = within(topicCard as HTMLElement).getByRole("button", { name: "52w" });
+    await user.click(toggle52);
+    expect(screen.getByText(/Sessions by topic over the last 52 weeks/)).toBeInTheDocument();
+  });
+
+  it("toggles the streak calendar horizon between 12/26/52 weeks", async () => {
+    const user = userEvent.setup();
+    const today = new Date();
+    const todayIso = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      12,
+    ).toISOString();
+    seedSessions([
+      {
+        id: "streak-1",
+        date: todayIso,
+        templateId: "react-hooks-internals",
+        level: "middle",
+      },
+    ]);
+    renderApp();
+
+    await switchToTab(user, "Charts");
+    expect(screen.getByText("Activity over the last 12 weeks")).toBeInTheDocument();
+
+    const streakCard = screen.getByText("Practice streak").closest(".MuiCard-root");
+    expect(streakCard).toBeTruthy();
+    const toggle52 = within(streakCard as HTMLElement).getByRole("button", { name: "52w" });
+    await user.click(toggle52);
+    expect(screen.getByText("Activity over the last 52 weeks")).toBeInTheDocument();
+  });
+
+  it("clicking a heatmap tag jumps to Sessions tab with that tag filter active", async () => {
+    const user = userEvent.setup();
+    const today = new Date();
+    const todayIso = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      12,
+    ).toISOString();
+    seedSessions([
+      {
+        id: "topic-react",
+        date: todayIso,
+        templateId: "react-hooks-internals",
+        level: "middle",
+      },
+      {
+        id: "topic-css",
+        date: todayIso,
+        templateId: "css-architecture-design-systems",
+        level: "middle",
+      },
+    ]);
+    renderApp();
+
+    await switchToTab(user, "Charts");
+    const reactTagBtn = screen.getByRole("button", { name: "Filter sessions by tag react" });
+    await user.click(reactTagBtn);
+
+    expect(screen.getByRole("tab", { name: "Sessions", selected: true })).toBeInTheDocument();
+    expect(screen.getByText("Recent Sessions")).toBeInTheDocument();
+
+    const reactChips = screen.getAllByRole("button", { name: "react" });
+    const selectedReactChip = reactChips.find(
+      (chip) => chip.getAttribute("aria-pressed") === "true",
+    );
+    expect(selectedReactChip).toBeDefined();
+
+    expect(screen.getByText(/topic-react/)).toBeInTheDocument();
+    expect(screen.queryByText(/topic-css/)).not.toBeInTheDocument();
+  });
+
+  it("clicking the current streak chip jumps to Sessions tab with date range filter", async () => {
+    const user = userEvent.setup();
+    const today = new Date();
+    const todayIso = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      12,
+    ).toISOString();
+    const longAgoIso = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() - 90,
+      12,
+    ).toISOString();
+    seedSessions([
+      {
+        id: "recent-1",
+        date: todayIso,
+        templateId: "react-hooks-internals",
+        level: "middle",
+      },
+      {
+        id: "stale-1",
+        date: longAgoIso,
+        templateId: "react-hooks-internals",
+        level: "middle",
+      },
+    ]);
+    renderApp();
+
+    await switchToTab(user, "Charts");
+    const streakLabel = screen.getByText(/1 day current streak/);
+    const chip = streakLabel.closest(".MuiChip-root");
+    expect(chip).toBeTruthy();
+    await user.click(chip as HTMLElement);
+
+    expect(screen.getByRole("tab", { name: "Sessions", selected: true })).toBeInTheDocument();
+    expect(screen.getByText("Last 1 day")).toBeInTheDocument();
+    expect(screen.getByText(/recent-1/)).toBeInTheDocument();
+    expect(screen.queryByText(/stale-1/)).not.toBeInTheDocument();
+  });
 });
