@@ -80,6 +80,7 @@ const App = () => {
     snack,
     stackInput,
     templateId,
+    templates,
     templatesForLevel,
     timebox,
   } = useInterviewAppState();
@@ -341,6 +342,7 @@ const App = () => {
                   language={language}
                   refreshSessions={refreshSessions}
                   sessions={sessions}
+                  templates={templates}
                   onCopyPrompt={copyPromptText}
                   onExportJson={handleExportJson}
                   onExportMarkdown={handleExportMarkdown}

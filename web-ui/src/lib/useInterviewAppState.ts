@@ -662,6 +662,7 @@ export const useInterviewAppState = () => {
     snack: state.snack,
     stackInput: state.stackInput,
     templateId: state.templateId,
+    templates: state.templates,
     templatesForLevel,
     levelTargets: (config.defaults.levelTargets ?? {
       junior: { score: 4, color: "#38bdf8" },

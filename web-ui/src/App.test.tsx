@@ -268,6 +268,40 @@ describe("App", () => {
     expect(screen.queryByText("junior-react-fundamentals")).not.toBeInTheDocument();
   });
 
+  it("filters sessions by clicking tag chips", async () => {
+    const user = userEvent.setup();
+    seedSessions([
+      {
+        id: "session-react",
+        date: "2026-03-18T10:00:00.000Z",
+        templateId: "react-hooks-internals",
+        level: "middle",
+      },
+      {
+        id: "session-css",
+        date: "2026-03-18T09:00:00.000Z",
+        templateId: "css-architecture-design-systems",
+        level: "middle",
+      },
+    ]);
+    renderApp();
+
+    await switchToTab(user, "Sessions");
+    expect(screen.getByText("react-hooks-internals")).toBeInTheDocument();
+    expect(screen.getByText("css-architecture-design-systems")).toBeInTheDocument();
+
+    const cssChip = screen.getByRole("button", { name: "css" });
+    await user.click(cssChip);
+
+    expect(screen.queryByText("react-hooks-internals")).not.toBeInTheDocument();
+    expect(screen.getByText("css-architecture-design-systems")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Clear tags" }));
+
+    expect(screen.getByText("react-hooks-internals")).toBeInTheDocument();
+    expect(screen.getByText("css-architecture-design-systems")).toBeInTheDocument();
+  });
+
   it("renders progress chart stats from rated sessions", async () => {
     const user = userEvent.setup();
     seedSessions([
