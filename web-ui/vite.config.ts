@@ -18,7 +18,16 @@ export default defineConfig({
             return "react-vendor";
           }
 
-          if (id.includes("node_modules/@mui") || id.includes("node_modules/@emotion")) {
+          if (
+            id.includes("node_modules/@emotion") ||
+            id.includes("node_modules/@mui/system") ||
+            id.includes("node_modules/@mui/utils") ||
+            id.includes("node_modules/@mui/private-theming")
+          ) {
+            return "mui-styling";
+          }
+
+          if (id.includes("node_modules/@mui")) {
             return "mui-vendor";
           }
 
